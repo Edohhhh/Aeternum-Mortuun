@@ -4,6 +4,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
+    [HideInInspector] public bool canMove = true;
     public float moveSpeed = 3.5f;
     public float acceleration = 10f;
     public float deceleration = 8f;
@@ -21,6 +22,7 @@ public class PlayerController : MonoBehaviour
     public float attackDuration = 0.5f;
 
     // Components
+    [HideInInspector] public Animator animator;
     [HideInInspector] public Rigidbody2D rb;
     public Collider2D hitbox; // BoxCollider2D for damage/collision
     [HideInInspector] public StateMachine stateMachine;
@@ -33,6 +35,7 @@ public class PlayerController : MonoBehaviour
 
     private void Awake()
     {
+        animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
         stateMachine = new StateMachine();
 
@@ -47,8 +50,14 @@ public class PlayerController : MonoBehaviour
         stateMachine.Initialize(IdleState);
     }
 
-    private void Update()
+    void Update()
     {
+        if (!canMove)
+        {
+            rb.linearVelocity = Vector2.zero;
+            return;
+        }
+
         stateMachine.CurrentState.HandleInput();
         stateMachine.CurrentState.LogicUpdate();
     }

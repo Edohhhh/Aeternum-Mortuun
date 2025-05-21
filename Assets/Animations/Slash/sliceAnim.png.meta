@@ -1,22 +1,13 @@
 fileFormatVersion: 2
-guid: d521527c5118b61438819f4d000b992e
+guid: cc28307112b1f76439c3ab9f77330a77
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -2533637577598832714
-    second: Inquisition Knight Idle (1)_0
+      213: 2925144124250855641
+    second: sliceAnim_0
   - first:
-      213: -7743146663493720394
-    second: Inquisition Knight Idle (1)_1
-  - first:
-      213: 7080140407870435076
-    second: Inquisition Knight Idle (1)_2
-  - first:
-      213: 3879709906587623996
-    second: Inquisition Knight Idle (1)_3
-  - first:
-      213: -3743953004176944183
-    second: Inquisition Knight Idle (1)_4
+      213: -8399248796606726216
+    second: sliceAnim_1
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -63,7 +54,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 16
+  spritePixelsToUnits: 18
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -87,7 +78,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 2
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -112,13 +103,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Inquisition Knight Idle (1)_0
+      name: sliceAnim_0
       rect:
         serializedVersion: 2
-        x: 11
-        y: 74
-        width: 11
-        height: 15
+        x: 1
+        y: 1
+        width: 21
+        height: 38
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -127,20 +118,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 6bfe3a50c06b6dcd0800000000000000
-      internalID: -2533637577598832714
+      spriteID: 9d81bca3513389820800000000000000
+      internalID: 2925144124250855641
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Inquisition Knight Idle (1)_1
+      name: sliceAnim_1
       rect:
         serializedVersion: 2
-        x: 43
-        y: 74
-        width: 11
-        height: 15
+        x: 24
+        y: 1
+        width: 21
+        height: 38
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -149,74 +140,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 6b6a4be6221da8490800000000000000
-      internalID: -7743146663493720394
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Inquisition Knight Idle (1)_2
-      rect:
-        serializedVersion: 2
-        x: 11
-        y: 42
-        width: 11
-        height: 15
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 40fa1035036b14260800000000000000
-      internalID: 7080140407870435076
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Inquisition Knight Idle (1)_3
-      rect:
-        serializedVersion: 2
-        x: 43
-        y: 42
-        width: 11
-        height: 15
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: c3228bdba9f77d530800000000000000
-      internalID: 3879709906587623996
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Inquisition Knight Idle (1)_4
-      rect:
-        serializedVersion: 2
-        x: 11
-        y: 10
-        width: 11
-        height: 15
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 9c3d64a349eca0cc0800000000000000
-      internalID: -3743953004176944183
+      spriteID: 8bff02a78bfdf6b80800000000000000
+      internalID: -8399248796606726216
       vertices: []
       indices: 
       edges: []
@@ -225,7 +150,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 64985deae55dff9468348df5c12d6816
+    spriteID: f55b275d86fbe81428cd2d9059e59f1c
     internalID: 0
     vertices: []
     indices: 
@@ -235,11 +160,8 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Inquisition Knight Idle (1)_0: -2533637577598832714
-      Inquisition Knight Idle (1)_1: -7743146663493720394
-      Inquisition Knight Idle (1)_2: 7080140407870435076
-      Inquisition Knight Idle (1)_3: 3879709906587623996
-      Inquisition Knight Idle (1)_4: -3743953004176944183
+      sliceAnim_0: 2925144124250855641
+      sliceAnim_1: -8399248796606726216
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

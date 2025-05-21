@@ -11,7 +11,10 @@ public class IdleState : IPlayerState
         sm = stateMachine;
     }
 
-    public void Enter() { }
+    public void Enter()
+    {
+        ctx.animator.SetBool("isMoving", false); // cuando esté en Idle
+    }
     public void HandleInput()
     {
         if (Input.GetKeyDown(KeyCode.Space))

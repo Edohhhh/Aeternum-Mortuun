@@ -13,7 +13,10 @@ public class MoveState : IPlayerState
         sm = stateMachine;
     }
 
-    public void Enter() { }
+    public void Enter()
+    {
+        ctx.animator.SetBool("isMoving", true);
+    }
     public void HandleInput()
     {
         if (Input.GetKeyDown(KeyCode.Space))
@@ -39,13 +42,12 @@ public class MoveState : IPlayerState
     {
         if (input != Vector2.zero)
         {
-            // Accelerate towards desired velocity
+            ctx.animator.SetFloat("moveY", input.y); // importante para elegir la animación
             velocity = Vector2.MoveTowards(velocity, input * ctx.moveSpeed,
                 ctx.acceleration * Time.deltaTime);
         }
         else
         {
-            // Decelerate naturally until stop
             float decelAmount = ctx.deceleration * Time.deltaTime;
             if (velocity.magnitude <= decelAmount)
             {
@@ -63,5 +65,9 @@ public class MoveState : IPlayerState
         ctx.rb.MovePosition(ctx.rb.position + velocity * Time.fixedDeltaTime);
     }
 
-    public void Exit() { }
+    public void Exit()
+    {
+        ctx.animator.SetBool("isMoving", false);
+        ctx.animator.SetFloat("moveY", 0); // opcional para evitar mantener valor
+    }
 }

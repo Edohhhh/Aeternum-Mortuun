@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 
 public class DashState : IPlayerState
@@ -17,9 +17,14 @@ public class DashState : IPlayerState
     {
         dashDir = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized;
         if (dashDir == Vector2.zero) dashDir = Vector2.right;
+
         if (ctx.hitbox != null) ctx.hitbox.enabled = false;
+
+        ctx.animator.SetBool("isDashing", true); // ← activar animación
         ctx.StartCoroutine(DashRoutine());
     }
+
+
     public void HandleInput() { }
     public void LogicUpdate() { }
     public void PhysicsUpdate() { }
@@ -27,7 +32,14 @@ public class DashState : IPlayerState
 
     private IEnumerator DashRoutine()
     {
-        // Main dash
+        // Activar animación de dash
+        ctx.animator.SetBool("isDashing", true);
+
+        // Desactivar hitbox temporalmente
+        if (ctx.hitbox != null)
+            ctx.hitbox.enabled = false;
+
+        // Fase principal del dash
         float elapsed = 0f;
         while (elapsed < ctx.dashDuration)
         {
@@ -35,7 +47,8 @@ public class DashState : IPlayerState
             elapsed += Time.deltaTime;
             yield return null;
         }
-        // Post-dash smoothing slide
+
+        // Fase de deslizamiento post-dash
         float slideElapsed = 0f;
         while (slideElapsed < ctx.dashSlideDuration)
         {
@@ -44,10 +57,22 @@ public class DashState : IPlayerState
             slideElapsed += Time.deltaTime;
             yield return null;
         }
-        // End movement
+
+        // Finalizar movimiento
         ctx.rb.linearVelocity = Vector2.zero;
-        if (ctx.hitbox != null) ctx.hitbox.enabled = true;
+
+        // Reactivar hitbox
+        if (ctx.hitbox != null)
+            ctx.hitbox.enabled = true;
+
+        // Desactivar animación de dash
+        ctx.animator.SetBool("isDashing", false);
+
+        // Cambiar a estado Idle
         sm.ChangeState(ctx.IdleState);
+
+        // Esperar cooldown antes de permitir otro dash (si lo manejás en otro lado podés quitar esto)
         yield return new WaitForSeconds(ctx.dashCooldown);
     }
+
 }

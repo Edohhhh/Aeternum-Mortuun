@@ -176,6 +176,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 844e97982a0bedd48b1a914da1a228ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  canMove: 1
   moveSpeed: 5
   acceleration: 10
   deceleration: 11
@@ -187,6 +188,7 @@ MonoBehaviour:
   dashCooldown: 1
   attackPrefab: {fileID: 0}
   attackDuration: 0.5
+  animator: {fileID: 0}
   rb: {fileID: 0}
   hitbox: {fileID: 0}
 --- !u!114 &4524082446147370524
