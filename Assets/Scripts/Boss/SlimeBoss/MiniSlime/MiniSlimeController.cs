@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class MiniSlimeController : MonoBehaviour, IEnemyDataProvider
 {
+
     public Transform player;
     public float detectionRadius = 2f;
     public float attackDistance = 0.8f;
@@ -16,6 +17,8 @@ public class MiniSlimeController : MonoBehaviour, IEnemyDataProvider
 
     private void Start()
     {
+        Debug.Log("MiniSlimeController Start - registrando enemigo");
+        EnemyManager.Instance.RegisterEnemy();
         if (player == null)
         {
             GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
@@ -71,6 +74,7 @@ public class MiniSlimeController : MonoBehaviour, IEnemyDataProvider
         Instantiate(miniSlimePrefab, pos + new Vector3(1.5f, -1.5f, 0), Quaternion.identity);
         Instantiate(miniSlimePrefab, pos + new Vector3(-1.5f, -1.5f, 0), Quaternion.identity);
 
+        EnemyManager.Instance.UnregisterEnemy();
         Destroy(gameObject);
     }
 

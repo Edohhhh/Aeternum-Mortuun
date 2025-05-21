@@ -16,6 +16,8 @@ public class MiniMiniSlimeController : MonoBehaviour, IEnemyDataProvider
 
     private void Start()
     {
+        EnemyManager.Instance.RegisterEnemy();
+
         if (player == null)
         {
             GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
@@ -64,7 +66,9 @@ public class MiniMiniSlimeController : MonoBehaviour, IEnemyDataProvider
 
     public void Die()
     {
+        EnemyManager.Instance.UnregisterEnemy();
         Destroy(gameObject);
+
     }
 
     private void HandleDeath()

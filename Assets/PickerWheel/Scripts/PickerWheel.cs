@@ -3,14 +3,14 @@ using UnityEngine.UI;
 using DG.Tweening;
 using UnityEngine.Events;
 using System.Collections.Generic;
+using TMPro;
+using System;
 
 namespace EasyUI.PickerWheelUI
 {
-
     public class PickerWheel : MonoBehaviour
     {
-
-        [Header("References :")]
+        [Header("Referencias :")]
         [SerializeField] private GameObject linePrefab;
         [SerializeField] private Transform linesParent;
 
@@ -21,30 +21,28 @@ namespace EasyUI.PickerWheelUI
         [SerializeField] private Transform wheelPiecesParent;
 
         [Space]
-        [Header("Sounds :")]
+        [Header("Sonidos :")]
         [SerializeField] private AudioSource audioSource;
         [SerializeField] private AudioClip tickAudioClip;
         [SerializeField][Range(0f, 1f)] private float volume = .5f;
         [SerializeField][Range(-3f, 3f)] private float pitch = 1f;
 
         [Space]
-        [Header("Picker wheel settings :")]
+        [Header("Configuración :")]
         [Range(1, 20)] public int spinDuration = 8;
         [SerializeField][Range(.2f, 2f)] private float wheelSize = 1f;
 
         [Space]
-        [Header("Picker wheel pieces :")]
+        [Header("Premios :")]
         public WheelPiece[] wheelPieces;
 
-        // Events
+        public Action<WheelPiece> OnSpinEnd;
+
         private UnityAction onSpinStartEvent;
         private UnityAction<WheelPiece> onSpinEndEvent;
 
-
         private bool _isSpinning = false;
-
-        public bool IsSpinning { get { return _isSpinning; } }
-
+        public bool IsSpinning => _isSpinning;
 
         private Vector2 pieceMinSize = new Vector2(81f, 146f);
         private Vector2 pieceMaxSize = new Vector2(144f, 213f);
@@ -55,27 +53,25 @@ namespace EasyUI.PickerWheelUI
         private float halfPieceAngle;
         private float halfPieceAngleWithPaddings;
 
-
         private double accumulatedWeight;
         private System.Random rand = new System.Random();
-
         private List<int> nonZeroChancesIndices = new List<int>();
+
+        private WheelPiece ultimoPremio;
 
         private void Start()
         {
-            pieceAngle = 360 / wheelPieces.Length;
+            pieceAngle = 360f / wheelPieces.Length;
             halfPieceAngle = pieceAngle / 2f;
             halfPieceAngleWithPaddings = halfPieceAngle - (halfPieceAngle / 4f);
 
             Generate();
-
             CalculateWeightsAndIndices();
+
             if (nonZeroChancesIndices.Count == 0)
                 Debug.LogError("You can't set all pieces chance to zero");
 
-
             SetupAudio();
-
         }
 
         private void SetupAudio()
@@ -88,7 +84,6 @@ namespace EasyUI.PickerWheelUI
         private void Generate()
         {
             wheelPiecePrefab = InstantiatePiece();
-
             RectTransform rt = wheelPiecePrefab.transform.GetChild(0).GetComponent<RectTransform>();
             float pieceWidth = Mathf.Lerp(pieceMinSize.x, pieceMaxSize.x, 1f - Mathf.InverseLerp(piecesMin, piecesMax, wheelPieces.Length));
             float pieceHeight = Mathf.Lerp(pieceMinSize.y, pieceMaxSize.y, 1f - Mathf.InverseLerp(piecesMin, piecesMax, wheelPieces.Length));
@@ -105,15 +100,12 @@ namespace EasyUI.PickerWheelUI
         {
             WheelPiece piece = wheelPieces[index];
             Transform pieceTrns = InstantiatePiece().transform.GetChild(0);
-
             pieceTrns.GetChild(0).GetComponent<Image>().sprite = piece.Icon;
             pieceTrns.GetChild(1).GetComponent<Text>().text = piece.Label;
             pieceTrns.GetChild(2).GetComponent<Text>().text = piece.Amount.ToString();
 
-            //Line
             Transform lineTrns = Instantiate(linePrefab, linesParent.position, Quaternion.identity, linesParent).transform;
             lineTrns.RotateAround(wheelPiecesParent.position, Vector3.back, (pieceAngle * index) + halfPieceAngle);
-
             pieceTrns.RotateAround(wheelPiecesParent.position, Vector3.back, pieceAngle * index);
         }
 
@@ -122,114 +114,84 @@ namespace EasyUI.PickerWheelUI
             return Instantiate(wheelPiecePrefab, wheelPiecesParent.position, Quaternion.identity, wheelPiecesParent);
         }
 
-
         public void Spin()
         {
-            if (!_isSpinning)
-            {
-                _isSpinning = true;
+            if (_isSpinning)
+                return;
 
-                onSpinStartEvent?.Invoke();
+            _isSpinning = true;
+            onSpinStartEvent?.Invoke();
 
-                int index = GetRandomPieceIndex();
-                WheelPiece piece = wheelPieces[index];
+            int index = GetRandomPieceIndex();
+            WheelPiece piece = wheelPieces[index];
 
-                if (piece.Chance == 0 && nonZeroChancesIndices.Count != 0)
+            float angle = pieceAngle * index;
+            float randomOffset = UnityEngine.Random.Range(-halfPieceAngleWithPaddings, halfPieceAngleWithPaddings);
+            float finalAngle = angle + randomOffset;
+            float totalRotation = finalAngle + 360f * spinDuration;
+            Vector3 targetRotation = Vector3.back * totalRotation;
+
+            float prevAngle = wheelCircle.eulerAngles.z;
+            float currentAngle = prevAngle;
+            bool isIndicatorOnLine = false;
+
+            wheelCircle
+                .DORotate(targetRotation, spinDuration, RotateMode.FastBeyond360)
+                .SetEase(Ease.InOutQuart)
+                .SetUpdate(true)
+                .OnUpdate(() =>
                 {
-                    index = nonZeroChancesIndices[Random.Range(0, nonZeroChancesIndices.Count)];
-                    piece = wheelPieces[index];
-                }
-
-                float angle = pieceAngle * index;
-                float randomOffset = Random.Range(-halfPieceAngleWithPaddings, halfPieceAngleWithPaddings);
-                float finalAngle = angle + randomOffset;
-
-                // Cambiar el signo para que gire en sentido antihorario
-                float totalRotation = finalAngle + 360f * spinDuration;
-                Vector3 targetRotation = Vector3.back * totalRotation;
-
-                float prevAngle, currentAngle;
-                prevAngle = currentAngle = wheelCircle.eulerAngles.z;
-
-                bool isIndicatorOnTheLine = false;
-
-                wheelCircle
-                    .DORotate(targetRotation, spinDuration, RotateMode.FastBeyond360)
-                    .SetEase(Ease.InOutQuart)
-                    .SetUpdate(true)
-                    .OnUpdate(() =>
+                    float diff = Mathf.Abs(prevAngle - currentAngle);
+                    if (diff >= halfPieceAngle)
                     {
-                        float diff = Mathf.Abs(prevAngle - currentAngle);
-                        if (diff >= halfPieceAngle)
-                        {
-                            if (isIndicatorOnTheLine)
-                            {
-                                audioSource.PlayOneShot(audioSource.clip);
-                            }
-                            prevAngle = currentAngle;
-                            isIndicatorOnTheLine = !isIndicatorOnTheLine;
-                        }
-                        currentAngle = wheelCircle.eulerAngles.z;
-                    })
-                    .OnComplete(() =>
-                    {
-                        _isSpinning = false;
-                        onSpinEndEvent?.Invoke(piece);
-                        onSpinStartEvent = null;
-                        onSpinEndEvent = null;
-                    });
-            }
+                        if (isIndicatorOnLine)
+                            audioSource.PlayOneShot(audioSource.clip);
+
+                        prevAngle = currentAngle;
+                        isIndicatorOnLine = !isIndicatorOnLine;
+                    }
+                    currentAngle = wheelCircle.eulerAngles.z;
+                })
+                .OnComplete(() =>
+                {
+                    _isSpinning = false;
+                    ultimoPremio = piece;
+
+                    OnSpinEnd?.Invoke(piece);
+                    onSpinEndEvent?.Invoke(piece);
+                });
         }
-   
-
-    private void FixedUpdate()
-        {
-
-        }
-
-        public void OnSpinStart(UnityAction action)
-        {
-            onSpinStartEvent = action;
-        }
-
-        public void OnSpinEnd(UnityAction<WheelPiece> action)
-        {
-            onSpinEndEvent = action;
-        }
-
 
         private int GetRandomPieceIndex()
         {
             double r = rand.NextDouble() * accumulatedWeight;
-
             for (int i = 0; i < wheelPieces.Length; i++)
-                if (wheelPieces[i]._weight >= r)
+                if (r < wheelPieces[i]._weight)
                     return i;
-
             return 0;
         }
 
         private void CalculateWeightsAndIndices()
         {
+            accumulatedWeight = 0;
+            nonZeroChancesIndices.Clear();
+
             for (int i = 0; i < wheelPieces.Length; i++)
             {
                 WheelPiece piece = wheelPieces[i];
-
-                //add weights:
                 accumulatedWeight += piece.Chance;
                 piece._weight = accumulatedWeight;
-
-                //add index :
                 piece.Index = i;
 
-                //save non zero chance indices:
                 if (piece.Chance > 0)
                     nonZeroChancesIndices.Add(i);
             }
         }
 
+        public void AddSpinStartListener(UnityAction callback) => onSpinStartEvent += callback;
+        public void AddSpinEndListener(UnityAction<WheelPiece> callback) => onSpinEndEvent += callback;
 
-
+        public WheelPiece ObtenerUltimoPremio() => ultimoPremio;
 
         private void OnValidate()
         {
@@ -237,7 +199,7 @@ namespace EasyUI.PickerWheelUI
                 PickerWheelTransform.localScale = new Vector3(wheelSize, wheelSize, 1f);
 
             if (wheelPieces.Length > piecesMax || wheelPieces.Length < piecesMin)
-                Debug.LogError("[ PickerWheelwheel ]  pieces length must be between " + piecesMin + " and " + piecesMax);
+                Debug.LogError("[ PickerWheel ] pieces length must be between " + piecesMin + " and " + piecesMax);
         }
     }
 }

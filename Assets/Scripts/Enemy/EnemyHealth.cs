@@ -1,57 +1,22 @@
+using System.Xml.Linq;
 using UnityEngine;
 
 public class EnemyHealth : MonoBehaviour
 {
-    [Header("Health")]
-    public int maxHealth = 5;
-    private int currentHealth;
+    [SerializeField] public int health = 30;
 
-    private EnemyKnockback enemyKnockback;
-
-    [Header("Effects")]
-    public ParticleSystem bloodEffect; // Referencia al sistema de partículas
-
-    void Start()
+    public void TakeDamage(int damage)
     {
-        currentHealth = maxHealth;
-        enemyKnockback = GetComponent<EnemyKnockback>();
+        health -= damage;
+        Debug.Log(name + " took " + damage + " damage.");
 
-        if (enemyKnockback == null)
-        {
-            Debug.LogError("EnemyKnockback script is missing.");
-        }
-
-        if (bloodEffect == null)
-        {
-            Debug.LogWarning("Blood particle system is not assigned.");
-        }
-    }
-
-    public void TakeDamage(int damage, Vector2 knockbackSourcePosition)
-    {
-        currentHealth -= damage;
-
-        // Reproduce el efecto de sangre
-        if (bloodEffect != null)
-        {
-            // Posiciona la sangre donde fue golpeado el enemigo (opcional)
-            bloodEffect.transform.position = transform.position;
-            bloodEffect.Play();
-        }
-
-        if (enemyKnockback != null)
-        {
-            Vector2 knockbackDirection = (transform.position - (Vector3)knockbackSourcePosition).normalized;
-            enemyKnockback.ApplyKnockback(knockbackDirection);
-        }
-
-        if (currentHealth <= 0)
+        if (health <= 0)
         {
             Die();
         }
     }
 
-    private void Die()
+    void Die()
     {
         Destroy(gameObject);
     }

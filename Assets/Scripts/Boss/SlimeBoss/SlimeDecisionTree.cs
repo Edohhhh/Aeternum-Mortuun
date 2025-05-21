@@ -35,7 +35,7 @@ public class SlimeDecisionTree : MonoBehaviour
 
     private void Attack()
     {
-        Debug.Log("Slime decisión: ¡Atacar!");
+        //Debug.Log("Slime decisión: ¡Atacar!");
         slime.Transition(EnemyInputs.SeePlayer);
     }
 

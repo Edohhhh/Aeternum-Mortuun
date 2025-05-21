@@ -9,67 +9,95 @@ public class Demo : MonoBehaviour
     [SerializeField] private TextMeshProUGUI uiSpinButtonText;
     [SerializeField] private PickerWheel pickerWheel;
 
+    [Header("UI Confirmación y Usos")]
+    [SerializeField] private Button confirmarBoton;
+    [SerializeField] private TextMeshProUGUI usosTexto;
+    [SerializeField] private int usosDisponibles = 3;
+
+    private WheelPiece premioPendiente;
+
     private void Start()
     {
-        uiSpinButton.onClick.AddListener(() =>
+        uiSpinButton.onClick.AddListener(SpinWheel);
+        confirmarBoton.onClick.AddListener(ConfirmarPremio);
+
+        pickerWheel.OnSpinEnd += OnSpinEnd;
+
+        confirmarBoton.gameObject.SetActive(false);
+        ActualizarUsosTexto();
+    }
+
+    private void SpinWheel()
+    {
+        if (usosDisponibles <= 0 || pickerWheel.IsSpinning)
+            return;
+
+        // Descartar premio anterior si no se confirmó
+        if (premioPendiente != null)
         {
-            uiSpinButton.interactable = false;
-            uiSpinButtonText.text = "Spinning";
+            Debug.Log("Premio descartado: " + premioPendiente.Label);
+        }
 
-            pickerWheel.OnSpinStart(() =>
-            {
-                Debug.Log("Spin Started...");
-            });
+        usosDisponibles--; // ✅ RESTAR USO AQUÍ
+        ActualizarUsosTexto();
 
-            pickerWheel.OnSpinEnd(wheelPiece =>
-            {
-                Debug.Log("Pieza seleccionada: " + wheelPiece.Label);
+        premioPendiente = null;
+        confirmarBoton.gameObject.SetActive(false);
 
-                switch (wheelPiece.Index)
-                {
-                    case 0:
-                        Debug.Log("Resultado: Salud aumentada en 20 puntos");
-                        break;
+        uiSpinButton.interactable = false;
+        uiSpinButtonText.text = "Girando...";
 
-                    case 1:
-                        Debug.Log("Resultado: Daño de bala aumentado en 3 puntos");
-                        break;
+        pickerWheel.Spin();
+    }
 
-                    case 2:
-                        Debug.Log("Resultado: Cuchillo activado).");
-                        break;
 
-                    case 3:
-                        Debug.Log("Resultado: Torreta activada.");
-                        break;
 
-                    case 4:
-                        Debug.Log("Resultado: Bala extra añadida al pool.");
-                        break;
+    private void OnSpinEnd(WheelPiece wheelPiece)
+    {
+        Debug.Log("Pieza seleccionada: " + wheelPiece.Label);
 
-                    case 5:
-                        Debug.Log("Resultado: Lanzallamas activado.");
-                        break;
+        premioPendiente = wheelPiece;
+        confirmarBoton.gameObject.SetActive(true);
 
-                    case 6:
-                        Debug.Log("Resultado: Escudo reflectante activado.");
-                        break;
+        uiSpinButtonText.text = "Girar";
+        uiSpinButton.interactable = usosDisponibles > 0; // Puedes girar de nuevo si aún tienes usos
+    }
 
-                    case 7:
-                        Debug.Log("Resultado: Mina activada.");
-                        break;
 
-                    default:
-                        Debug.Log("Resultado: No se asignó ningún efecto a esta pieza.");
-                        break;
-                }
+    private void ConfirmarPremio()
+    {
+        if (premioPendiente == null)
+            return;
 
-                uiSpinButton.interactable = true;
-                uiSpinButtonText.text = "Spin";
-            });
+        Debug.Log("Premio confirmado: " + premioPendiente.Label + " x" + premioPendiente.Amount);
 
-            pickerWheel.Spin();
-        });
+        AplicarPremio(premioPendiente);
+
+        confirmarBoton.gameObject.SetActive(false);
+        premioPendiente = null;
+
+        uiSpinButton.interactable = usosDisponibles > 0;
+        uiSpinButtonText.text = usosDisponibles > 0 ? "Girar" : "Sin Usos";
+    }
+
+    private void ActualizarUsosTexto()
+    {
+        usosTexto.text = "Usos: " + usosDisponibles;
+    }
+
+    private void AplicarPremio(WheelPiece pieza)
+    {
+        switch (pieza.Index)
+        {
+            case 0: Debug.Log("Salud aumentada en 20 puntos"); break;
+            case 1: Debug.Log("Daño aumentado en 3 puntos"); break;
+            case 2: Debug.Log("Cuchillo activado."); break;
+            case 3: Debug.Log("Torreta activada."); break;
+            case 4: Debug.Log("Bala extra añadida."); break;
+            case 5: Debug.Log("Lanzallamas activado."); break;
+            case 6: Debug.Log("Escudo activado."); break;
+            case 7: Debug.Log("Mina activada."); break;
+            default: Debug.Log("Premio sin efecto."); break;
+        }
     }
 }
-

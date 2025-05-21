@@ -3,7 +3,7 @@
 public class HealthSystem : MonoBehaviour
 {
     public float maxHealth = 100f;
-    private float currentHealth;
+    [SerializeField] private float currentHealth;
 
     public delegate void OnDeathDelegate();
     public event OnDeathDelegate OnDeath;
@@ -13,13 +13,16 @@ public class HealthSystem : MonoBehaviour
         currentHealth = maxHealth;
     }
 
+
     public void TakeDamage(float amount)
     {
         currentHealth -= amount;
 
         if (currentHealth <= 0)
         {
-            OnDeath?.Invoke(); 
+            OnDeath?.Invoke();
+
+            EnemyManager.Instance.UnregisterEnemy();
         }
     }
 

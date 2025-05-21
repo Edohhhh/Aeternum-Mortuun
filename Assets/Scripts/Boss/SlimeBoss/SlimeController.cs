@@ -19,7 +19,10 @@ public class SlimeController : MonoBehaviour, IEnemyDataProvider
 
     private void Start()
     {
+        EnemyManager.Instance.RegisterEnemy();
+
         health = GetComponent<HealthSystem>();
+        health.OnDeath += Die;
 
         EnemyIdleState Enemyidle = new EnemyIdleState(transform);
         EnemyAttackState Enemyattack = new EnemyAttackState(transform, player);
@@ -49,13 +52,22 @@ public class SlimeController : MonoBehaviour, IEnemyDataProvider
     {
         fsm.Transition(input);
     }
+    private IEnumerator UnregisterAfterChildrenRegistered()
+    {
+        yield return new WaitForEndOfFrame();  // espera a que se registren los mini slimes
+        EnemyManager.Instance.UnregisterEnemy();
+    }
 
     public void Die()
     {
         Instantiate(miniSlimePrefab, transform.position + Vector3.right * 1.5f, Quaternion.identity);
         Instantiate(miniSlimePrefab, transform.position + Vector3.left * 1.5f, Quaternion.identity);
+
+        StartCoroutine(UnregisterAfterChildrenRegistered());
         Destroy(gameObject);
     }
+
+
 
     public float GetCurrentHealth()
     {
