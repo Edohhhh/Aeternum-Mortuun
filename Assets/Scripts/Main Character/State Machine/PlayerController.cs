@@ -66,4 +66,40 @@ public class PlayerController : MonoBehaviour
     {
         stateMachine.CurrentState.PhysicsUpdate();
     }
+
+    public void SavePlayerData()
+    {
+        GameDataManager.Instance.SavePlayerData(this);
+    }
+    public void LoadPlayerData()
+    {
+        var data = GameDataManager.Instance.playerData;
+
+        // Movimiento / Dash
+        moveSpeed = data.moveSpeed;
+        acceleration = data.acceleration;
+        deceleration = data.deceleration;
+        slideFactor = data.slideFactor;
+        dashSpeed = data.dashSpeed;
+        dashIframes = data.dashIframes;
+        dashSlideDuration = data.dashSlideDuration;
+        dashDuration = data.dashDuration;
+        dashCooldown = data.dashCooldown;
+
+        // Posición
+        transform.position = data.position;
+
+        // Salud
+        var health = GetComponent<PlayerHealth>();
+        if (health != null)
+        {
+            health.maxHealth = data.maxHealth;
+            health.currentHealth = data.currentHealth;
+            health.regenerationRate = data.regenerationRate;
+            health.regenDelay = data.regenDelay;
+            health.invulnerableTime = data.invulnerableTime;
+            health.UpdateUI();
+        }
+
+    }
 }

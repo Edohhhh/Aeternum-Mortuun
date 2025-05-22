@@ -1214,31 +1214,31 @@ MonoBehaviour:
   spinDuration: 2
   wheelSize: 1
   wheelPieces:
-  - Icon: {fileID: 21300000, guid: 66a11d9e6213172488075040ca0dbf21, type: 3}
+  - Icon: {fileID: 1753655533966520807, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
     Label: 
     Amount: 10
     Chance: 73.3
     Index: 0
     _weight: 0
-  - Icon: {fileID: 21300000, guid: 4cd9a0b0f428054429109957c248e4ae, type: 3}
+  - Icon: {fileID: -6379153957335788890, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
     Label: 
     Amount: 20
     Chance: 56.6
     Index: 0
     _weight: 0
-  - Icon: {fileID: 21300000, guid: 4cd9a0b0f428054429109957c248e4ae, type: 3}
+  - Icon: {fileID: 3622378070614508730, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
     Label: 
     Amount: 30
     Chance: 60
     Index: 0
     _weight: 0
-  - Icon: {fileID: 21300000, guid: 19a48c273e699344789bafa1e0e9ed23, type: 3}
+  - Icon: {fileID: -3436129635470280944, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
     Label: 
     Amount: 40
     Chance: 25
     Index: 0
     _weight: 0
-  - Icon: {fileID: 21300000, guid: 4cd9a0b0f428054429109957c248e4ae, type: 3}
+  - Icon: {fileID: 7005750741070879577, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
     Label: 
     Amount: 60
     Chance: 10
@@ -2633,6 +2633,80 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1817333387}
   m_CullTransparentMesh: 1
+--- !u!1 &1919018559
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1919018562}
+  - component: {fileID: 1919018561}
+  - component: {fileID: 1919018560}
+  m_Layer: 0
+  m_Name: GameDataManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1919018560
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1919018559}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b844d86b8aaf37b43a1671144d417ab4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nextSceneName: 
+--- !u!114 &1919018561
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1919018559}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b77ca3adcf53bd41b72b53ea646b741, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerData:
+    moveSpeed: 0
+    acceleration: 0
+    deceleration: 0
+    slideFactor: 0
+    dashSpeed: 0
+    dashIframes: 0
+    dashSlideDuration: 0
+    dashDuration: 0
+    dashCooldown: 0
+    maxHealth: 0
+    currentHealth: 0
+    regenerationRate: 0
+    regenDelay: 0
+    invulnerableTime: 0
+    position: {x: 0, y: 0}
+--- !u!4 &1919018562
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1919018559}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.494478, y: 0.87381566, z: 5.7964363}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1975395832
 GameObject:
   m_ObjectHideFlags: 0
@@ -2893,3 +2967,4 @@ SceneRoots:
   - {fileID: 1151842902}
   - {fileID: 1372325445}
   - {fileID: 184486771}
+  - {fileID: 1919018562}

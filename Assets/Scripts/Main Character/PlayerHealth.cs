@@ -82,7 +82,7 @@ public class PlayerHealth : MonoBehaviour
         regenActive = false;
     }
 
-    private void UpdateUI()
+    public void UpdateUI()
     {
         if (healthUI != null)
             healthUI.UpdateHearts(currentHealth);
