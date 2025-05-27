@@ -34,7 +34,7 @@ public class MiniMiniSlimeController : MonoBehaviour, IEnemyDataProvider
         health = GetComponent<HealthSystem>();
 
         EnemyIdleState idle = new EnemyIdleState(transform);
-        EnemyAttackState attack = new EnemyAttackState(transform, player);
+        EnemyAttackState attack = new EnemyAttackState(transform);
         SlimeDeathStateSimple death = new SlimeDeathStateSimple(this);
 
         idle.AddTransition(EnemyInputs.SeePlayer, attack);

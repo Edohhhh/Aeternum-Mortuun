@@ -5,30 +5,39 @@ using UnityEngine;
 public class EnemyAttackState : State<EnemyInputs>
 {
     private Transform enemy;
-    private Transform target;
-    private float speed;
+    private IEnemyDataProvider data;
     private SpriteRenderer spriteRenderer;
+    private Rigidbody2D rb;
+    private Vector2 currentVelocity = Vector2.zero;
 
-    public EnemyAttackState(Transform enemy, Transform target, float speed = 2f)
+    public EnemyAttackState(Transform enemy)
     {
         this.enemy = enemy;
-        this.target = target;
-        this.speed = speed;
-        spriteRenderer = enemy.GetComponent<SpriteRenderer>();
+        this.data = enemy.GetComponent<IEnemyDataProvider>();
+        this.rb = enemy.GetComponent<Rigidbody2D>();
+        this.spriteRenderer = enemy.GetComponent<SpriteRenderer>();
     }
+
     public override void Awake()
     {
         base.Awake();
-        if (spriteRenderer != null)
-            spriteRenderer.color = Color.red;
+        
     }
 
     public override void Execute()
     {
-        if (target == null) return;
+        if (data == null || data.GetPlayer() == null) return;
 
-        Vector3 dir = (target.position - enemy.position).normalized;
-        enemy.position += dir * speed * Time.deltaTime;
+        Vector2 direction = (data.GetPlayer().position - enemy.position).normalized;
+
+        // Movimiento con aceleración
+        currentVelocity = Vector2.MoveTowards(
+            currentVelocity,
+            direction * data.GetMaxSpeed(),
+            data.GetAcceleration() * Time.deltaTime
+        );
+
+        rb.MovePosition(rb.position + currentVelocity * Time.deltaTime);
     }
 }
 //public class EnemyAttackState : State<EnemyInputs>

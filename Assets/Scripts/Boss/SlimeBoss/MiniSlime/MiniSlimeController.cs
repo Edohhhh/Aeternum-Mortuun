@@ -4,6 +4,8 @@ public class MiniSlimeController : MonoBehaviour, IEnemyDataProvider
 {
 
     public Transform player;
+    private Animator animator;
+    private SpriteRenderer spriteRenderer;
     public float detectionRadius = 2f;
     public float attackDistance = 0.8f;
     public float maxHealth = 50f;
@@ -32,10 +34,12 @@ public class MiniSlimeController : MonoBehaviour, IEnemyDataProvider
             }
         }
 
+        animator = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
         health = GetComponent<HealthSystem>();
 
         EnemyIdleState idle = new EnemyIdleState(transform);
-        EnemyAttackState attack = new EnemyAttackState(transform, player);
+        EnemyAttackState attack = new EnemyAttackState(transform);
         MiniSlimeDeathState death = new MiniSlimeDeathState(this);
 
         idle.AddTransition(EnemyInputs.SeePlayer, attack);
@@ -46,7 +50,6 @@ public class MiniSlimeController : MonoBehaviour, IEnemyDataProvider
 
         fsm = new FSM<EnemyInputs>(idle);
 
-        
     }
 
     private void Update()
@@ -58,6 +61,14 @@ public class MiniSlimeController : MonoBehaviour, IEnemyDataProvider
             Transition(EnemyInputs.SeePlayer);
         else
             Transition(EnemyInputs.LostPlayer);
+
+        animator.SetBool("isWalking", fsm.GetCurrentState() is EnemyAttackState);
+
+        if (fsm.GetCurrentState() is EnemyAttackState && player != null)
+        {
+            Vector2 direction = player.position - transform.position;
+            spriteRenderer.flipX = direction.x < 0;
+        }
     }
 
     public void Transition(EnemyInputs input)

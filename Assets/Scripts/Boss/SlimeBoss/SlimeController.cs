@@ -5,6 +5,8 @@ using UnityEngine;
 public class SlimeController : MonoBehaviour, IEnemyDataProvider
 {
     public Transform player;
+    private Animator animator;
+    private SpriteRenderer spriteRenderer;
     public float detectionRadius = 3f;
     public float attackDistance = 1f;
     public float maxHealth = 100f;
@@ -21,12 +23,16 @@ public class SlimeController : MonoBehaviour, IEnemyDataProvider
     {
         EnemyManager.Instance.RegisterEnemy();
 
+        animator = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
         health = GetComponent<HealthSystem>();
         health.OnDeath += Die;
 
         EnemyIdleState Enemyidle = new EnemyIdleState(transform);
-        EnemyAttackState Enemyattack = new EnemyAttackState(transform, player);
+        EnemyAttackState Enemyattack = new EnemyAttackState(transform);
         SlimeDeathState Enemydeath = new SlimeDeathState(this);
+        
+
 
         Enemyidle.AddTransition(EnemyInputs.SeePlayer, Enemyattack);
         Enemyattack.AddTransition(EnemyInputs.LostPlayer, Enemyidle);
@@ -46,6 +52,14 @@ public class SlimeController : MonoBehaviour, IEnemyDataProvider
             Transition(EnemyInputs.SeePlayer);
         else
             Transition(EnemyInputs.LostPlayer);
+
+        animator.SetBool("isWalking", fsm.GetCurrentState() is EnemyAttackState);
+
+        if (fsm.GetCurrentState() is EnemyAttackState && player != null)
+        {
+            Vector2 direction = player.position - transform.position;
+            spriteRenderer.flipX = direction.x < 0;
+        }
     }
 
     public void Transition(EnemyInputs input)
@@ -66,7 +80,6 @@ public class SlimeController : MonoBehaviour, IEnemyDataProvider
         StartCoroutine(UnregisterAfterChildrenRegistered());
         Destroy(gameObject);
     }
-
 
 
     public float GetCurrentHealth()
