@@ -13,6 +13,8 @@ public class MiniMiniSlimeController : MonoBehaviour, IEnemyDataProvider
     public float maxSpeed = 2f;
     public float acceleration = 3f;
 
+    private bool alreadyUnregistered = false;
+
     private FSM<EnemyInputs> fsm;
     private HealthSystem health;
 
@@ -36,6 +38,7 @@ public class MiniMiniSlimeController : MonoBehaviour, IEnemyDataProvider
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         health = GetComponent<HealthSystem>();
+
 
         EnemyIdleState idle = new EnemyIdleState(transform);
         EnemyAttackState attack = new EnemyAttackState(transform);
@@ -78,14 +81,25 @@ public class MiniMiniSlimeController : MonoBehaviour, IEnemyDataProvider
 
     public void Die()
     {
+        if (alreadyUnregistered) return; // Evita doble ejecución
+
+        alreadyUnregistered = true;
+        //EnemyManager.Instance.UnregisterEnemy();
+        //Destroy(gameObject);
+        StartCoroutine(DelayedDeath());
+
+    }
+
+    private IEnumerator DelayedDeath()
+    {
+        yield return new WaitForEndOfFrame();
         EnemyManager.Instance.UnregisterEnemy();
         Destroy(gameObject);
-
     }
 
     private void HandleDeath()
     {
-        Transition(EnemyInputs.Die); 
+        Transition(EnemyInputs.Die);
     }
 
     public float GetCurrentHealth() => health.GetCurrentHealth();

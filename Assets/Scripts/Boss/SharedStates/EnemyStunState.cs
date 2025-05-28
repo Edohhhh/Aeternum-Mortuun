@@ -37,8 +37,11 @@ public class EnemyStunState : State<EnemyInputs>
         timer += Time.deltaTime;
         if (timer >= stunDuration)
         {
-            var controller = enemy.GetComponent<SlimeController>();
-            if (controller != null)
+            var controller = enemy.GetComponent<IEnemyDataProvider>();
+            var stunnable = enemy.GetComponent<IStunnable>();
+            stunnable?.EndStun();
+
+            if (controller != null && controller.GetPlayer() != null)
             {
                 float distance = Vector2.Distance(enemy.position, controller.GetPlayer().position);
                 if (distance <= controller.GetDetectionRadius())

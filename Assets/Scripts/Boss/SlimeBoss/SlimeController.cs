@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SlimeController : MonoBehaviour, IEnemyDataProvider
+public class SlimeController : MonoBehaviour, IEnemyDataProvider, IStunnable
 {
     public Transform player;
     private Animator animator;
@@ -14,7 +14,10 @@ public class SlimeController : MonoBehaviour, IEnemyDataProvider
     public float maxSpeed = 3f;
     public float acceleration = 10f;
 
+    private bool alreadyUnregistered = false;
+
     private bool isStunned = false;
+    public void EndStun() => isStunned = false;
 
     private FSM<EnemyInputs> fsm;
     private HealthSystem health;
@@ -60,10 +63,10 @@ public class SlimeController : MonoBehaviour, IEnemyDataProvider
         if (!isStunned)
         {
             float distance = Vector2.Distance(transform.position, player.position);
-        if (distance <= detectionRadius)
-            Transition(EnemyInputs.SeePlayer);
-        else
-            Transition(EnemyInputs.LostPlayer);
+            if (distance <= detectionRadius)
+                Transition(EnemyInputs.SeePlayer);
+            else
+                Transition(EnemyInputs.LostPlayer);
         }
         animator.SetBool("isWalking", fsm.GetCurrentState() is EnemyAttackState);
 
@@ -83,19 +86,31 @@ public class SlimeController : MonoBehaviour, IEnemyDataProvider
 
         fsm.Transition(input);
     }
-    private IEnumerator UnregisterAfterChildrenRegistered()
+
+    private IEnumerator DelayedDeath()
     {
-        yield return new WaitForEndOfFrame();  // espera a que se registren los mini slimes
-        EnemyManager.Instance.UnregisterEnemy();
+        yield return new WaitForEndOfFrame(); // Espera un frame por seguridad
+        EnemyManager.Instance.UnregisterEnemy(); // Desregistra antes de destruir
+        Destroy(gameObject);
     }
+    //private IEnumerator UnregisterAfterChildrenRegistered()
+    //{
+    //    yield return new WaitForEndOfFrame();  // espera a que se registren los mini slimes
+    //    EnemyManager.Instance.UnregisterEnemy();
+    //}
 
     public void Die()
     {
+        if (alreadyUnregistered) return; // Evita doble ejecución
+
+        alreadyUnregistered = true;
+
         Instantiate(miniSlimePrefab, transform.position + Vector3.right * 1.5f, Quaternion.identity);
         Instantiate(miniSlimePrefab, transform.position + Vector3.left * 1.5f, Quaternion.identity);
 
-        StartCoroutine(UnregisterAfterChildrenRegistered());
-        Destroy(gameObject);
+        //StartCoroutine(UnregisterAfterChildrenRegistered());
+        StartCoroutine(DelayedDeath());
+        //Destroy(gameObject);
     }
 
 

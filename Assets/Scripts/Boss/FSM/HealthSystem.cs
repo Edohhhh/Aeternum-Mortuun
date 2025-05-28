@@ -19,13 +19,11 @@ public class HealthSystem : MonoBehaviour
     {
         currentHealth -= amount;
 
-        OnDamaged?.Invoke(); // Notifica que se recibió daño
+        OnDamaged?.Invoke();
 
         if (currentHealth <= 0)
         {
             OnDeath?.Invoke();
-
-            EnemyManager.Instance.UnregisterEnemy();
         }
     }
 

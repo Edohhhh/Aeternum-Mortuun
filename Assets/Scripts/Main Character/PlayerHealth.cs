@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class PlayerHealth : MonoBehaviour
 {
@@ -41,6 +42,12 @@ public class PlayerHealth : MonoBehaviour
         currentHealth -= amount;
         UpdateUI();
 
+        if (currentHealth <= 0f)
+        {
+            Die();
+            return;
+        }
+
         Vector2 knockDir = (transform.position - (Vector3)sourcePosition).normalized;
         var knockback = playerController.KnockbackState;
         knockback.SetKnockback(knockDir, 10f, 0.2f);
@@ -50,12 +57,19 @@ public class PlayerHealth : MonoBehaviour
         StartCoroutine(TemporaryInvulnerability());
     }
 
+
     public void ModifyHealthFlat(float amount)
     {
         currentHealth += amount;
         currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
         UpdateUI();
+
+        if (currentHealth <= 0f)
+        {
+            Die();
+        }
     }
+
 
     public void ModifyHealthPercent(float percent)
     {
@@ -108,6 +122,7 @@ public class PlayerHealth : MonoBehaviour
 
     private void Die()
     {
+        SceneManager.LoadScene("Lose");
         Debug.Log("Player Died");
     }
 }

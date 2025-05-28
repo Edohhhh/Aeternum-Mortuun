@@ -31,7 +31,7 @@ public class SlimeDecisionTree : MonoBehaviour
         // Pregunta: ¿Puede ver al jugador? (por radio)
         rootNode = new QuestionNode(attack, idle, CanSeePlayer);
         rootNode = isDead;
-        
+
     }
 
     private void Attack()
