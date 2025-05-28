@@ -7,6 +7,7 @@ public class HealthSystem : MonoBehaviour
 
     public delegate void OnDeathDelegate();
     public event OnDeathDelegate OnDeath;
+    public event System.Action OnDamaged;
 
     private void Start()
     {
@@ -17,6 +18,8 @@ public class HealthSystem : MonoBehaviour
     public void TakeDamage(float amount)
     {
         currentHealth -= amount;
+
+        OnDamaged?.Invoke(); // Notifica que se recibió daño
 
         if (currentHealth <= 0)
         {

@@ -14,6 +14,8 @@ public class SlimeController : MonoBehaviour, IEnemyDataProvider
     public float maxSpeed = 3f;
     public float acceleration = 10f;
 
+    private bool isStunned = false;
+
     private FSM<EnemyInputs> fsm;
     private HealthSystem health;
 
@@ -27,11 +29,13 @@ public class SlimeController : MonoBehaviour, IEnemyDataProvider
         spriteRenderer = GetComponent<SpriteRenderer>();
         health = GetComponent<HealthSystem>();
         health.OnDeath += Die;
+        health.OnDamaged += HandleStun;
+
 
         EnemyIdleState Enemyidle = new EnemyIdleState(transform);
         EnemyAttackState Enemyattack = new EnemyAttackState(transform);
         SlimeDeathState Enemydeath = new SlimeDeathState(this);
-        
+        EnemyStunState stun = new EnemyStunState(transform);
 
 
         Enemyidle.AddTransition(EnemyInputs.SeePlayer, Enemyattack);
@@ -40,6 +44,12 @@ public class SlimeController : MonoBehaviour, IEnemyDataProvider
         Enemyattack.AddTransition(EnemyInputs.Die, Enemydeath);
         Enemyidle.AddTransition(EnemyInputs.Die, Enemydeath);
 
+        Enemyidle.AddTransition(EnemyInputs.Stun, stun);
+        Enemyattack.AddTransition(EnemyInputs.Stun, stun);
+
+        stun.AddTransition(EnemyInputs.SeePlayer, Enemyattack);
+        stun.AddTransition(EnemyInputs.LostPlayer, Enemyidle);
+
         fsm = new FSM<EnemyInputs>(Enemyidle);
     }
 
@@ -47,12 +57,14 @@ public class SlimeController : MonoBehaviour, IEnemyDataProvider
     {
         fsm.Update();
 
-        float distance = Vector2.Distance(transform.position, player.position);
+        if (!isStunned)
+        {
+            float distance = Vector2.Distance(transform.position, player.position);
         if (distance <= detectionRadius)
             Transition(EnemyInputs.SeePlayer);
         else
             Transition(EnemyInputs.LostPlayer);
-
+        }
         animator.SetBool("isWalking", fsm.GetCurrentState() is EnemyAttackState);
 
         if (fsm.GetCurrentState() is EnemyAttackState && player != null)
@@ -64,6 +76,11 @@ public class SlimeController : MonoBehaviour, IEnemyDataProvider
 
     public void Transition(EnemyInputs input)
     {
+        if (input == EnemyInputs.Stun)
+            isStunned = true;
+        else if (input == EnemyInputs.SeePlayer || input == EnemyInputs.LostPlayer)
+            isStunned = false;
+
         fsm.Transition(input);
     }
     private IEnumerator UnregisterAfterChildrenRegistered()
@@ -87,10 +104,15 @@ public class SlimeController : MonoBehaviour, IEnemyDataProvider
         return health.GetCurrentHealth();
     }
 
+    private void HandleStun()
+    {
+        Transition(EnemyInputs.Stun);
+    }
     public Transform GetPlayer() => player;
     public float GetDetectionRadius() => detectionRadius;
     public float GetAttackDistance() => attackDistance;
     public float GetDamage() => damage;
     public float GetMaxSpeed() => maxSpeed;
     public float GetAcceleration() => acceleration;
+    public bool IsStunned() => isStunned;
 }

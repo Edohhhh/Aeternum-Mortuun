@@ -15,6 +15,7 @@ public class SlimeDecisionTree : MonoBehaviour
 
     private void Update()
     {
+        if (slime.IsStunned()) return;
         rootNode.Execute();
     }
 

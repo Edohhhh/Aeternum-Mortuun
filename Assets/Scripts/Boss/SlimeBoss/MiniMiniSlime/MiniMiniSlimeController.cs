@@ -4,6 +4,8 @@ using UnityEngine;
 public class MiniMiniSlimeController : MonoBehaviour, IEnemyDataProvider
 {
     public Transform player;
+    private Animator animator;
+    private SpriteRenderer spriteRenderer;
     public float detectionRadius = 2f;
     public float attackDistance = 0.8f;
     public float maxHealth = 20f;
@@ -31,6 +33,8 @@ public class MiniMiniSlimeController : MonoBehaviour, IEnemyDataProvider
             }
         }
 
+        animator = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
         health = GetComponent<HealthSystem>();
 
         EnemyIdleState idle = new EnemyIdleState(transform);
@@ -57,6 +61,14 @@ public class MiniMiniSlimeController : MonoBehaviour, IEnemyDataProvider
             Transition(EnemyInputs.SeePlayer);
         else
             Transition(EnemyInputs.LostPlayer);
+
+        animator.SetBool("isWalking", fsm.GetCurrentState() is EnemyAttackState);
+
+        if (fsm.GetCurrentState() is EnemyAttackState && player != null)
+        {
+            Vector2 direction = player.position - transform.position;
+            spriteRenderer.flipX = direction.x < 0;
+        }
     }
 
     public void Transition(EnemyInputs input)

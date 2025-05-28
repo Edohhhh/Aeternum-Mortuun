@@ -7,5 +7,7 @@ public enum EnemyInputs
     LowHealth,
     Die,
     TimeToPatrol,
-    IdleHere
+    IdleHere,
+    Stun
+
 }
