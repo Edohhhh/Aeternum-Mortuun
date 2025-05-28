@@ -1,5 +1,5 @@
+ï»¿using UnityEngine;
 using Unity.IO.LowLevel.Unsafe;
-using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
@@ -19,12 +19,12 @@ public class PlayerController : MonoBehaviour
 
     [Header("Attack")]
     public GameObject attackPrefab;
-    public float attackDuration = 0.5f;
+    public float attackDuration = 0.13f;
 
     // Components
     [HideInInspector] public Animator animator;
     [HideInInspector] public Rigidbody2D rb;
-    public Collider2D hitbox; // BoxCollider2D for damage/collision
+    public Collider2D hitbox;
     [HideInInspector] public StateMachine stateMachine;
 
     // State instances
@@ -32,6 +32,7 @@ public class PlayerController : MonoBehaviour
     public MoveState MoveState { get; private set; }
     public DashState DashState { get; private set; }
     public AttackState AttackState { get; private set; }
+    public KnockbackState KnockbackState { get; private set; }
 
     private void Awake()
     {
@@ -43,6 +44,7 @@ public class PlayerController : MonoBehaviour
         MoveState = new MoveState(this, stateMachine);
         DashState = new DashState(this, stateMachine);
         AttackState = new AttackState(this, stateMachine);
+        KnockbackState = new KnockbackState(this, stateMachine);
     }
 
     private void Start()
@@ -55,6 +57,7 @@ public class PlayerController : MonoBehaviour
         if (!canMove)
         {
             rb.linearVelocity = Vector2.zero;
+            if (animator != null) animator.SetBool("isMoving", false);
             return;
         }
 
@@ -71,11 +74,11 @@ public class PlayerController : MonoBehaviour
     {
         GameDataManager.Instance.SavePlayerData(this);
     }
+
     public void LoadPlayerData()
     {
         var data = GameDataManager.Instance.playerData;
 
-        // Movimiento / Dash
         moveSpeed = data.moveSpeed;
         acceleration = data.acceleration;
         deceleration = data.deceleration;
@@ -86,10 +89,8 @@ public class PlayerController : MonoBehaviour
         dashDuration = data.dashDuration;
         dashCooldown = data.dashCooldown;
 
-        // Posición
         transform.position = data.position;
 
-        // Salud
         var health = GetComponent<PlayerHealth>();
         if (health != null)
         {
@@ -100,6 +101,5 @@ public class PlayerController : MonoBehaviour
             health.invulnerableTime = data.invulnerableTime;
             health.UpdateUI();
         }
-
     }
 }

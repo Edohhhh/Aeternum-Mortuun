@@ -42,7 +42,7 @@ public class SlimeDecisionTree : MonoBehaviour
 
     private void Idle()
     {
-        Debug.Log("Slime decisión: Idle.");
+        //Debug.Log("Slime decisión: Idle.");
         slime.Transition(EnemyInputs.LostPlayer);
     }
 

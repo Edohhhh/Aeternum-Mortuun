@@ -1,11 +1,12 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Combat/Attack Data")]
-public class AttackData : ScriptableObject
+[System.Serializable]
+public class AttackData
 {
     public string attackName;
+    public string attackType; // <-- "stab", "swing", "cast", etc.
     public float damage;
-    public float range;
     public float cooldown;
-    public float hitboxRadius = 0.5f;
+    public float range;
+    public float hitboxRadius;
 }

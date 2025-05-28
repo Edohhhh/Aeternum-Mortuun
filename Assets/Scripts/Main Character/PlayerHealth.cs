@@ -4,7 +4,7 @@ using System.Collections;
 public class PlayerHealth : MonoBehaviour
 {
     [Header("Health")]
-    public float maxHealth = 5f;    // represents number of hearts
+    public float maxHealth = 5f;
     public float currentHealth = 5f;
 
     [Header("Regeneration")]
@@ -15,11 +15,16 @@ public class PlayerHealth : MonoBehaviour
     [Header("Invulnerability")]
     public float invulnerableTime = 1f;
     private bool invulnerable = false;
-
     private Coroutine regenRoutine;
 
     [Header("UI")]
-    public HealthUI healthUI;       // assign in inspector
+    public HealthUI healthUI;
+    private PlayerController playerController;
+
+    private void Awake()
+    {
+        playerController = GetComponent<PlayerController>();
+    }
 
     private void Start()
     {
@@ -28,19 +33,21 @@ public class PlayerHealth : MonoBehaviour
             healthUI.Initialize(maxHealth);
     }
 
-    public void TakeDamage(float damage)
+    public void TakeDamage(int amount, Vector2 sourcePosition)
     {
-        if (invulnerable) return;
+        if (invulnerable || playerController.stateMachine.CurrentState == playerController.KnockbackState)
+            return;
 
-        currentHealth -= damage;
-        currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
+        currentHealth -= amount;
         UpdateUI();
 
-        StartCoroutine(InvulnerabilityRoutine());
-        RestartRegenDelay();
+        Vector2 knockDir = (transform.position - (Vector3)sourcePosition).normalized;
+        var knockback = playerController.KnockbackState;
+        knockback.SetKnockback(knockDir, 10f, 0.2f);
+        playerController.stateMachine.ChangeState(knockback);
 
-        if (currentHealth <= 0f)
-            Die();
+        StartCoroutine(DamageFlash());
+        StartCoroutine(TemporaryInvulnerability());
     }
 
     public void ModifyHealthFlat(float amount)
@@ -56,7 +63,7 @@ public class PlayerHealth : MonoBehaviour
         ModifyHealthFlat(delta);
     }
 
-    private IEnumerator InvulnerabilityRoutine()
+    private IEnumerator TemporaryInvulnerability()
     {
         invulnerable = true;
         yield return new WaitForSeconds(invulnerableTime);
@@ -80,6 +87,17 @@ public class PlayerHealth : MonoBehaviour
             yield return null;
         }
         regenActive = false;
+    }
+
+    private IEnumerator DamageFlash()
+    {
+        SpriteRenderer sr = GetComponent<SpriteRenderer>();
+        if (sr == null) yield break;
+
+        Color originalColor = sr.color;
+        sr.color = Color.white;
+        yield return new WaitForSeconds(0.1f);
+        sr.color = originalColor;
     }
 
     public void UpdateUI()

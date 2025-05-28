@@ -71,7 +71,7 @@ public class Demo : MonoBehaviour
 
         Debug.Log("Premio confirmado: " + premioPendiente.Label + " x" + premioPendiente.Amount);
 
-        AplicarPremio(premioPendiente);
+        
 
         confirmarBoton.gameObject.SetActive(false);
         premioPendiente = null;
@@ -85,19 +85,4 @@ public class Demo : MonoBehaviour
         usosTexto.text = "Usos: " + usosDisponibles;
     }
 
-    private void AplicarPremio(WheelPiece pieza)
-    {
-        switch (pieza.Index)
-        {
-            case 0: Debug.Log("Salud aumentada en 20 puntos"); break;
-            case 1: Debug.Log("Daño aumentado en 3 puntos"); break;
-            case 2: Debug.Log("Cuchillo activado."); break;
-            case 3: Debug.Log("Torreta activada."); break;
-            case 4: Debug.Log("Bala extra añadida."); break;
-            case 5: Debug.Log("Lanzallamas activado."); break;
-            case 6: Debug.Log("Escudo activado."); break;
-            case 7: Debug.Log("Mina activada."); break;
-            default: Debug.Log("Premio sin efecto."); break;
-        }
-    }
 }

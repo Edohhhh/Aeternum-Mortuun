@@ -6,15 +6,18 @@ public class PlayerAttack : MonoBehaviour
     public AttackData[] comboAttacks;
     public Transform attackPoint;
     public LayerMask enemyLayers;
+    public float animTime;
 
     public GameObject slashPrefab;
     public float slashLifetime = 0.5f;
 
-    private int comboIndex = 0;
+    public int comboIndex = 0;
     private float lastAttackTime;
     private float comboResetTime = 1.0f;
 
     private PlayerController playerController;
+
+    public Vector2 lastAttackDir { get; private set; }
 
     void Start()
     {
@@ -23,13 +26,13 @@ public class PlayerAttack : MonoBehaviour
 
     void Update()
     {
+        animTime += Time.deltaTime;
+
         Vector2 mouseDir = GetMouseDirection();
 
         float angle = Mathf.Atan2(mouseDir.y, mouseDir.x) * Mathf.Rad2Deg;
         attackPoint.rotation = Quaternion.Euler(0f, 0f, angle);
-
-        float distance = 1f;
-        attackPoint.position = transform.position + (Vector3)(mouseDir.normalized * distance);
+        attackPoint.position = transform.position + (Vector3)(mouseDir.normalized * 1f);
 
         transform.localScale = new Vector3(mouseDir.x < 0 ? -1 : 1, 1, 1);
 
@@ -44,7 +47,7 @@ public class PlayerAttack : MonoBehaviour
         }
     }
 
-    Vector2 GetMouseDirection()
+    public Vector2 GetMouseDirection()
     {
         Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         mouseWorld.z = 0f;
@@ -53,6 +56,9 @@ public class PlayerAttack : MonoBehaviour
 
     void TryAttack(Vector2 dir)
     {
+        animTime = 0f;
+        lastAttackDir = dir;
+
         if (comboAttacks.Length == 0) return;
 
         var attack = comboAttacks[comboIndex];
@@ -60,14 +66,10 @@ public class PlayerAttack : MonoBehaviour
         {
             lastAttackTime = Time.time;
 
-            // Desactivar movimiento
             playerController.canMove = false;
-
             PerformAttack(attack, dir);
 
-            // Reactivar movimiento después de la duración
             StartCoroutine(EndAttackAfterTime(playerController.attackDuration));
-
             comboIndex = (comboIndex + 1) % comboAttacks.Length;
         }
     }
@@ -100,7 +102,6 @@ public class PlayerAttack : MonoBehaviour
             }
         }
 
-        // SPAWNEAR SLASH
         if (slashPrefab != null)
         {
             GameObject slash = Instantiate(slashPrefab, attackPoint.position, Quaternion.identity);
@@ -108,12 +109,14 @@ public class PlayerAttack : MonoBehaviour
             float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
             slash.transform.rotation = Quaternion.Euler(0f, 0f, angle);
 
-            if (dir.x < 0)
+            Vector3 scale = slash.transform.localScale;
+
+            if (comboIndex % 3 == 1)
             {
-                Vector3 scale = slash.transform.localScale;
-                scale.y *= -1;
-                slash.transform.localScale = scale;
+                scale.y *= -1; // Flipear solo el segundo ataque
             }
+
+            slash.transform.localScale = scale;
 
             Destroy(slash, slashLifetime);
         }
@@ -121,14 +124,24 @@ public class PlayerAttack : MonoBehaviour
         Debug.Log("Performed attack: " + attack.attackName);
     }
 
-    void OnDrawGizmosSelected()
+    public string GetCurrentAttackType()
     {
-        if (attackPoint == null) return;
+        if (comboAttacks.Length == 0) return "";
+        return comboAttacks[comboIndex].attackType;
+    }
 
-        Vector2 mouseDir = Application.isPlaying ? GetMouseDirection() : Vector2.right;
-        Vector2 point = (Vector2)attackPoint.position + mouseDir * 1f;
+    void OnDrawGizmos()
+    {
+        if (!Application.isPlaying || attackPoint == null)
+            return;
+
+        Vector2 dir = lastAttackDir != Vector2.zero ? lastAttackDir : Vector2.right;
+        Vector2 attackPos = (Vector2)attackPoint.position + dir.normalized * comboAttacks[comboIndex].range;
 
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(point, 0.5f);
+        Gizmos.DrawWireSphere(attackPos, comboAttacks[comboIndex].hitboxRadius);
+
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawLine(attackPoint.position, attackPos);
     }
 }
