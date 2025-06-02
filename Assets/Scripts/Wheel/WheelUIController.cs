@@ -5,14 +5,19 @@ namespace EasyUI.PickerWheelUI
     public class WheelUIController : MonoBehaviour
     {
         [SerializeField] private GameObject wheelCanvas;
+        [Tooltip("¿La ruleta debe estar activa al iniciar el juego?")]
+        [SerializeField] private bool startActive = false;
 
         private void Start()
         {
-            // Ocultar al inicio y asegurarse de que el juego no esté pausado
             if (wheelCanvas != null)
-                wheelCanvas.SetActive(false);
+            {
+                // Activa o desactiva según el bool del Inspector
+                wheelCanvas.SetActive(startActive);
+            }
 
-            Time.timeScale = 1f; // Asegura que el juego comience sin pausa
+            // Ajusta el timeScale según si arrancamos con ruleta activa o no
+            Time.timeScale = startActive ? 0f : 1f;
         }
 
         public void ConfirmarPremio()
@@ -34,7 +39,6 @@ namespace EasyUI.PickerWheelUI
         public void VerificarYMostrarSiNoHayEnemigos()
         {
             GameObject[] enemigos = GameObject.FindGameObjectsWithTag("Enemy");
-
             if (enemigos.Length == 0)
                 MostrarRuleta();
         }
