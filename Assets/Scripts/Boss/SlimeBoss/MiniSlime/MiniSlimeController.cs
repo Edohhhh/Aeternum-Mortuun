@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class MiniSlimeController : MonoBehaviour, IEnemyDataProvider, IStunnable
+public class MiniSlimeController : MonoBehaviour, IEnemyDataProvider/*, IStunnable*/
 {
     public Transform player;
     private Animator animator;
@@ -14,8 +14,8 @@ public class MiniSlimeController : MonoBehaviour, IEnemyDataProvider, IStunnable
     public float acceleration = 4f;
     public GameObject miniSlimePrefab;
 
-    private bool isStunned = false;
-    public void EndStun() => isStunned = false;
+    //private bool isStunned = false;
+    //public void EndStun() => isStunned = false;
 
     private bool alreadyUnregistered = false;
 
@@ -48,7 +48,7 @@ public class MiniSlimeController : MonoBehaviour, IEnemyDataProvider, IStunnable
         EnemyIdleState idle = new EnemyIdleState(transform);
         EnemyAttackState attack = new EnemyAttackState(transform);
         MiniSlimeDeathState death = new MiniSlimeDeathState(this);
-        EnemyStunState stun = new EnemyStunState(transform);
+        //EnemyStunState stun = new EnemyStunState(transform);
 
         idle.AddTransition(EnemyInputs.SeePlayer, attack);
         attack.AddTransition(EnemyInputs.LostPlayer, idle);
@@ -56,11 +56,11 @@ public class MiniSlimeController : MonoBehaviour, IEnemyDataProvider, IStunnable
         idle.AddTransition(EnemyInputs.Die, death);
         attack.AddTransition(EnemyInputs.Die, death);
 
-        idle.AddTransition(EnemyInputs.Stun, stun);
-        attack.AddTransition(EnemyInputs.Stun, stun);
+        //idle.AddTransition(EnemyInputs.Stun, stun);
+        //attack.AddTransition(EnemyInputs.Stun, stun);
 
-        stun.AddTransition(EnemyInputs.SeePlayer, attack);
-        stun.AddTransition(EnemyInputs.LostPlayer, idle);
+        //stun.AddTransition(EnemyInputs.SeePlayer, attack);
+        //stun.AddTransition(EnemyInputs.LostPlayer, idle);
 
         fsm = new FSM<EnemyInputs>(idle);
 
@@ -70,14 +70,14 @@ public class MiniSlimeController : MonoBehaviour, IEnemyDataProvider, IStunnable
     {
         fsm.Update();
 
-        if (!isStunned)
-        {
+        //if (!isStunned)
+        //{
             float distance = Vector2.Distance(transform.position, player.position);
             if (distance <= detectionRadius)
                 Transition(EnemyInputs.SeePlayer);
             else
                 Transition(EnemyInputs.LostPlayer);
-        }
+        //}
 
         animator.SetBool("isWalking", fsm.GetCurrentState() is EnemyAttackState);
 
@@ -90,10 +90,10 @@ public class MiniSlimeController : MonoBehaviour, IEnemyDataProvider, IStunnable
 
     public void Transition(EnemyInputs input)
     {
-        if (input == EnemyInputs.Stun)
-            isStunned = true;
-        else if (input == EnemyInputs.SeePlayer || input == EnemyInputs.LostPlayer)
-            isStunned = false;
+        if (input == EnemyInputs.Stun) ;
+        //isStunned = true;
+        else if (input == EnemyInputs.SeePlayer || input == EnemyInputs.LostPlayer) ;
+            //isStunned = false;
 
         fsm.Transition(input);
     }
@@ -142,5 +142,5 @@ public class MiniSlimeController : MonoBehaviour, IEnemyDataProvider, IStunnable
     public float GetMaxSpeed() => maxSpeed;
     public float GetAcceleration() => acceleration;
 
-    public bool IsStunned() => isStunned;
+    //public bool IsStunned() => isStunned;
 }

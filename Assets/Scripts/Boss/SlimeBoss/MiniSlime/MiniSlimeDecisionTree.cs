@@ -13,7 +13,7 @@ public class MiniSlimeDecisionTree : MonoBehaviour
 
     private void Update()
     {
-        if (slime.IsStunned()) return;
+        //if (slime.IsStunned()) return;
         rootNode.Execute();
     }
 

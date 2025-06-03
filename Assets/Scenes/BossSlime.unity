@@ -6203,6 +6203,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   wheelCanvas: {fileID: 698149857}
+  startActive: 0
 --- !u!4 &1749465131
 Transform:
   m_ObjectHideFlags: 0
@@ -6261,13 +6262,29 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 2245224395399163533, guid: 21dc0317654d69040a7da0ea29363176, type: 3}
+      propertyPath: damage
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2245224395399163533, guid: 21dc0317654d69040a7da0ea29363176, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3533896556080658998, guid: 21dc0317654d69040a7da0ea29363176, type: 3}
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3533896556080658998, guid: 21dc0317654d69040a7da0ea29363176, type: 3}
+      propertyPath: maxHealth
+      value: 50
+      objectReference: {fileID: 0}
     - target: {fileID: 3829048495203301257, guid: 21dc0317654d69040a7da0ea29363176, type: 3}
       propertyPath: m_Constraints
       value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3928819613699127562, guid: 21dc0317654d69040a7da0ea29363176, type: 3}
+      propertyPath: damage
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3928819613699127562, guid: 21dc0317654d69040a7da0ea29363176, type: 3}
       propertyPath: player
@@ -6275,11 +6292,15 @@ PrefabInstance:
       objectReference: {fileID: 1715398198}
     - target: {fileID: 3928819613699127562, guid: 21dc0317654d69040a7da0ea29363176, type: 3}
       propertyPath: maxSpeed
-      value: 3
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 3928819613699127562, guid: 21dc0317654d69040a7da0ea29363176, type: 3}
       propertyPath: acceleration
-      value: 3
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 3928819613699127562, guid: 21dc0317654d69040a7da0ea29363176, type: 3}
+      propertyPath: attackDistance
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4919014819646625355, guid: 21dc0317654d69040a7da0ea29363176, type: 3}
       propertyPath: m_LocalScale.x
@@ -6350,12 +6371,32 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6625256764397753969, guid: 21dc0317654d69040a7da0ea29363176, type: 3}
+      propertyPath: m_Size.x
+      value: 1.5006821
+      objectReference: {fileID: 0}
+    - target: {fileID: 6625256764397753969, guid: 21dc0317654d69040a7da0ea29363176, type: 3}
+      propertyPath: m_Size.y
+      value: 1.2635168
+      objectReference: {fileID: 0}
+    - target: {fileID: 6625256764397753969, guid: 21dc0317654d69040a7da0ea29363176, type: 3}
+      propertyPath: m_Offset.x
+      value: 0.0018821955
+      objectReference: {fileID: 0}
+    - target: {fileID: 6625256764397753969, guid: 21dc0317654d69040a7da0ea29363176, type: 3}
+      propertyPath: m_Offset.y
+      value: 0.0037645698
+      objectReference: {fileID: 0}
+    - target: {fileID: 6625256764397753969, guid: 21dc0317654d69040a7da0ea29363176, type: 3}
       propertyPath: m_SpriteTilingProperty.oldSize.x
-      value: 0.9375
+      value: 1.625
       objectReference: {fileID: 0}
     - target: {fileID: 6625256764397753969, guid: 21dc0317654d69040a7da0ea29363176, type: 3}
       propertyPath: m_SpriteTilingProperty.oldSize.y
-      value: 0.8125
+      value: 1.375
+      objectReference: {fileID: 0}
+    - target: {fileID: 7957312627381895950, guid: 21dc0317654d69040a7da0ea29363176, type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SlimeController : MonoBehaviour, IEnemyDataProvider, IStunnable
+public class SlimeController : MonoBehaviour, IEnemyDataProvider/*, IStunnable*/
 {
     public Transform player;
     private Animator animator;
@@ -16,8 +16,8 @@ public class SlimeController : MonoBehaviour, IEnemyDataProvider, IStunnable
 
     private bool alreadyUnregistered = false;
 
-    private bool isStunned = false;
-    public void EndStun() => isStunned = false;
+    //private bool isStunned = false;
+    //public void EndStun() => isStunned = false;
 
     private FSM<EnemyInputs> fsm;
     private HealthSystem health;
@@ -32,13 +32,13 @@ public class SlimeController : MonoBehaviour, IEnemyDataProvider, IStunnable
         spriteRenderer = GetComponent<SpriteRenderer>();
         health = GetComponent<HealthSystem>();
         health.OnDeath += Die;
-        health.OnDamaged += HandleStun;
+        //health.OnDamaged += HandleStun;
 
 
         EnemyIdleState Enemyidle = new EnemyIdleState(transform);
         EnemyAttackState Enemyattack = new EnemyAttackState(transform);
         SlimeDeathState Enemydeath = new SlimeDeathState(this);
-        EnemyStunState stun = new EnemyStunState(transform);
+        //EnemyStunState stun = new EnemyStunState(transform);
 
 
         Enemyidle.AddTransition(EnemyInputs.SeePlayer, Enemyattack);
@@ -47,11 +47,11 @@ public class SlimeController : MonoBehaviour, IEnemyDataProvider, IStunnable
         Enemyattack.AddTransition(EnemyInputs.Die, Enemydeath);
         Enemyidle.AddTransition(EnemyInputs.Die, Enemydeath);
 
-        Enemyidle.AddTransition(EnemyInputs.Stun, stun);
-        Enemyattack.AddTransition(EnemyInputs.Stun, stun);
+        //Enemyidle.AddTransition(EnemyInputs.Stun, stun);
+        //Enemyattack.AddTransition(EnemyInputs.Stun, stun);
 
-        stun.AddTransition(EnemyInputs.SeePlayer, Enemyattack);
-        stun.AddTransition(EnemyInputs.LostPlayer, Enemyidle);
+        //stun.AddTransition(EnemyInputs.SeePlayer, Enemyattack);
+        //stun.AddTransition(EnemyInputs.LostPlayer, Enemyidle);
 
         fsm = new FSM<EnemyInputs>(Enemyidle);
     }
@@ -60,14 +60,14 @@ public class SlimeController : MonoBehaviour, IEnemyDataProvider, IStunnable
     {
         fsm.Update();
 
-        if (!isStunned)
-        {
+        //if (!isStunned)
+        //{
             float distance = Vector2.Distance(transform.position, player.position);
             if (distance <= detectionRadius)
                 Transition(EnemyInputs.SeePlayer);
             else
                 Transition(EnemyInputs.LostPlayer);
-        }
+        //}
         animator.SetBool("isWalking", fsm.GetCurrentState() is EnemyAttackState);
 
         if (fsm.GetCurrentState() is EnemyAttackState && player != null)
@@ -79,12 +79,12 @@ public class SlimeController : MonoBehaviour, IEnemyDataProvider, IStunnable
 
     public void Transition(EnemyInputs input)
     {
-        if (input == EnemyInputs.Stun)
-            isStunned = true;
-        else if (input == EnemyInputs.SeePlayer || input == EnemyInputs.LostPlayer)
-            isStunned = false;
+        if (input == EnemyInputs.Stun);
+        //isStunned = true;
+        else if (input == EnemyInputs.SeePlayer || input == EnemyInputs.LostPlayer);
+            //isStunned = false;
 
-        fsm.Transition(input);
+            fsm.Transition(input);
     }
 
     private IEnumerator DelayedDeath()
@@ -113,21 +113,20 @@ public class SlimeController : MonoBehaviour, IEnemyDataProvider, IStunnable
         //Destroy(gameObject);
     }
 
-
     public float GetCurrentHealth()
     {
         return health.GetCurrentHealth();
     }
 
-    private void HandleStun()
-    {
-        Transition(EnemyInputs.Stun);
-    }
+    //private void HandleStun()
+    //{
+    //    Transition(EnemyInputs.Stun);
+    //}
     public Transform GetPlayer() => player;
     public float GetDetectionRadius() => detectionRadius;
     public float GetAttackDistance() => attackDistance;
     public float GetDamage() => damage;
     public float GetMaxSpeed() => maxSpeed;
     public float GetAcceleration() => acceleration;
-    public bool IsStunned() => isStunned;
+    //public bool IsStunned() => isStunned;
 }

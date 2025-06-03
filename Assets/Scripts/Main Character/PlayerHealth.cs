@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using UnityEngine.SceneManagement;
+using System.Diagnostics;
 
 public class PlayerHealth : MonoBehaviour
 {
@@ -36,6 +37,10 @@ public class PlayerHealth : MonoBehaviour
 
     public void TakeDamage(int amount, Vector2 sourcePosition)
     {
+        // Log del origen de la llamada
+        UnityEngine.Debug.Log($"[TakeDamage] Llamado con amount: {amount} desde: {sourcePosition}");
+        UnityEngine.Debug.Log(new StackTrace(1, true)); // '1' para omitir este método del log
+
         if (invulnerable || playerController.stateMachine.CurrentState == playerController.KnockbackState)
             return;
 
@@ -123,6 +128,6 @@ public class PlayerHealth : MonoBehaviour
     private void Die()
     {
         SceneManager.LoadScene("Lose");
-        Debug.Log("Player Died");
+        UnityEngine.Debug.Log("Player Died");
     }
 }
