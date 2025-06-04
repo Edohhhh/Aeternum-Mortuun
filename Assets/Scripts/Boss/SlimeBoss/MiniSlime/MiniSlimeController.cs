@@ -90,10 +90,10 @@ public class MiniSlimeController : MonoBehaviour, IEnemyDataProvider/*, IStunnab
 
     public void Transition(EnemyInputs input)
     {
-        if (input == EnemyInputs.Stun) ;
-        //isStunned = true;
-        else if (input == EnemyInputs.SeePlayer || input == EnemyInputs.LostPlayer) ;
-            //isStunned = false;
+        //if (input == EnemyInputs.Stun) ;
+        ////isStunned = true;
+        //else if (input == EnemyInputs.SeePlayer || input == EnemyInputs.LostPlayer) ;
+        //    //isStunned = false;
 
         fsm.Transition(input);
     }
@@ -107,8 +107,8 @@ public class MiniSlimeController : MonoBehaviour, IEnemyDataProvider/*, IStunnab
         Vector3 pos = transform.position;
 
         Instantiate(miniSlimePrefab, pos + new Vector3(1.5f, 1.5f, 0), Quaternion.identity);
-        Instantiate(miniSlimePrefab, pos + new Vector3(-1.5f, 1.5f, 0), Quaternion.identity);
-        Instantiate(miniSlimePrefab, pos + new Vector3(1.5f, -1.5f, 0), Quaternion.identity);
+        //Instantiate(miniSlimePrefab, pos + new Vector3(-1.5f, 1.5f, 0), Quaternion.identity);
+        //Instantiate(miniSlimePrefab, pos + new Vector3(1.5f, -1.5f, 0), Quaternion.identity);
         Instantiate(miniSlimePrefab, pos + new Vector3(-1.5f, -1.5f, 0), Quaternion.identity);
 
         StartCoroutine(DelayedDeath());

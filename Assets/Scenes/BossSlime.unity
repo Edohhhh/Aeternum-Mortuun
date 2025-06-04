@@ -6292,15 +6292,19 @@ PrefabInstance:
       objectReference: {fileID: 1715398198}
     - target: {fileID: 3928819613699127562, guid: 21dc0317654d69040a7da0ea29363176, type: 3}
       propertyPath: maxSpeed
-      value: 50
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 3928819613699127562, guid: 21dc0317654d69040a7da0ea29363176, type: 3}
       propertyPath: acceleration
-      value: 50
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 3928819613699127562, guid: 21dc0317654d69040a7da0ea29363176, type: 3}
       propertyPath: attackDistance
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3928819613699127562, guid: 21dc0317654d69040a7da0ea29363176, type: 3}
+      propertyPath: detectionRadius
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 4919014819646625355, guid: 21dc0317654d69040a7da0ea29363176, type: 3}
       propertyPath: m_LocalScale.x
@@ -6396,7 +6400,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7957312627381895950, guid: 21dc0317654d69040a7da0ea29363176, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

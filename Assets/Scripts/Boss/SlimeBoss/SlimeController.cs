@@ -79,10 +79,10 @@ public class SlimeController : MonoBehaviour, IEnemyDataProvider/*, IStunnable*/
 
     public void Transition(EnemyInputs input)
     {
-        if (input == EnemyInputs.Stun);
-        //isStunned = true;
-        else if (input == EnemyInputs.SeePlayer || input == EnemyInputs.LostPlayer);
-            //isStunned = false;
+        //if (input == EnemyInputs.Stun);
+        ////isStunned = true;
+        //else if (input == EnemyInputs.SeePlayer || input == EnemyInputs.LostPlayer);
+        //    //isStunned = false;
 
             fsm.Transition(input);
     }
@@ -93,11 +93,6 @@ public class SlimeController : MonoBehaviour, IEnemyDataProvider/*, IStunnable*/
         EnemyManager.Instance.UnregisterEnemy(); // Desregistra antes de destruir
         Destroy(gameObject);
     }
-    //private IEnumerator UnregisterAfterChildrenRegistered()
-    //{
-    //    yield return new WaitForEndOfFrame();  // espera a que se registren los mini slimes
-    //    EnemyManager.Instance.UnregisterEnemy();
-    //}
 
     public void Die()
     {
@@ -108,7 +103,6 @@ public class SlimeController : MonoBehaviour, IEnemyDataProvider/*, IStunnable*/
         Instantiate(miniSlimePrefab, transform.position + Vector3.right * 1.5f, Quaternion.identity);
         Instantiate(miniSlimePrefab, transform.position + Vector3.left * 1.5f, Quaternion.identity);
 
-        //StartCoroutine(UnregisterAfterChildrenRegistered());
         StartCoroutine(DelayedDeath());
         //Destroy(gameObject);
     }
@@ -122,11 +116,13 @@ public class SlimeController : MonoBehaviour, IEnemyDataProvider/*, IStunnable*/
     //{
     //    Transition(EnemyInputs.Stun);
     //}
+
     public Transform GetPlayer() => player;
     public float GetDetectionRadius() => detectionRadius;
     public float GetAttackDistance() => attackDistance;
     public float GetDamage() => damage;
     public float GetMaxSpeed() => maxSpeed;
     public float GetAcceleration() => acceleration;
+
     //public bool IsStunned() => isStunned;
 }
