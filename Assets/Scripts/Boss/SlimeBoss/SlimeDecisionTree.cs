@@ -15,7 +15,7 @@ public class SlimeDecisionTree : MonoBehaviour
 
     private void Update()
     {
-        if (slime.IsStunned()) return;
+        //if (slime.IsStunned()) return;
         rootNode.Execute();
     }
 
@@ -31,7 +31,7 @@ public class SlimeDecisionTree : MonoBehaviour
         // Pregunta: ¿Puede ver al jugador? (por radio)
         rootNode = new QuestionNode(attack, idle, CanSeePlayer);
         rootNode = isDead;
-        
+
     }
 
     private void Attack()

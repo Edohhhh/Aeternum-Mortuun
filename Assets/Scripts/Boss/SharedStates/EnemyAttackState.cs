@@ -10,12 +10,17 @@ public class EnemyAttackState : State<EnemyInputs>
     private Rigidbody2D rb;
     private Vector2 currentVelocity = Vector2.zero;
 
-    public EnemyAttackState(Transform enemy)
+    private float acidSpawnInterval = 0.2f; // tiempo entre gotas de ácido
+    private float acidSpawnTimer = 0f;
+    private GameObject acidPrefab;
+
+    public EnemyAttackState(Transform enemy, GameObject acidPrefab)
     {
         this.enemy = enemy;
         this.data = enemy.GetComponent<IEnemyDataProvider>();
         this.rb = enemy.GetComponent<Rigidbody2D>();
         this.spriteRenderer = enemy.GetComponent<SpriteRenderer>();
+        this.acidPrefab = acidPrefab; // lo recibís desde el slime
     }
 
     public override void Awake()
@@ -38,6 +43,16 @@ public class EnemyAttackState : State<EnemyInputs>
         );
 
         rb.MovePosition(rb.position + currentVelocity * Time.deltaTime);
+
+        // -------------------------
+        // Spawnear ácido
+        acidSpawnTimer += Time.deltaTime;
+        if (acidSpawnTimer >= acidSpawnInterval)
+        {
+            acidSpawnTimer = 0f;
+            GameObject.Instantiate(acidPrefab, enemy.position, Quaternion.identity);
+        }
+        // -------------------------
     }
 }
 //public class EnemyAttackState : State<EnemyInputs>

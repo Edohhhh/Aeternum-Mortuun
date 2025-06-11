@@ -4,20 +4,20 @@ using UnityEngine;
 
 public class SlimeController : MonoBehaviour, IEnemyDataProvider
 {
+    [SerializeField] private GameObject acidPrefab; // en el controller
     public Transform player;
     private Animator animator;
     private SpriteRenderer spriteRenderer;
     public float detectionRadius = 3f;
     public float attackDistance = 1f;
-    public float maxHealth = 100f;
     public float damage = 10f;
     public float maxSpeed = 3f;
     public float acceleration = 10f;
 
-    private bool isStunned = false;
+    private bool alreadyUnregistered = false;
 
     private FSM<EnemyInputs> fsm;
-    private HealthSystem health;
+    private EnemyHealth health;
 
     public GameObject miniSlimePrefab;
 
@@ -27,28 +27,21 @@ public class SlimeController : MonoBehaviour, IEnemyDataProvider
 
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
-        health = GetComponent<HealthSystem>();
-        health.OnDeath += Die;
-        health.OnDamaged += HandleStun;
-
+        health = GetComponent<EnemyHealth>();
+        if (health != null)
+        {
+            health.OnDeath += () => Transition(EnemyInputs.Die);
+        }
 
         EnemyIdleState Enemyidle = new EnemyIdleState(transform);
-        EnemyAttackState Enemyattack = new EnemyAttackState(transform);
+        EnemyAttackState Enemyattack = new EnemyAttackState(transform, acidPrefab);
         SlimeDeathState Enemydeath = new SlimeDeathState(this);
-        EnemyStunState stun = new EnemyStunState(transform);
-
 
         Enemyidle.AddTransition(EnemyInputs.SeePlayer, Enemyattack);
         Enemyattack.AddTransition(EnemyInputs.LostPlayer, Enemyidle);
 
         Enemyattack.AddTransition(EnemyInputs.Die, Enemydeath);
         Enemyidle.AddTransition(EnemyInputs.Die, Enemydeath);
-
-        Enemyidle.AddTransition(EnemyInputs.Stun, stun);
-        Enemyattack.AddTransition(EnemyInputs.Stun, stun);
-
-        stun.AddTransition(EnemyInputs.SeePlayer, Enemyattack);
-        stun.AddTransition(EnemyInputs.LostPlayer, Enemyidle);
 
         fsm = new FSM<EnemyInputs>(Enemyidle);
     }
@@ -57,14 +50,12 @@ public class SlimeController : MonoBehaviour, IEnemyDataProvider
     {
         fsm.Update();
 
-        if (!isStunned)
-        {
-            float distance = Vector2.Distance(transform.position, player.position);
+        float distance = Vector2.Distance(transform.position, player.position);
         if (distance <= detectionRadius)
             Transition(EnemyInputs.SeePlayer);
         else
             Transition(EnemyInputs.LostPlayer);
-        }
+
         animator.SetBool("isWalking", fsm.GetCurrentState() is EnemyAttackState);
 
         if (fsm.GetCurrentState() is EnemyAttackState && player != null)
@@ -76,43 +67,39 @@ public class SlimeController : MonoBehaviour, IEnemyDataProvider
 
     public void Transition(EnemyInputs input)
     {
-        if (input == EnemyInputs.Stun)
-            isStunned = true;
-        else if (input == EnemyInputs.SeePlayer || input == EnemyInputs.LostPlayer)
-            isStunned = false;
-
         fsm.Transition(input);
     }
-    private IEnumerator UnregisterAfterChildrenRegistered()
+
+    private IEnumerator DelayedDeath()
     {
-        yield return new WaitForEndOfFrame();  // espera a que se registren los mini slimes
+        yield return new WaitForEndOfFrame();
         EnemyManager.Instance.UnregisterEnemy();
-    }
-
-    public void Die()
-    {
-        Instantiate(miniSlimePrefab, transform.position + Vector3.right * 1.5f, Quaternion.identity);
-        Instantiate(miniSlimePrefab, transform.position + Vector3.left * 1.5f, Quaternion.identity);
-
-        StartCoroutine(UnregisterAfterChildrenRegistered());
         Destroy(gameObject);
     }
 
+    //public void Die()
+    //{
+    //    if (alreadyUnregistered) return;
+
+    //    alreadyUnregistered = true;
+
+    //    // Instanciar slimes chiquitos al morir
+    //    Instantiate(miniSlimePrefab, transform.position + Vector3.right * 1.5f, Quaternion.identity);
+    //    Instantiate(miniSlimePrefab, transform.position + Vector3.left * 1.5f, Quaternion.identity);
+
+    //    StartCoroutine(DelayedDeath());
+    //}
 
     public float GetCurrentHealth()
     {
-        return health.GetCurrentHealth();
+        return health != null ? health.GetCurrentHealth() : 0f;
     }
 
-    private void HandleStun()
-    {
-        Transition(EnemyInputs.Stun);
-    }
+    public GameObject GetMiniSlimePrefab() => miniSlimePrefab;
     public Transform GetPlayer() => player;
     public float GetDetectionRadius() => detectionRadius;
     public float GetAttackDistance() => attackDistance;
     public float GetDamage() => damage;
     public float GetMaxSpeed() => maxSpeed;
     public float GetAcceleration() => acceleration;
-    public bool IsStunned() => isStunned;
 }

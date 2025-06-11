@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class MoveState : IPlayerState
 {
@@ -15,7 +15,8 @@ public class MoveState : IPlayerState
 
     public void Enter()
     {
-        ctx.animator.SetBool("isMoving", true);
+        if (ctx.animator != null)
+            ctx.animator.SetBool("isMoving", true);
     }
 
     public void HandleInput()
@@ -25,13 +26,6 @@ public class MoveState : IPlayerState
         if (Input.GetKeyDown(KeyCode.Space))
         {
             sm.ChangeState(ctx.DashState);
-            return;
-        }
-
-        if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow)
-            || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            sm.ChangeState(ctx.AttackState);
             return;
         }
 
@@ -75,16 +69,18 @@ public class MoveState : IPlayerState
     {
         if (!ctx.canMove)
         {
-            ctx.rb.linearVelocity = Vector2.zero; // stop physical movement
+            // 🔥 Durante recoil o bloqueo: no toques nada
             return;
         }
 
+        // 🔥 Movimiento normal
         ctx.rb.MovePosition(ctx.rb.position + velocity * Time.fixedDeltaTime);
     }
 
     public void Exit()
     {
-        ctx.animator.SetBool("isMoving", false);
+        if (ctx.animator != null)
+            ctx.animator.SetBool("isMoving", false);
         ctx.animator.SetFloat("moveY", 0);
     }
 }

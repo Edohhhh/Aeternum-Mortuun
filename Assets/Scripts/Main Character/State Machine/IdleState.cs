@@ -22,12 +22,6 @@ public class IdleState : IPlayerState
             sm.ChangeState(ctx.DashState);
             return;
         }
-        if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow)
-            || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            sm.ChangeState(ctx.AttackState);
-            return;
-        }
         if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A)
             || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D))
         {

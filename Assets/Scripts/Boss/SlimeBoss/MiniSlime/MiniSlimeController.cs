@@ -1,26 +1,31 @@
 using UnityEngine;
+using System.Collections;
 
 public class MiniSlimeController : MonoBehaviour, IEnemyDataProvider
 {
-
+    [SerializeField] private GameObject acidPrefab; // en el controller
     public Transform player;
     private Animator animator;
     private SpriteRenderer spriteRenderer;
     public float detectionRadius = 2f;
     public float attackDistance = 0.8f;
-    public float maxHealth = 50f;
     public float damage = 10f;
     public float maxSpeed = 2f;
     public float acceleration = 4f;
     public GameObject miniSlimePrefab;
 
+    private bool alreadyUnregistered = false;
+
+    public GameObject miniMiniSlimePrefab;
+
     private FSM<EnemyInputs> fsm;
-    private HealthSystem health;
+    private EnemyHealth health;
 
     private void Start()
     {
         Debug.Log("MiniSlimeController Start - registrando enemigo");
         EnemyManager.Instance.RegisterEnemy();
+
         if (player == null)
         {
             GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
@@ -30,16 +35,21 @@ public class MiniSlimeController : MonoBehaviour, IEnemyDataProvider
             }
             else
             {
-                Debug.LogWarning("MiniSlime no encontró al jugador con el tag 'Player'");
+                Debug.LogWarning("MiniSlime no encontrÃ³ al jugador con el tag 'Player'");
             }
         }
 
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
-        health = GetComponent<HealthSystem>();
+        health = GetComponent<EnemyHealth>();
+        if (health != null)
+        {
+            health.OnDamaged += HandleStun;
+            health.OnDeath += () => Transition(EnemyInputs.Die);
+        }
 
         EnemyIdleState idle = new EnemyIdleState(transform);
-        EnemyAttackState attack = new EnemyAttackState(transform);
+        EnemyAttackState attack = new EnemyAttackState(transform, acidPrefab);
         MiniSlimeDeathState death = new MiniSlimeDeathState(this);
 
         idle.AddTransition(EnemyInputs.SeePlayer, attack);
@@ -49,7 +59,6 @@ public class MiniSlimeController : MonoBehaviour, IEnemyDataProvider
         attack.AddTransition(EnemyInputs.Die, death);
 
         fsm = new FSM<EnemyInputs>(idle);
-
     }
 
     private void Update()
@@ -76,20 +85,33 @@ public class MiniSlimeController : MonoBehaviour, IEnemyDataProvider
         fsm.Transition(input);
     }
 
-    public void Die()
+    //public void Die()
+    //{
+    //    if (alreadyUnregistered) return;
+
+    //    alreadyUnregistered = true;
+
+    //    Vector3 pos = transform.position;
+
+    //    Instantiate(miniSlimePrefab, pos + new Vector3(1.5f, 1.5f, 0), Quaternion.identity);
+    //    Instantiate(miniSlimePrefab, pos + new Vector3(-1.5f, -1.5f, 0), Quaternion.identity);
+
+    //    StartCoroutine(DelayedDeath());
+    //}
+
+    private IEnumerator DelayedDeath()
     {
-        Vector3 pos = transform.position;
-
-        Instantiate(miniSlimePrefab, pos + new Vector3(1.5f, 1.5f, 0), Quaternion.identity);
-        Instantiate(miniSlimePrefab, pos + new Vector3(-1.5f, 1.5f, 0), Quaternion.identity);
-        Instantiate(miniSlimePrefab, pos + new Vector3(1.5f, -1.5f, 0), Quaternion.identity);
-        Instantiate(miniSlimePrefab, pos + new Vector3(-1.5f, -1.5f, 0), Quaternion.identity);
-
+        yield return new WaitForEndOfFrame();
         EnemyManager.Instance.UnregisterEnemy();
         Destroy(gameObject);
     }
 
-    public float GetCurrentHealth() => health.GetCurrentHealth();
+    private void HandleStun()
+    {
+        Transition(EnemyInputs.Stun);
+    }
+
+    public float GetCurrentHealth() => health != null ? health.GetCurrentHealth() : 0f;
     public Transform GetPlayer() => player;
     public float GetDetectionRadius() => detectionRadius;
     public float GetAttackDistance() => attackDistance;
@@ -97,5 +119,3 @@ public class MiniSlimeController : MonoBehaviour, IEnemyDataProvider
     public float GetMaxSpeed() => maxSpeed;
     public float GetAcceleration() => acceleration;
 }
-
-

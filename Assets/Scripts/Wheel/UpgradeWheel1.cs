@@ -55,17 +55,6 @@ public class UpgradeWheel1 : MonoBehaviour
                 }
                 Debug.Log("✅ Velocidad aumentada a 6.3");
                 break;
-
-            case 2:
-                // Damage de todos los comboAttacks a 15
-                var attack = player.GetComponent<PlayerAttack>();
-                if (attack != null && attack.comboAttacks != null)
-                {
-                    foreach (var a in attack.comboAttacks)
-                        a.damage = 15f;
-                }
-                Debug.Log("✅ Daño de todos los ataques aumentado a 15");
-                break;
         }
 
         confirmarButton.interactable = false;

@@ -14,18 +14,15 @@ public class HealthSystem : MonoBehaviour
         currentHealth = maxHealth;
     }
 
-
     public void TakeDamage(float amount)
     {
         currentHealth -= amount;
 
-        OnDamaged?.Invoke(); // Notifica que se recibió daño
+        OnDamaged?.Invoke();
 
         if (currentHealth <= 0)
         {
             OnDeath?.Invoke();
-
-            EnemyManager.Instance.UnregisterEnemy();
         }
     }
 

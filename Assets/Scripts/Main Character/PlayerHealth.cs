@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.SceneManagement;
+using System.Diagnostics;
 
 public class PlayerHealth : MonoBehaviour
 {
@@ -33,13 +35,23 @@ public class PlayerHealth : MonoBehaviour
             healthUI.Initialize(maxHealth);
     }
 
-    public void TakeDamage(int amount, Vector2 sourcePosition)
+    public void TakeDamage(float amount, Vector2 sourcePosition)
     {
+        // Log del origen de la llamada
+        UnityEngine.Debug.Log($"[TakeDamage] Llamado con amount: {amount} desde: {sourcePosition}");
+        UnityEngine.Debug.Log(new StackTrace(1, true)); // '1' para omitir este método del log
+
         if (invulnerable || playerController.stateMachine.CurrentState == playerController.KnockbackState)
             return;
 
         currentHealth -= amount;
         UpdateUI();
+
+        if (currentHealth <= 0f)
+        {
+            Die();
+            return;
+        }
 
         Vector2 knockDir = (transform.position - (Vector3)sourcePosition).normalized;
         var knockback = playerController.KnockbackState;
@@ -50,12 +62,19 @@ public class PlayerHealth : MonoBehaviour
         StartCoroutine(TemporaryInvulnerability());
     }
 
+
     public void ModifyHealthFlat(float amount)
     {
         currentHealth += amount;
         currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
         UpdateUI();
+
+        if (currentHealth <= 0f)
+        {
+            Die();
+        }
     }
+
 
     public void ModifyHealthPercent(float percent)
     {
@@ -108,6 +127,7 @@ public class PlayerHealth : MonoBehaviour
 
     private void Die()
     {
-        Debug.Log("Player Died");
+        SceneManager.LoadScene("Lose");
+        UnityEngine.Debug.Log("Player Died");
     }
 }

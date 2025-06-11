@@ -18,8 +18,7 @@ public class EnemyIdleState : State<EnemyInputs>
     {
         base.Awake();
         timer = 0f;
-        if (spriteRenderer != null)
-            spriteRenderer.color = Color.green;
+        
     }
 
     public override void Execute()

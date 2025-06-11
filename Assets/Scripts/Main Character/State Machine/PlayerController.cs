@@ -1,38 +1,35 @@
 ﻿using UnityEngine;
-using Unity.IO.LowLevel.Unsafe;
 
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
     [HideInInspector] public bool canMove = true;
-    public float moveSpeed = 3.5f;
+    public float moveSpeed = 90f;
     public float acceleration = 10f;
     public float deceleration = 8f;
     [Range(0f, 1f)] public float slideFactor = 0.15f;
 
     [Header("Dash")]
-    public float dashSpeed = 12f;
+    public float dashSpeed = 300f;
     public int dashIframes = 10;
     public float dashSlideDuration = 0.1f;
-    public float dashDuration = 0.2f;
-    public float dashCooldown = 1f;
+    public float dashDuration = 0.15f;
+    public float dashCooldown = 0.75f;
 
-    [Header("Attack")]
-    public GameObject attackPrefab;
-    public float attackDuration = 0.13f;
-
-    // Components
     [HideInInspector] public Animator animator;
     [HideInInspector] public Rigidbody2D rb;
     public Collider2D hitbox;
     [HideInInspector] public StateMachine stateMachine;
 
-    // State instances
     public IdleState IdleState { get; private set; }
     public MoveState MoveState { get; private set; }
     public DashState DashState { get; private set; }
-    public AttackState AttackState { get; private set; }
     public KnockbackState KnockbackState { get; private set; }
+
+    private Vector2 moveInput;
+    private float dashCooldownTimer;
+
+    public bool isInvulnerable { get; set; }
 
     private void Awake()
     {
@@ -43,8 +40,9 @@ public class PlayerController : MonoBehaviour
         IdleState = new IdleState(this, stateMachine);
         MoveState = new MoveState(this, stateMachine);
         DashState = new DashState(this, stateMachine);
-        AttackState = new AttackState(this, stateMachine);
         KnockbackState = new KnockbackState(this, stateMachine);
+
+        dashCooldownTimer = 0f;
     }
 
     private void Start()
@@ -54,6 +52,38 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        // 🔥 Flip del sprite para mirar al cursor
+        Vector2 playerScreenPos = Camera.main.WorldToScreenPoint(transform.position);
+        Vector2 mousePos = Input.mousePosition;
+
+        if (mousePos.x < playerScreenPos.x)
+        {
+            GetComponent<SpriteRenderer>().flipX = true;
+        }
+        else
+        {
+            GetComponent<SpriteRenderer>().flipX = false;
+        }
+
+        // 🔥 Dash cooldown
+        dashCooldownTimer -= Time.deltaTime;
+
+        // 🔥 Obtén input de movimiento solo si no está bloqueado
+        if (canMove)
+        {
+            float moveX = Input.GetAxisRaw("Horizontal");
+            float moveY = Input.GetAxisRaw("Vertical");
+            moveInput = new Vector2(moveX, moveY).normalized;
+        }
+
+        // 🔥 Inicia dash (usa StateMachine)
+        if (Input.GetButtonDown("Jump") && dashCooldownTimer <= 0f && moveInput != Vector2.zero)
+        {
+            dashCooldownTimer = dashCooldown;
+            stateMachine.ChangeState(DashState);
+            return; // 🔥 No sigas con otros estados en el mismo frame
+        }
+
         if (!canMove)
         {
             rb.linearVelocity = Vector2.zero;
@@ -61,6 +91,7 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
+        // 🔥 Usa la StateMachine normalmente
         stateMachine.CurrentState.HandleInput();
         stateMachine.CurrentState.LogicUpdate();
     }
@@ -69,6 +100,8 @@ public class PlayerController : MonoBehaviour
     {
         stateMachine.CurrentState.PhysicsUpdate();
     }
+
+    public Vector2 GetMoveInput() => moveInput;
 
     public void SavePlayerData()
     {

@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class MiniMiniSlimeController : MonoBehaviour, IEnemyDataProvider
 {
+    [SerializeField] private GameObject acidPrefab; // en el controller
     public Transform player;
     private Animator animator;
     private SpriteRenderer spriteRenderer;
@@ -13,8 +14,10 @@ public class MiniMiniSlimeController : MonoBehaviour, IEnemyDataProvider
     public float maxSpeed = 2f;
     public float acceleration = 3f;
 
+    private bool alreadyUnregistered = false;
+
     private FSM<EnemyInputs> fsm;
-    private HealthSystem health;
+    private EnemyHealth health;
 
     private void Start()
     {
@@ -35,10 +38,11 @@ public class MiniMiniSlimeController : MonoBehaviour, IEnemyDataProvider
 
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
-        health = GetComponent<HealthSystem>();
+        health = GetComponent<EnemyHealth>();
+
 
         EnemyIdleState idle = new EnemyIdleState(transform);
-        EnemyAttackState attack = new EnemyAttackState(transform);
+        EnemyAttackState attack = new EnemyAttackState(transform, acidPrefab);
         SlimeDeathStateSimple death = new SlimeDeathStateSimple(this);
 
         idle.AddTransition(EnemyInputs.SeePlayer, attack);
@@ -78,14 +82,25 @@ public class MiniMiniSlimeController : MonoBehaviour, IEnemyDataProvider
 
     public void Die()
     {
+        if (alreadyUnregistered) return; // Evita doble ejecución
+
+        alreadyUnregistered = true;
+        //EnemyManager.Instance.UnregisterEnemy();
+        //Destroy(gameObject);
+        StartCoroutine(DelayedDeath());
+
+    }
+
+    private IEnumerator DelayedDeath()
+    {
+        yield return new WaitForEndOfFrame();
         EnemyManager.Instance.UnregisterEnemy();
         Destroy(gameObject);
-
     }
 
     private void HandleDeath()
     {
-        Transition(EnemyInputs.Die); 
+        Transition(EnemyInputs.Die);
     }
 
     public float GetCurrentHealth() => health.GetCurrentHealth();

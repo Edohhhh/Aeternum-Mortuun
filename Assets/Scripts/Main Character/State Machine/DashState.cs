@@ -6,6 +6,7 @@ public class DashState : IPlayerState
     private PlayerController ctx;
     private StateMachine sm;
     private Vector2 dashDir;
+    private float dashTimer;
 
     public DashState(PlayerController context, StateMachine stateMachine)
     {
@@ -15,64 +16,68 @@ public class DashState : IPlayerState
 
     public void Enter()
     {
+        // 🔥 Calcula la dirección del dash solo al iniciar
         dashDir = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized;
         if (dashDir == Vector2.zero) dashDir = Vector2.right;
 
-        if (ctx.hitbox != null) ctx.hitbox.enabled = false;
+        // 🔥 Activa invulnerabilidad
+        ctx.isInvulnerable = true;
 
-        ctx.animator.SetBool("isDashing", true); // ← activar animación
-        ctx.StartCoroutine(DashRoutine());
+        // 🔥 Configura el timer
+        dashTimer = ctx.dashDuration;
+
+        // 🔥 Desactiva hitbox si corresponde
+        if (ctx.GetComponent<Collider2D>() != null)
+        {
+            ctx.hitbox.enabled = false;
+        }
+
+        // 🔥 Animación (opcional)
+        ctx.GetComponent<Animator>()?.SetBool("isDashing", true);
     }
-
 
     public void HandleInput() { }
     public void LogicUpdate() { }
-    public void PhysicsUpdate() { }
-    public void Exit() { }
 
-    private IEnumerator DashRoutine()
+    public void PhysicsUpdate()
     {
-        // Activar animación de dash
-        ctx.animator.SetBool("isDashing", true);
+        // 🔥 Aplica el movimiento del dash
+        ctx.rb.linearVelocity = dashDir * ctx.dashSpeed;
 
-        // Desactivar hitbox temporalmente
-        if (ctx.hitbox != null)
-            ctx.hitbox.enabled = false;
-
-        // Fase principal del dash
-        float elapsed = 0f;
-        while (elapsed < ctx.dashDuration)
+        // 🔥 Actualiza el temporizador
+        dashTimer -= Time.fixedDeltaTime;
+        if (dashTimer <= 0f)
         {
-            ctx.rb.linearVelocity = dashDir * ctx.dashSpeed;
-            elapsed += Time.deltaTime;
-            yield return null;
+            // 🔥 Termina el dash
+            ctx.rb.linearVelocity = Vector2.zero;
+            ctx.isInvulnerable = false;
+
+            // 🔥 Reactiva hitbox si corresponde
+            if (ctx.GetComponent<Collider2D>() != null)
+            {
+                ctx.hitbox.enabled = true;
+            }
+
+            // 🔥 Apaga animación (opcional)
+            ctx.GetComponent<Animator>()?.SetBool("isDashing", false);
+
+            // 🔥 Cambia al estado Idle
+            sm.ChangeState(ctx.IdleState);
         }
-
-        // Fase de deslizamiento post-dash
-        float slideElapsed = 0f;
-        while (slideElapsed < ctx.dashSlideDuration)
-        {
-            float t = slideElapsed / ctx.dashSlideDuration;
-            ctx.rb.linearVelocity = dashDir * ctx.dashSpeed * (1f - t);
-            slideElapsed += Time.deltaTime;
-            yield return null;
-        }
-
-        // Finalizar movimiento
-        ctx.rb.linearVelocity = Vector2.zero;
-
-        // Reactivar hitbox
-        if (ctx.hitbox != null)
-            ctx.hitbox.enabled = true;
-
-        // Desactivar animación de dash
-        ctx.animator.SetBool("isDashing", false);
-
-        // Cambiar a estado Idle
-        sm.ChangeState(ctx.IdleState);
-
-        // Esperar cooldown antes de permitir otro dash (si lo manejás en otro lado podés quitar esto)
-        yield return new WaitForSeconds(ctx.dashCooldown);
     }
 
+    public void Exit()
+    {
+        // 🔥 Asegura que la animación de dash se apague siempre
+        if (ctx.animator != null)
+            ctx.animator.SetBool("isDashing", false);
+
+        // 🔥 Reactiva el hitbox y la vulnerabilidad
+        if (ctx.hitbox != null) ctx.hitbox.enabled = true;
+        ctx.isInvulnerable = false;
+
+        // 🔥 Reactiva el movimiento
+        ctx.canMove = true;
+        ctx.isInvulnerable = false;
+    }
 }

@@ -1,12 +1,12 @@
 using System.Collections;
 using UnityEngine;
 
-// Estado de muerte para el slime
 public class SlimeDeathState : State<EnemyInputs>
 {
     private SlimeController slime;
-    private float deathDelay = 0.5f;
+    private float duration = 1f;
     private float timer = 0f;
+    private Vector3 originalPos;
 
     public SlimeDeathState(SlimeController slime)
     {
@@ -16,25 +16,38 @@ public class SlimeDeathState : State<EnemyInputs>
     public override void Awake()
     {
         base.Awake();
+        originalPos = slime.transform.position;
         timer = 0f;
-        Debug.Log("Slime entró en DeathState");
-
-        // Acá podrías poner una animación de muerte o efecto visual
-        // slime.GetComponent<Animator>().SetTrigger("Die");
+        Debug.Log("Entró al SlimeDeathState");
     }
 
     public override void Execute()
     {
         timer += Time.deltaTime;
 
-        if (timer >= deathDelay)
+        // Vibración visual durante 1 segundo
+        float offsetX = Random.Range(-0.1f, 0.1f);
+        float offsetY = Random.Range(-0.1f, 0.1f);
+        slime.transform.position = originalPos + new Vector3(offsetX, offsetY, 0);
+
+        if (timer >= duration)
         {
-            slime.Die();
+            slime.transform.position = originalPos; // Restaurar posición
+
+            // Instanciar nuevos slimes
+            GameObject prefab = slime.GetMiniSlimePrefab();
+            GameObject.Instantiate(prefab, slime.transform.position + Vector3.right * 1.5f, Quaternion.identity);
+            GameObject.Instantiate(prefab, slime.transform.position + Vector3.left * 1.5f, Quaternion.identity);
+
+            // Desregistrar y destruir
+            EnemyManager.Instance.UnregisterEnemy();
+            GameObject.Destroy(slime.gameObject);
         }
     }
 
     public override void Sleep()
     {
-        // No hace falta limpiar nada porque el slime se destruye
+        base.Sleep();
+        slime.transform.position = originalPos;
     }
 }
