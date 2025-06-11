@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class EnemyHealth : MonoBehaviour
 {
@@ -15,6 +16,12 @@ public class EnemyHealth : MonoBehaviour
     private float hitDamping = 10f;
     private float stunTimer;
 
+    private SpriteRenderer spriteRenderer;
+    private Color originalColor;
+    private readonly Color damageColor = Color.red;
+    private float flashDuration = 0.1f;
+
+
     private void Awake()
     {
         currentHealth = maxHealth;
@@ -22,8 +29,13 @@ public class EnemyHealth : MonoBehaviour
         if (rb != null)
         {
             rb.linearDamping = baseDamping;
-            rb.gravityScale = 1f; // Asegura que haya gravedad si es necesario
+            rb.gravityScale = 1f;
         }
+
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        if (spriteRenderer != null)
+            originalColor = spriteRenderer.color;
+
     }
 
     private void Update()
@@ -49,25 +61,25 @@ public class EnemyHealth : MonoBehaviour
         currentHealth -= damage;
         OnDamaged?.Invoke();
 
+  
+        if (spriteRenderer != null)
+        {
+            StopCoroutine(FlashRed());
+            StartCoroutine(FlashRed());
+        }
+
+
         if (rb != null)
         {
-            // Resetear velocidad antes de aplicar knockback
             rb.linearVelocity = Vector2.zero;
-
-            // Aplicar knockback directamente a la velocidad
             Vector2 knockbackVelocity = knockbackDir.normalized * knockbackForce;
             rb.linearVelocity = knockbackVelocity;
-
-            // Ajustar damping para simular desaceleración
             rb.linearDamping = hitDamping;
-
-            // Duración breve de aturdimiento antes de volver a damping base
             stunTimer = 0.1f;
         }
 
         if (currentHealth <= 0f)
         {
-            // Knockback más largo al morir
             if (rb != null)
             {
                 rb.linearVelocity = knockbackDir.normalized * knockbackForce * 0.5f;
@@ -75,14 +87,34 @@ public class EnemyHealth : MonoBehaviour
                 stunTimer = 0.28f;
             }
             OnDeath?.Invoke();
-            //Die();
         }
     }
 
-    public float GetCurrentHealth() => currentHealth;
+    private IEnumerator FlashRed()
+    {
+        float half = flashDuration * 0.5f;
+        float t = 0f;
+        // Fade in a rojo
+        while (t < half)
+        {
+            spriteRenderer.color = Color.Lerp(originalColor, damageColor, t / half);
+            t += Time.deltaTime;
+            yield return null;
+        }
+        spriteRenderer.color = damageColor;
 
-   
+        t = 0f;
+        while (t < half)
+        {
+            spriteRenderer.color = Color.Lerp(damageColor, originalColor, t / half);
+            t += Time.deltaTime;
+            yield return null;
+        }
+        spriteRenderer.color = originalColor;
+    }
+    public float GetCurrentHealth() => currentHealth;
 }
+
 
 //private void Die()
 //{
