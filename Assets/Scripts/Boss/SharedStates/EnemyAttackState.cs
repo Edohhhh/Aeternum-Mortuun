@@ -33,15 +33,17 @@ public class EnemyAttackState : State<EnemyInputs>
     {
         if (data == null || data.GetPlayer() == null) return;
 
+        EnemyHealth health = enemy.GetComponent<EnemyHealth>();
+        if (health != null && health.IsStunned)
+        {
+            Debug.Log("Enemigo aturdido, no se mueve.");
+            return;
+        }
+
         Vector2 direction = (data.GetPlayer().position - enemy.position).normalized;
 
-        // Movimiento con aceleración
-        currentVelocity = Vector2.MoveTowards(
-            currentVelocity,
-            direction * data.GetMaxSpeed(),
-            data.GetAcceleration() * Time.deltaTime
-        );
-
+        // Movimiento sin aceleración
+        currentVelocity = direction * data.GetMaxSpeed();
         rb.MovePosition(rb.position + currentVelocity * Time.deltaTime);
 
         // -------------------------

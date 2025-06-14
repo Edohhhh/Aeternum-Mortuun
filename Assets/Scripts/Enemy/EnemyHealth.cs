@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using System.Collections;
 
 public class EnemyHealth : MonoBehaviour
@@ -6,6 +6,8 @@ public class EnemyHealth : MonoBehaviour
     [Header("Health")]
     public float maxHealth = 100f;
     [SerializeField] private float currentHealth;
+    public GameObject impactEffectPrefab;
+    public bool IsStunned => stunTimer > 0f;
 
     public delegate void OnDeathDelegate();
     public event OnDeathDelegate OnDeath;
@@ -51,17 +53,21 @@ public class EnemyHealth : MonoBehaviour
     }
 
     /// <summary>
-    /// Aplica daño al enemigo, retroceso y efectos de aturdimiento.
+    /// Aplica daÃ±o al enemigo, retroceso y efectos de aturdimiento.
     /// </summary>
-    public void TakeDamage(float damage, Vector2 knockbackDir, float knockbackForce)
-    {
-        if (currentHealth <= 0f)
-            return;
 
+
+    public void TakeDamage(int damage, Vector2 knockbackDir, float knockbackForce)
+    {
         currentHealth -= damage;
+
+        if (impactEffectPrefab != null)
+        {
+            Instantiate(impactEffectPrefab, transform.position, Quaternion.identity);
+        }
         OnDamaged?.Invoke();
 
-  
+
         if (spriteRenderer != null)
         {
             StopCoroutine(FlashRed());
@@ -118,6 +124,6 @@ public class EnemyHealth : MonoBehaviour
 
 //private void Die()
 //{
-//    Debug.Log("¡Enemigo derrotado!");
+//    Debug.Log("Â¡Enemigo derrotado!");
 //    Destroy(gameObject, 0.3f);
 //}
