@@ -5,9 +5,6 @@ public class PlayerController : MonoBehaviour
     [Header("Movement")]
     [HideInInspector] public bool canMove = true;
     public float moveSpeed = 90f;
-    public float acceleration = 10f;
-    public float deceleration = 8f;
-    [Range(0f, 1f)] public float slideFactor = 0.15f;
 
     [Header("Dash")]
     public float dashSpeed = 300f;
@@ -52,23 +49,15 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        // 🔥 Flip del sprite para mirar al cursor
+        // Flip sprite hacia el cursor
         Vector2 playerScreenPos = Camera.main.WorldToScreenPoint(transform.position);
         Vector2 mousePos = Input.mousePosition;
+        GetComponent<SpriteRenderer>().flipX = mousePos.x < playerScreenPos.x;
 
-        if (mousePos.x < playerScreenPos.x)
-        {
-            GetComponent<SpriteRenderer>().flipX = true;
-        }
-        else
-        {
-            GetComponent<SpriteRenderer>().flipX = false;
-        }
-
-        // 🔥 Dash cooldown
+        // Dash cooldown
         dashCooldownTimer -= Time.deltaTime;
 
-        // 🔥 Obtén input de movimiento solo si no está bloqueado
+        // Input de movimiento
         if (canMove)
         {
             float moveX = Input.GetAxisRaw("Horizontal");
@@ -76,12 +65,12 @@ public class PlayerController : MonoBehaviour
             moveInput = new Vector2(moveX, moveY).normalized;
         }
 
-        // 🔥 Inicia dash (usa StateMachine)
+        // Iniciar dash
         if (Input.GetButtonDown("Jump") && dashCooldownTimer <= 0f && moveInput != Vector2.zero)
         {
             dashCooldownTimer = dashCooldown;
             stateMachine.ChangeState(DashState);
-            return; // 🔥 No sigas con otros estados en el mismo frame
+            return;
         }
 
         if (!canMove)
@@ -91,7 +80,6 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        // 🔥 Usa la StateMachine normalmente
         stateMachine.CurrentState.HandleInput();
         stateMachine.CurrentState.LogicUpdate();
     }
@@ -113,9 +101,6 @@ public class PlayerController : MonoBehaviour
         var data = GameDataManager.Instance.playerData;
 
         moveSpeed = data.moveSpeed;
-        acceleration = data.acceleration;
-        deceleration = data.deceleration;
-        slideFactor = data.slideFactor;
         dashSpeed = data.dashSpeed;
         dashIframes = data.dashIframes;
         dashSlideDuration = data.dashSlideDuration;

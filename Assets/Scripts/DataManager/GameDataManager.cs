@@ -40,9 +40,6 @@ public class GameDataManager : MonoBehaviour
     {
         // Movimiento / Dash
         playerData.moveSpeed = player.moveSpeed;
-        playerData.acceleration = player.acceleration;
-        playerData.deceleration = player.deceleration;
-        playerData.slideFactor = player.slideFactor;
         playerData.dashSpeed = player.dashSpeed;
         playerData.dashIframes = player.dashIframes;
         playerData.dashSlideDuration = player.dashSlideDuration;

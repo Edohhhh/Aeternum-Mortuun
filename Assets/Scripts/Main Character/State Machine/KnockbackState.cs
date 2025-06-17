@@ -26,6 +26,10 @@ public class KnockbackState : IPlayerState
 
     public void SetKnockback(Vector2 direction, float force = 10f, float duration = 0.2f)
     {
+     
+        if (ctx.isInvulnerable)
+            return;
+
         knockDirection = direction.normalized;
         knockForce = force;
         knockbackDuration = duration;

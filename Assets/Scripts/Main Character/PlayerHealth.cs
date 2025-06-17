@@ -17,6 +17,9 @@ public class PlayerHealth : MonoBehaviour
     [Header("Invulnerability")]
     public float invulnerableTime = 1f;
     private bool invulnerable = false;
+
+    public bool IsInvulnerable => invulnerable || playerController.isInvulnerable;
+
     private Coroutine regenRoutine;
 
     [Header("UI")]
@@ -37,11 +40,10 @@ public class PlayerHealth : MonoBehaviour
 
     public void TakeDamage(float amount, Vector2 sourcePosition)
     {
-        // Log del origen de la llamada
         UnityEngine.Debug.Log($"[TakeDamage] Llamado con amount: {amount} desde: {sourcePosition}");
-        UnityEngine.Debug.Log(new StackTrace(1, true)); // '1' para omitir este método del log
+        UnityEngine.Debug.Log(new StackTrace(1, true));
 
-        if (invulnerable || playerController.stateMachine.CurrentState == playerController.KnockbackState)
+        if (IsInvulnerable || playerController.stateMachine.CurrentState == playerController.KnockbackState)
             return;
 
         currentHealth -= amount;
@@ -62,7 +64,6 @@ public class PlayerHealth : MonoBehaviour
         StartCoroutine(TemporaryInvulnerability());
     }
 
-
     public void ModifyHealthFlat(float amount)
     {
         currentHealth += amount;
@@ -74,7 +75,6 @@ public class PlayerHealth : MonoBehaviour
             Die();
         }
     }
-
 
     public void ModifyHealthPercent(float percent)
     {

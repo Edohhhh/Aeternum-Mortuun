@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class DashState : IPlayerState
 {
@@ -16,68 +15,69 @@ public class DashState : IPlayerState
 
     public void Enter()
     {
-        // 🔥 Calcula la dirección del dash solo al iniciar
+        // Dirección del dash (si no hay input, va a la derecha)
         dashDir = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized;
         if (dashDir == Vector2.zero) dashDir = Vector2.right;
 
-        // 🔥 Activa invulnerabilidad
-        ctx.isInvulnerable = true;
-
-        // 🔥 Configura el timer
         dashTimer = ctx.dashDuration;
 
-        // 🔥 Desactiva hitbox si corresponde
-        if (ctx.GetComponent<Collider2D>() != null)
-        {
-            ctx.hitbox.enabled = false;
-        }
+        // Activar invulnerabilidad
+        ctx.isInvulnerable = true;
 
-        // 🔥 Animación (opcional)
-        ctx.GetComponent<Animator>()?.SetBool("isDashing", true);
+        // Desactivar el hitbox para evitar daño
+        if (ctx.hitbox != null)
+            ctx.hitbox.enabled = false;
+
+        // Activar animación de dash
+        if (ctx.animator != null)
+            ctx.animator.SetBool("isDashing", true);
+
+        // (Opcional) Ignorar colisiones con enemigos
+        Physics2D.IgnoreLayerCollision(
+            LayerMask.NameToLayer("Player"),
+            LayerMask.NameToLayer("Enemy"),
+            true
+        );
     }
 
     public void HandleInput() { }
+
     public void LogicUpdate() { }
 
     public void PhysicsUpdate()
     {
-        // 🔥 Aplica el movimiento del dash
-        ctx.rb.linearVelocity = dashDir * ctx.dashSpeed;
+        // Mover al jugador
+        ctx.rb.MovePosition(ctx.rb.position + dashDir * ctx.dashSpeed * Time.fixedDeltaTime);
 
-        // 🔥 Actualiza el temporizador
+        // Contador del dash
         dashTimer -= Time.fixedDeltaTime;
         if (dashTimer <= 0f)
         {
-            // 🔥 Termina el dash
-            ctx.rb.linearVelocity = Vector2.zero;
-            ctx.isInvulnerable = false;
-
-            // 🔥 Reactiva hitbox si corresponde
-            if (ctx.GetComponent<Collider2D>() != null)
-            {
-                ctx.hitbox.enabled = true;
-            }
-
-            // 🔥 Apaga animación (opcional)
-            ctx.GetComponent<Animator>()?.SetBool("isDashing", false);
-
-            // 🔥 Cambia al estado Idle
             sm.ChangeState(ctx.IdleState);
         }
     }
 
     public void Exit()
     {
-        // 🔥 Asegura que la animación de dash se apague siempre
+        // Detener movimiento
+        ctx.rb.linearVelocity = Vector2.zero;
+
+        // Restaurar el hitbox
+        if (ctx.hitbox != null)
+            ctx.hitbox.enabled = true;
+
+        // Desactivar invulnerabilidad
+        ctx.isInvulnerable = false;
+
+        // Desactivar animación de dash
         if (ctx.animator != null)
             ctx.animator.SetBool("isDashing", false);
 
-        // 🔥 Reactiva el hitbox y la vulnerabilidad
-        if (ctx.hitbox != null) ctx.hitbox.enabled = true;
-        ctx.isInvulnerable = false;
-
-        // 🔥 Reactiva el movimiento
-        ctx.canMove = true;
-        ctx.isInvulnerable = false;
+        // Restaurar colisiones normales
+        Physics2D.IgnoreLayerCollision(
+            LayerMask.NameToLayer("Player"),
+            LayerMask.NameToLayer("Enemy"),
+            false
+        );
     }
 }
