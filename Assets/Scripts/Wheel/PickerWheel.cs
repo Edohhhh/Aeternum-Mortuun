@@ -109,9 +109,10 @@ namespace EasyUI.PickerWheelUI
             pieceTrns.RotateAround(wheelPiecesParent.position, Vector3.back, pieceAngle * index);
         }
 
+        // ✅ MODIFICADO: ya no toca posición mundial
         private GameObject InstantiatePiece()
         {
-            return Instantiate(wheelPiecePrefab, wheelPiecesParent.position, Quaternion.identity, wheelPiecesParent);
+            return Instantiate(wheelPiecePrefab, wheelPiecesParent); // solo se asigna el padre
         }
 
         public void Spin()
