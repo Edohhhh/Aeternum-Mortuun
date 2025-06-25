@@ -1750,13 +1750,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: edea4fe735ec28c408404f28126f33b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weaponTransform: {fileID: 0}
-  weaponSprite: {fileID: 1406276605}
-  playerAttack: {fileID: 1715398192}
-  swordOrigin: {fileID: 335085514}
-  swordDistance: 0.3
-  showDelay: 0.08
-  hideAfter: 0.25
 --- !u!212 &1406276605
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -2332,27 +2325,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3df72c94127db2446bd274651471717c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  comboAttacks:
-  - attackName: Swing1
-    attackType: swing
-    damage: 10
-    cooldown: 0.5
-    range: 0
-    hitboxRadius: 0.8
-  - attackName: Swing2
-    attackType: swing
-    damage: 10
-    cooldown: 0.5
-    range: 0
-    hitboxRadius: 0.8
-  attackPoint: {fileID: 2137700289}
-  enemyLayers:
-    serializedVersion: 2
-    m_Bits: 8
-  animTime: 0
-  slashPrefab: {fileID: 6191476579873659533, guid: 17c2401f9190dc146b75f80cdf5272c3, type: 3}
-  slashLifetime: 0.5
-  comboIndex: 0
 --- !u!114 &1715398193
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2385,16 +2357,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   canMove: 1
   moveSpeed: 5
-  acceleration: 10
-  deceleration: 11
-  slideFactor: 0.15
   dashSpeed: 10
   dashIframes: 10
   dashSlideDuration: 0.4
   dashDuration: 0.2
   dashCooldown: 1
-  attackPrefab: {fileID: 0}
-  attackDuration: 0.5
   animator: {fileID: 0}
   rb: {fileID: 0}
   hitbox: {fileID: 0}
@@ -2579,17 +2546,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47ac1ac6c8a663844a508faa845e8175, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackPoint: {fileID: 2137700289}
-  drawGizmos: 1
-  debugDir: {x: 1, y: 0}
-  debugRange: 1
-  debugRadius: 0.5
-  weaponTransform: {fileID: 1406276603}
-  offsetUp: {x: 0, y: 0.4}
-  offsetDown: {x: 0, y: -0.4}
-  offsetRight: {x: 0.06, y: 0}
-  offsetLeft: {x: -0.5, y: 0}
-  directionPreview: right
 --- !u!1 &1718504767
 GameObject:
   m_ObjectHideFlags: 0
@@ -2825,8 +2781,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 666c17561017d7340a40f63829824ebf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  wheelCanvas: {fileID: 698149857}
+  wheelCanvases:
+  - {fileID: 698149857}
   startActive: 1
+  wheelSelector: {fileID: 0}
 --- !u!4 &1749465131
 Transform:
   m_ObjectHideFlags: 0

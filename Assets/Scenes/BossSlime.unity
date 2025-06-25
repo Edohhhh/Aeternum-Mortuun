@@ -831,7 +831,7 @@ Transform:
   m_GameObject: {fileID: 379909847}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -353.7, y: 2.4, z: 0}
+  m_LocalPosition: {x: 1.8999939, y: 2.4, z: 0}
   m_LocalScale: {x: 116.550095, y: 73.64222, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -899,7 +899,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 402130078}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1749465130}
+        m_TargetAssemblyTypeName: EasyUI.PickerWheelUI.WheelUIController, Assembly-CSharp
+        m_MethodName: ConfirmarPremio
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &402130078
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2265,7 +2277,7 @@ Transform:
   m_GameObject: {fileID: 843631930}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -358, y: 2, z: -10}
+  m_LocalPosition: {x: -2.399994, y: 2, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2400,7 +2412,7 @@ Transform:
   m_GameObject: {fileID: 975771201}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -366.46, y: 2.0900002, z: 0}
+  m_LocalPosition: {x: -10.859985, y: 2.0900002, z: 0}
   m_LocalScale: {x: -6.4838796, y: 11.893826, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2599,7 +2611,7 @@ Transform:
   m_GameObject: {fileID: 1149395600}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -354.13, y: 2.14, z: 0}
+  m_LocalPosition: {x: 1.4700012, y: 2.14, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3486,7 +3498,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1209306227}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1749465130}
+        m_TargetAssemblyTypeName: EasyUI.PickerWheelUI.WheelUIController, Assembly-CSharp
+        m_MethodName: ConfirmarPremio
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1209306227
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3974,7 +3998,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1503765942}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1749465130}
+        m_TargetAssemblyTypeName: EasyUI.PickerWheelUI.WheelUIController, Assembly-CSharp
+        m_MethodName: ConfirmarPremio
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1503765942
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4060,7 +4096,7 @@ Transform:
   m_GameObject: {fileID: 1591186370}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -354.13, y: 2.14, z: 0}
+  m_LocalPosition: {x: 1.4700012, y: 2.14, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6458,7 +6494,7 @@ MonoBehaviour:
   dashSpeed: 10
   dashIframes: 10
   dashSlideDuration: 0.4
-  dashDuration: 0.45
+  dashDuration: 0.5
   dashCooldown: 0.75
   animator: {fileID: 0}
   rb: {fileID: 0}
@@ -6600,7 +6636,7 @@ Transform:
   m_GameObject: {fileID: 1715398191}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -358, y: 2, z: 0}
+  m_LocalPosition: {x: -2.399994, y: 2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6932,7 +6968,7 @@ Transform:
   m_GameObject: {fileID: 1736311342}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -358, y: 2, z: -10}
+  m_LocalPosition: {x: -2.4, y: 2, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7043,7 +7079,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 666c17561017d7340a40f63829824ebf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  wheelCanvas: {fileID: 5093980180941550136, guid: 0aa9bd31d43a670449c29311a98586d1, type: 3}
+  wheelCanvases:
+  - {fileID: 2032046660}
+  - {fileID: 328972261}
+  - {fileID: 1174474506}
+  - {fileID: 576635355}
   startActive: 0
   wheelSelector: {fileID: 0}
 --- !u!4 &1749465131
@@ -7121,7 +7161,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 845481032151546229, guid: 21dc0317654d69040a7da0ea29363176, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2245224395399163533, guid: 21dc0317654d69040a7da0ea29363176, type: 3}
       propertyPath: damage
@@ -7189,7 +7229,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4919014819646625355, guid: 21dc0317654d69040a7da0ea29363176, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -350.27002
+      value: 5.3299866
       objectReference: {fileID: 0}
     - target: {fileID: 4919014819646625355, guid: 21dc0317654d69040a7da0ea29363176, type: 3}
       propertyPath: m_LocalPosition.y

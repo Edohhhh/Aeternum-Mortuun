@@ -1,13 +1,14 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
 namespace EasyUI.PickerWheelUI
 {
     public class WheelUIController : MonoBehaviour
     {
-        [Header("Canvas de la ruleta")]
-        [SerializeField] private GameObject wheelCanvas;
+        [Header("Canvas de las ruletas")]
+        [SerializeField] private List<GameObject> wheelCanvases;
 
-        [Tooltip("¿La ruleta debe estar activa al iniciar el juego?")]
+        [Tooltip("¿Las ruletas deben estar activas al iniciar el juego?")]
         [SerializeField] private bool startActive = false;
 
         [Header("Referencia al selector de ruletas")]
@@ -15,34 +16,33 @@ namespace EasyUI.PickerWheelUI
 
         private void Start()
         {
-            if (wheelCanvas != null)
+            foreach (var canvas in wheelCanvases)
             {
-                wheelCanvas.SetActive(startActive);
+                if (canvas != null)
+                    canvas.SetActive(startActive);
             }
 
-            if (startActive)
-            {
-                Time.timeScale = 0f;
-            }
-            else
-            {
-                Time.timeScale = 1f;
-            }
+            Time.timeScale = startActive ? 0f : 1f;
         }
 
         public void MostrarRuleta()
         {
-            if (wheelCanvas != null)
-                wheelCanvas.SetActive(true);
-
+            foreach (var canvas in wheelCanvases)
+            {
+                if (canvas != null)
+                    canvas.SetActive(true);
+            }
 
             Time.timeScale = 0f;
         }
 
         public void ConfirmarPremio()
         {
-            if (wheelCanvas != null)
-                wheelCanvas.SetActive(false);
+            foreach (var canvas in wheelCanvases)
+            {
+                if (canvas != null)
+                    canvas.SetActive(false);
+            }
 
             Time.timeScale = 1f;
         }
@@ -51,7 +51,10 @@ namespace EasyUI.PickerWheelUI
         {
             GameObject[] enemigos = GameObject.FindGameObjectsWithTag("Enemy");
 
-            if (enemigos.Length == 0 && !wheelCanvas.activeSelf)
+            // Solo muestra si TODOS los canvas están desactivados
+            bool todosDesactivados = wheelCanvases.TrueForAll(c => !c.activeSelf);
+
+            if (enemigos.Length == 0 && todosDesactivados)
             {
                 MostrarRuleta();
             }
