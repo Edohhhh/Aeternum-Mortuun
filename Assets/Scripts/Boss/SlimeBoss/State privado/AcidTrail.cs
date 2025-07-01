@@ -24,9 +24,12 @@ public class AcidTrail : MonoBehaviour
         if (timer >= damageInterval)
         {
             timer = 0f;
-            int damage = Mathf.CeilToInt(damagePerSecond);  // redondea el daño
-            health.TakeDamage(damage, transform.position); // usa el método existente
-            Debug.Log($"[ACID] Dañando al jugador con {damage} desde {transform.position}");
+            int damage = Mathf.CeilToInt(damagePerSecond);
+
+            //  Mandamos la posición del jugador como "source" para anular el knockback
+            health.TakeDamage(damage, other.transform.position);
+
+            Debug.Log($"[ACID] Dañando al jugador con {damage} desde {other.transform.position} (sin knockback)");
         }
     }
 

@@ -5,6 +5,7 @@ using UnityEngine;
 public class SlimeController : MonoBehaviour, IEnemyDataProvider
 {
     [SerializeField] private GameObject acidPrefab; // en el controller
+    [SerializeField] private float specialCooldown = 10f;
     public Transform player;
     private Animator animator;
     private SpriteRenderer spriteRenderer;
@@ -13,6 +14,8 @@ public class SlimeController : MonoBehaviour, IEnemyDataProvider
     public float damage = 10f;
     public float maxSpeed = 3f;
     public float acceleration = 10f;
+    private float lastSpecialTime;
+    private float nextSpecialTime;
 
     private bool alreadyUnregistered = false;
 
@@ -37,18 +40,38 @@ public class SlimeController : MonoBehaviour, IEnemyDataProvider
         EnemyAttackState Enemyattack = new EnemyAttackState(transform, acidPrefab);
         SlimeDeathState Enemydeath = new SlimeDeathState(this);
 
+        fsm = new FSM<EnemyInputs>(Enemyidle);
+
+        EspecialAtackSlime especial = new EspecialAtackSlime(this, fsm);
+        ChargeSlimeState charge = new ChargeSlimeState(this, fsm, acidPrefab);
+
         Enemyidle.AddTransition(EnemyInputs.SeePlayer, Enemyattack);
         Enemyattack.AddTransition(EnemyInputs.LostPlayer, Enemyidle);
 
         Enemyattack.AddTransition(EnemyInputs.Die, Enemydeath);
         Enemyidle.AddTransition(EnemyInputs.Die, Enemydeath);
 
-        fsm = new FSM<EnemyInputs>(Enemyidle);
+        Enemyattack.AddTransition(EnemyInputs.SpecialAttack, especial);
+        especial.AddTransition(EnemyInputs.SeePlayer, Enemyattack);
+        especial.AddTransition(EnemyInputs.LostPlayer, Enemyidle);
+        especial.AddTransition(EnemyInputs.Die, Enemydeath);
+
+        especial.AddTransition(EnemyInputs.SpecialAttack, charge); // viene del azul
+        charge.AddTransition(EnemyInputs.SeePlayer, Enemyattack); // vuelve al normal
+        charge.AddTransition(EnemyInputs.LostPlayer, Enemyidle);
+        charge.AddTransition(EnemyInputs.Die, Enemydeath);
+
+
     }
 
     private void Update()
     {
         fsm.Update();
+
+        if (IsBusyWithSpecial()) return;
+
+        //if (fsm.GetCurrentState() is EspecialAtackSlime)
+        //    return;
 
         float distance = Vector2.Distance(transform.position, player.position);
         if (distance <= detectionRadius)
@@ -63,6 +86,28 @@ public class SlimeController : MonoBehaviour, IEnemyDataProvider
             Vector2 direction = player.position - transform.position;
             spriteRenderer.flipX = direction.x < 0;
         }
+
+        //float distance = Vector2.Distance(transform.position, player.position);
+        //if (distance <= detectionRadius)
+        //    Transition(EnemyInputs.SeePlayer);
+        //else
+        //    Transition(EnemyInputs.LostPlayer);
+
+        //animator.SetBool("isWalking", fsm.GetCurrentState() is EnemyAttackState);
+
+        //if (fsm.GetCurrentState() is EnemyAttackState && player != null)
+        //{
+        //    Vector2 direction = player.position - transform.position;
+        //    spriteRenderer.flipX = direction.x < 0;
+        //}
+
+        //// <<< ATAQUE ESPECIAL AUTOMÁTICO >>>
+        //if (Time.time >= nextSpecialTime)
+        //{
+        //    Debug.Log("Auto: Activando ataque especial por tiempo");
+        //    nextSpecialTime = Time.time + specialCooldown; // Reinicia cooldown
+        //    Transition(EnemyInputs.SpecialAttack);
+        //}
     }
 
     public void Transition(EnemyInputs input)
@@ -77,22 +122,42 @@ public class SlimeController : MonoBehaviour, IEnemyDataProvider
         Destroy(gameObject);
     }
 
-    //public void Die()
-    //{
-    //    if (alreadyUnregistered) return;
-
-    //    alreadyUnregistered = true;
-
-    //    // Instanciar slimes chiquitos al morir
-    //    Instantiate(miniSlimePrefab, transform.position + Vector3.right * 1.5f, Quaternion.identity);
-    //    Instantiate(miniSlimePrefab, transform.position + Vector3.left * 1.5f, Quaternion.identity);
-
-    //    StartCoroutine(DelayedDeath());
-    //}
-
     public float GetCurrentHealth()
     {
         return health != null ? health.GetCurrentHealth() : 0f;
+    }
+
+    public bool CanUseSpecialAttack()
+    {
+        return Time.time >= lastSpecialTime + specialCooldown;
+    }
+
+    public void MarkSpecialUsed()
+    {
+        lastSpecialTime = Time.time;
+    }
+
+    public bool IsInSpecialAttackState()
+    {
+        return fsm.GetCurrentState() is EspecialAtackSlime;
+    }
+
+    public bool IsInChargeState()
+    {
+        return fsm.GetCurrentState() is ChargeSlimeState;
+    }
+
+    public bool IsBusyWithSpecial()
+    {
+        return fsm.GetCurrentState() is EspecialAtackSlime || fsm.GetCurrentState() is ChargeSlimeState;
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (fsm.GetCurrentState() is ICollisionHandler handler)
+        {
+            handler.OnCollisionEnter2D(collision);
+        }
     }
 
     public GameObject GetMiniSlimePrefab() => miniSlimePrefab;

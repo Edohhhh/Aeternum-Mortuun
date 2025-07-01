@@ -15,21 +15,29 @@ public class SlimeDecisionTree : MonoBehaviour
 
     private void Update()
     {
+        if (slime.IsBusyWithSpecial()) return;
+        //if (slime.IsInSpecialAttackState()) return;
         //if (slime.IsStunned()) return;
         rootNode.Execute();
     }
 
     private void CreateTree()
     {
+
         // Acciones
         ActionNode attack = new ActionNode(Attack);
         ActionNode idle = new ActionNode(Idle);
         ActionNode death = new ActionNode(Die);
+        ActionNode special = new ActionNode(SpecialAttack);
 
-        QuestionNode isDead = new QuestionNode(death, new QuestionNode(attack, idle, CanSeePlayer), IsDead);
+        // Sub-nodos organizados como en el ejemplo de tu amigo
+        QuestionNode canSee = new QuestionNode(attack, idle, CanSeePlayer);
+        QuestionNode canSpecial = new QuestionNode(special, canSee, CanDoSpecialAttack);
+        QuestionNode isDead = new QuestionNode(death, canSpecial, IsDead);
+        //QuestionNode isDead = new QuestionNode(death, new QuestionNode(attack, idle, CanSeePlayer), IsDead);
 
         // Pregunta: ¿Puede ver al jugador? (por radio)
-        rootNode = new QuestionNode(attack, idle, CanSeePlayer);
+        //rootNode = new QuestionNode(attack, idle, CanSeePlayer);
         rootNode = isDead;
 
     }
@@ -44,6 +52,14 @@ public class SlimeDecisionTree : MonoBehaviour
     {
         //Debug.Log("Slime decisión: Idle.");
         slime.Transition(EnemyInputs.LostPlayer);
+
+
+    }
+
+    private void SpecialAttack()
+    {
+        Debug.Log("Árbol: ataque especial!");
+        slime.Transition(EnemyInputs.SpecialAttack);
     }
 
     private bool IsDead()
@@ -64,4 +80,11 @@ public class SlimeDecisionTree : MonoBehaviour
         float distance = Vector2.Distance(slime.transform.position, slime.GetPlayer().position);
         return distance <= slime.GetDetectionRadius();
     }
+
+    private bool CanDoSpecialAttack()
+    {
+        return slime.CanUseSpecialAttack();
+        //return true;
+    }
+
 }

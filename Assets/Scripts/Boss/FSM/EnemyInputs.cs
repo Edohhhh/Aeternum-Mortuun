@@ -8,6 +8,7 @@ public enum EnemyInputs
     Die,
     TimeToPatrol,
     IdleHere,
+    SpecialAttack,
     Stun
 
 }
