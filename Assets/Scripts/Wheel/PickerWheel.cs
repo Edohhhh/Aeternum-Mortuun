@@ -36,6 +36,11 @@ namespace EasyUI.PickerWheelUI
         [Header("Premios :")]
         public WheelPiece[] wheelPieces;
 
+        [Header("Usos disponibles")]
+        [SerializeField] private int usosMaximos = 3;
+        private int usosRestantes;
+        public int UsosRestantes => usosRestantes;
+
         public Action<WheelPiece> OnSpinEnd;
 
         private UnityAction onSpinStartEvent;
@@ -58,6 +63,13 @@ namespace EasyUI.PickerWheelUI
         private List<int> nonZeroChancesIndices = new List<int>();
 
         private WheelPiece ultimoPremio;
+
+
+
+        private void Awake()
+        {
+            usosRestantes = usosMaximos;
+        }
 
         private void Start()
         {
@@ -120,6 +132,12 @@ namespace EasyUI.PickerWheelUI
             if (_isSpinning)
                 return;
 
+            if (usosRestantes <= 0)
+            {
+                Debug.LogWarning($"{gameObject.name} no tiene más usos.");
+                return;
+            }
+
             _isSpinning = true;
             onSpinStartEvent?.Invoke();
 
@@ -157,6 +175,12 @@ namespace EasyUI.PickerWheelUI
                 {
                     _isSpinning = false;
                     ultimoPremio = piece;
+                    usosRestantes--;
+
+                    if (usosRestantes <= 0)
+                    {
+                        Debug.Log($"{gameObject.name} se quedó sin usos.");
+                    }
 
                     OnSpinEnd?.Invoke(piece);
                     onSpinEndEvent?.Invoke(piece);

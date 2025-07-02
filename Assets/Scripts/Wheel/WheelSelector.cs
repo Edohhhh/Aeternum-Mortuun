@@ -20,6 +20,7 @@ public class WheelSelector : MonoBehaviour
     private List<PickerWheel> ruletasInstanciadas = new List<PickerWheel>();
     private PickerWheel ruletaSeleccionada;
 
+
     private void Start()
     {
         InstanciarRuletasAleatorias();
@@ -60,9 +61,12 @@ public class WheelSelector : MonoBehaviour
     {
         ruletaSeleccionada = seleccionado.linkedWheel;
 
-        // Activar solo los botones del set seleccionado
+        // 🔒 Bloquear el botón "Seleccionar" de todas las otras ruletas
         foreach (var set in ruletaUISets)
+        {
+            set.selectButton.interactable = false;
             set.Activar(set == seleccionado);
+        }
 
         Debug.Log($"🎯 Ruleta seleccionada: {ruletaSeleccionada.name}");
     }
@@ -80,9 +84,30 @@ public class WheelSelector : MonoBehaviour
 
     public void SpinRuleta(PickerWheel wheel)
     {
-        if (wheel != null && !wheel.IsSpinning)
+        if (wheel != null && !wheel.IsSpinning && wheel.UsosRestantes > 0)
         {
             wheel.Spin();
+
+            // 💥 Verificar si se agotaron los usos
+            if (wheel.UsosRestantes == 1) // después de este uso, quedará en 0
+            {
+                // Esperar al final del spin para desactivar
+                wheel.AddSpinEndListener((_) =>
+                {
+                    if (wheel.UsosRestantes <= 0)
+                    {
+                        // Buscar su UISet y desactivarlo
+                        foreach (var set in ruletaUISets)
+                        {
+                            if (set.linkedWheel == wheel)
+                            {
+                                set.Activar(false);
+                                Debug.Log($"❌ Botones de {wheel.name} desactivados (usos agotados)");
+                            }
+                        }
+                    }
+                });
+            }
         }
     }
 
@@ -94,6 +119,20 @@ public class WheelSelector : MonoBehaviour
             if (premio != null)
             {
                 Debug.Log($"✅ Premio confirmado: {premio.Label} x{premio.Amount}");
+
+                foreach (var set in ruletaUISets)
+                {
+                    if (set.linkedWheel == wheel)
+                    {
+                        set.ActualizarTextoSpin();
+
+                        if (wheel.UsosRestantes <= 0)
+                        {
+                            set.Activar(false);
+                            Debug.Log($"🔒 Botones desactivados para {wheel.name}");
+                        }
+                    }
+                }
             }
         }
     }
