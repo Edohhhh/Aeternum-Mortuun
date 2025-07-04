@@ -35,7 +35,7 @@ public class CombatSystem : MonoBehaviour
     private void Update()
     {
 
-        // Cooldown del ataque
+       
         attackTimer -= Time.deltaTime;
         comboTimer -= Time.deltaTime;
 
@@ -59,10 +59,10 @@ public class CombatSystem : MonoBehaviour
 
         if (dashingSpeed > 0f)
         {
-            // 🔥 Recoil menos resbaloso
+            
             rb.linearVelocity = attackRecoilDir * dashSpeed * Time.deltaTime;
 
-            // 🔥 Ajuste de Lerp para que frene más rápido
+            
             dashingSpeed = Mathf.Lerp(dashingSpeed, 0f, 15f * Time.deltaTime);
 
             if (dashingSpeed < 1f)
@@ -96,19 +96,20 @@ public class CombatSystem : MonoBehaviour
         attackRecoilDir = GetAttackDirection();
         dashingSpeed = dashSpeed;
 
-        // 🔥 Bloquea el movimiento durante el ataque
+        
         if (playerController != null)
         {
             playerController.canMove = false;
         }
 
-        // 🔥 Activa animación de ataque
+        
         if (playerController.animator != null)
         {
+            playerController.animator.ResetTrigger("attackTrigger");
             playerController.animator.SetTrigger("attackTrigger");
         }
 
-        // 🔥 Spawn del efecto visual y hitbox (ya lo tenés configurado)
+        
         Vector2 spawnPos = (Vector2)transform.position + attackRecoilDir * hitboxOffset;
         if (slashEffectPrefabs != null && slashEffectPrefabs.Length >= comboIndex)
         {

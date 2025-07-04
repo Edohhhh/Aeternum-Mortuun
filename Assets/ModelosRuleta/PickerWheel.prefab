@@ -227,6 +227,13 @@ MonoBehaviour:
     Chance: 10
     Index: 0
     _weight: 0
+  - Icon: {fileID: 7005750741070879577, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
+    Label: 
+    Amount: 5
+    Chance: 10
+    Index: 0
+    _weight: 0
+  usosMaximos: 3
 --- !u!1 &647435951967983033
 GameObject:
   m_ObjectHideFlags: 0
@@ -262,8 +269,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 223.00021}
-  m_SizeDelta: {x: -477.4, y: -455.80002}
+  m_AnchoredPosition: {x: 17, y: 215}
+  m_SizeDelta: {x: -474.4991, y: -452.2545}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1200383427413697135
 CanvasRenderer:
