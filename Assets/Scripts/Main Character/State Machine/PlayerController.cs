@@ -18,6 +18,9 @@ public class PlayerController : MonoBehaviour
     public Collider2D hitbox;
     [HideInInspector] public StateMachine stateMachine;
 
+    [Header("PowerUps")]
+    public PowerUp[] initialPowerUps;
+
     public IdleState IdleState { get; private set; }
     public MoveState MoveState { get; private set; }
     public DashState DashState { get; private set; }
@@ -45,6 +48,12 @@ public class PlayerController : MonoBehaviour
     private void Start()
     {
         stateMachine.Initialize(IdleState);
+
+        foreach (var powerUp in initialPowerUps)
+        {
+            if (powerUp != null)
+                powerUp.Apply(this);
+        }
     }
 
     void Update()
