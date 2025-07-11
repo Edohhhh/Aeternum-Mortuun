@@ -10,9 +10,12 @@ namespace EasyUI.PickerWheelUI
 {
     public class PickerWheel : MonoBehaviour
     {
+        [SerializeField] private PowerUpPool powerUpPool;
         [Header("Referencias :")]
         [SerializeField] private GameObject linePrefab;
         [SerializeField] private Transform linesParent;
+
+        private float ruletaUltimoAngulo = 0f;
 
         [Space]
         [SerializeField] private Transform PickerWheelTransform;
@@ -64,8 +67,6 @@ namespace EasyUI.PickerWheelUI
 
         private WheelPiece ultimoPremio;
 
-
-
         private void Awake()
         {
             usosRestantes = usosMaximos;
@@ -73,6 +74,8 @@ namespace EasyUI.PickerWheelUI
 
         private void Start()
         {
+            CargarPremiosDesdePool(); // ✅ Nuevo paso antes de generar la ruleta
+
             pieceAngle = 360f / wheelPieces.Length;
             halfPieceAngle = pieceAngle / 2f;
             halfPieceAngleWithPaddings = halfPieceAngle - (halfPieceAngle / 4f);
@@ -93,19 +96,21 @@ namespace EasyUI.PickerWheelUI
             audioSource.pitch = pitch;
         }
 
-        private void Generate()
+        public void Generate()
         {
-            wheelPiecePrefab = InstantiatePiece();
-            RectTransform rt = wheelPiecePrefab.transform.GetChild(0).GetComponent<RectTransform>();
+            // Asegurarse de que el prefab original no se sobrescriba
+            GameObject tempPiece = InstantiatePiece();
+            RectTransform rt = tempPiece.transform.GetChild(0).GetComponent<RectTransform>();
+
             float pieceWidth = Mathf.Lerp(pieceMinSize.x, pieceMaxSize.x, 1f - Mathf.InverseLerp(piecesMin, piecesMax, wheelPieces.Length));
             float pieceHeight = Mathf.Lerp(pieceMinSize.y, pieceMaxSize.y, 1f - Mathf.InverseLerp(piecesMin, piecesMax, wheelPieces.Length));
             rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, pieceWidth);
             rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, pieceHeight);
 
+            Destroy(tempPiece); // destruimos la muestra inicial
+
             for (int i = 0; i < wheelPieces.Length; i++)
                 DrawPiece(i);
-
-            Destroy(wheelPiecePrefab);
         }
 
         private void DrawPiece(int index)
@@ -121,10 +126,9 @@ namespace EasyUI.PickerWheelUI
             pieceTrns.RotateAround(wheelPiecesParent.position, Vector3.back, pieceAngle * index);
         }
 
-        // ✅ MODIFICADO: ya no toca posición mundial
         private GameObject InstantiatePiece()
         {
-            return Instantiate(wheelPiecePrefab, wheelPiecesParent); // solo se asigna el padre
+            return Instantiate(wheelPiecePrefab, wheelPiecesParent);
         }
 
         public void Spin()
@@ -148,7 +152,7 @@ namespace EasyUI.PickerWheelUI
             float randomOffset = UnityEngine.Random.Range(-halfPieceAngleWithPaddings, halfPieceAngleWithPaddings);
             float finalAngle = angle + randomOffset;
             float totalRotation = finalAngle + 360f * spinDuration;
-            Vector3 targetRotation = Vector3.back * totalRotation;
+            Vector3 targetRotation = Vector3.forward * totalRotation;
 
             float prevAngle = wheelCircle.eulerAngles.z;
             float currentAngle = prevAngle;
@@ -174,17 +178,25 @@ namespace EasyUI.PickerWheelUI
                 .OnComplete(() =>
                 {
                     _isSpinning = false;
-                    ultimoPremio = piece;
                     usosRestantes--;
 
                     if (usosRestantes <= 0)
-                    {
                         Debug.Log($"{gameObject.name} se quedó sin usos.");
-                    }
 
-                    OnSpinEnd?.Invoke(piece);
-                    onSpinEndEvent?.Invoke(piece);
+                    // 🧭 Capturar el ángulo real de frenado
+                    ruletaUltimoAngulo = wheelCircle.eulerAngles.z;
+
+                    // ✅ Corregir ángulo e identificar sector bajo la flecha
+                    float correctedAngle = (360f - ruletaUltimoAngulo + pieceAngle / 2f) % 360f;
+                    int landedIndex = Mathf.FloorToInt(correctedAngle / pieceAngle) % wheelPieces.Length;
+                    ultimoPremio = wheelPieces[landedIndex];
+
+                    Debug.Log($"🎯 Flecha apunta al índice {landedIndex}: {ultimoPremio.Label} (ángulo {ruletaUltimoAngulo:0.0}°)");
+
+                    OnSpinEnd?.Invoke(ultimoPremio);
+                    onSpinEndEvent?.Invoke(ultimoPremio);
                 });
+
         }
 
         private int GetRandomPieceIndex()
@@ -226,5 +238,143 @@ namespace EasyUI.PickerWheelUI
             if (wheelPieces.Length > piecesMax || wheelPieces.Length < piecesMin)
                 Debug.LogError("[ PickerWheel ] pieces length must be between " + piecesMin + " and " + piecesMax);
         }
+
+        public void AplicarUltimoPremio()
+        {
+            if (ultimoPremio == null)
+            {
+                Debug.LogWarning("⚠️ No hay premio para aplicar.");
+                return;
+            }
+
+            if (ultimoPremio.Effect == null)
+            {
+                Debug.LogError($"❌ El WheelPiece '{ultimoPremio.Label}' no tiene asignado un PowerUpEffect.");
+                return;
+            }
+
+            GameObject player = GameObject.FindWithTag("Player");
+            if (player == null)
+            {
+                Debug.LogError("❌ No se encontró el Player en la escena.");
+                return;
+            }
+
+            ultimoPremio.Effect.Apply(player);
+            Debug.Log($"✅ PowerUp aplicado: {ultimoPremio.Effect.label}");
+        }
+
+        public void CargarPremiosDesdePool()
+        {
+            if (powerUpPool == null || powerUpPool.entries == null || powerUpPool.entries.Length == 0)
+            {
+                Debug.LogError("❌ PowerUpPool no asignado o vacío.");
+                return;
+            }
+
+            // Asignar nuevas piezas desde el pool
+            wheelPieces = new WheelPiece[powerUpPool.entries.Length];
+
+            for (int i = 0; i < powerUpPool.entries.Length; i++)
+            {
+                PowerUpEntry entry = powerUpPool.entries[i];
+
+                if (entry == null || entry.effect == null)
+                {
+                    Debug.LogError($"❌ Entrada nula o sin efecto en índice {i}");
+                    continue;
+                }
+
+                if (entry.effect.powerUp == null)
+                {
+                    Debug.LogWarning($"⚠️ El PowerUpEffect '{entry.effect.label}' no tiene PowerUp asignado.");
+                }
+
+                wheelPieces[i] = new WheelPiece
+                {
+                    Icon = entry.effect.icon,
+                    Label = entry.effect.label,
+                    Amount = 1,
+                    Chance = entry.chance,
+                    Effect = entry.effect
+                };
+
+                Debug.Log($"🧩 [{i}] Cargado: {entry.effect.label} (Icon: {(entry.effect.icon != null ? "✅" : "❌")})");
+            }
+
+            // Actualizar cálculos de ángulo
+            pieceAngle = 360f / wheelPieces.Length;
+            halfPieceAngle = pieceAngle / 2f;
+            halfPieceAngleWithPaddings = halfPieceAngle - (halfPieceAngle / 4f);
+
+            // 💣 Limpiar visual anterior antes de dibujar nueva ruleta
+            foreach (Transform child in wheelPiecesParent)
+                Destroy(child.gameObject);
+            foreach (Transform child in linesParent)
+                Destroy(child.gameObject);
+
+            // 🎨 Redibujar la ruleta con las nuevas piezas
+            Generate();
+
+            // 🧮 Recalcular pesos de probabilidad
+            CalculateWeightsAndIndices();
+
+            // 🔍 Validación debug opcional
+            RevisarWheelPiecesDebug();
+        }
+
+
+        private void RevisarWheelPiecesDebug()
+        {
+            Debug.Log($"🧪 Validando WheelPieces en {gameObject.name}...");
+
+            if (wheelPieces == null || wheelPieces.Length == 0)
+            {
+                Debug.LogError("❌ wheelPieces vacío o nulo.");
+                return;
+            }
+
+            for (int i = 0; i < wheelPieces.Length; i++)
+            {
+                var piece = wheelPieces[i];
+
+                string label = piece.Label ?? "(sin label)";
+                string iconStatus = piece.Icon != null ? "🖼️ icon ✅" : "❌ sin icon";
+                string effectLabel = piece.Effect != null ? piece.Effect.label : "❌ null";
+                string powerUpName = (piece.Effect != null && piece.Effect.powerUp != null) ? piece.Effect.powerUp.name : "❌ null";
+
+                bool ok = piece.Effect != null && piece.Effect.powerUp != null && piece.Icon != null;
+
+                string status = ok ? "✅ OK" : "⚠️ ERROR";
+
+                Debug.Log($"🧩 Pieza {i} → Label: '{label}' | Effect: '{effectLabel}' | PowerUp: '{powerUpName}' | {iconStatus} → {status}");
+            }
+        }
+
+        private void OnDrawGizmos()
+        {
+#if UNITY_EDITOR
+            if (wheelCircle == null) return;
+
+            // Centro de la ruleta
+            Vector3 center = wheelCircle.position;
+
+            // Calcular dirección del ángulo final
+            float angleRad = -ruletaUltimoAngulo * Mathf.Deg2Rad;
+            Vector3 direction = new Vector3(Mathf.Cos(angleRad), Mathf.Sin(angleRad), 0f);
+
+            // Dibujar línea desde el centro hacia la dirección del premio
+            Gizmos.color = Color.green;
+            Gizmos.DrawLine(center, center + direction * 2f);
+
+            // Dibujo del punto final
+            Gizmos.color = Color.red;
+            Gizmos.DrawSphere(center + direction * 2f, 0.1f);
+
+            // Mostrar ángulo numérico en consola
+            UnityEditor.Handles.Label(center + direction * 2.2f, $"Ángulo final: {ruletaUltimoAngulo:0.0}°");
+#endif
+        }
+
     }
 }

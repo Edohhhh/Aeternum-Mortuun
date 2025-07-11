@@ -15,30 +15,28 @@ public class DashState : IPlayerState
 
     public void Enter()
     {
-        // Dirección del dash (si no hay input, va a la derecha)
         dashDir = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized;
         if (dashDir == Vector2.zero) dashDir = Vector2.right;
 
         dashTimer = ctx.dashDuration;
-
-        // Activar invulnerabilidad
         ctx.isInvulnerable = true;
 
-        // Desactivar el hitbox para evitar daño
         if (ctx.hitbox != null)
             ctx.hitbox.enabled = false;
 
-        // Activar animación de dash
         if (ctx.animator != null)
             ctx.animator.SetBool("isDashing", true);
 
-        // (Opcional) Ignorar colisiones con enemigos
         Physics2D.IgnoreLayerCollision(
             LayerMask.NameToLayer("Player"),
             LayerMask.NameToLayer("Enemy"),
             true
         );
+
+        // 🔊 Reproducir sonido de dash
+        AudioManager.Instance.Play("dash");
     }
+
 
     public void HandleInput() { }
 

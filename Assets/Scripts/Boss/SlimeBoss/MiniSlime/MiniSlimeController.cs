@@ -14,7 +14,6 @@ public class MiniSlimeController : MonoBehaviour, IEnemyDataProvider
     public float acceleration = 4f;
     public GameObject miniSlimePrefab;
 
-    private bool alreadyUnregistered = false;
 
     public GameObject miniMiniSlimePrefab;
 

@@ -17,7 +17,7 @@ public class SlimeController : MonoBehaviour, IEnemyDataProvider
     private float lastSpecialTime;
     private float nextSpecialTime;
 
-    private bool alreadyUnregistered = false;
+    //private bool alreadyUnregistered = false;
 
     private FSM<EnemyInputs> fsm;
     private EnemyHealth health;

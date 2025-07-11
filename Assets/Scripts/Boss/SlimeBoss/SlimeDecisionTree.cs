@@ -58,7 +58,7 @@ public class SlimeDecisionTree : MonoBehaviour
 
     private void SpecialAttack()
     {
-        Debug.Log("Árbol: ataque especial!");
+        
         slime.Transition(EnemyInputs.SpecialAttack);
     }
 
@@ -69,7 +69,7 @@ public class SlimeDecisionTree : MonoBehaviour
 
     private void Die()
     {
-        Debug.Log("Slime decisión: Morir.");
+        
         slime.Transition(EnemyInputs.Die);
     }
 

@@ -128,5 +128,13 @@ public class PlayerController : MonoBehaviour
             health.invulnerableTime = data.invulnerableTime;
             health.UpdateUI();
         }
+
+        // PowerUps (referencias directas)
+        initialPowerUps = data.initialPowerUps.ToArray();
+        foreach (var powerUp in initialPowerUps)
+        {
+            if (powerUp != null)
+                powerUp.Apply(this);
+        }
     }
 }

@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections.Generic;
 
 public class GameDataManager : MonoBehaviour
 {
@@ -13,11 +14,9 @@ public class GameDataManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
 
-            // --- PRIMERA INICIALIZACIÓN: copiar valores por defecto del Player ---
             var initialPlayer = Object.FindFirstObjectByType<PlayerController>();
             if (initialPlayer != null)
             {
-                // Esto volcará todas las stats según tu PlayerController/PlayerHealth actuales
                 SavePlayerData(initialPlayer);
             }
 
@@ -31,9 +30,18 @@ public class GameDataManager : MonoBehaviour
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        StartCoroutine(WaitAndLoadPlayer());
+    }
+
+    private System.Collections.IEnumerator WaitAndLoadPlayer()
+    {
+        yield return null; // esperar un frame
+
         var player = Object.FindFirstObjectByType<PlayerController>();
         if (player != null)
+        {
             player.LoadPlayerData();
+        }
     }
 
     public void SavePlayerData(PlayerController player)
@@ -50,14 +58,22 @@ public class GameDataManager : MonoBehaviour
         var health = player.GetComponent<PlayerHealth>();
         if (health != null)
         {
-            playerData.maxHealth = health.maxHealth;
-            playerData.currentHealth = health.currentHealth;
+            playerData.maxHealth = (int)health.maxHealth;
+            playerData.currentHealth = (int)health.currentHealth;
             playerData.regenerationRate = health.regenerationRate;
             playerData.regenDelay = health.regenDelay;
             playerData.invulnerableTime = health.invulnerableTime;
         }
 
-        // Posición
+        // PosiciÃ³n
         playerData.position = player.transform.position;
+
+        // PowerUps (referencias directas)
+        playerData.initialPowerUps.Clear();
+        foreach (var powerUp in player.initialPowerUps)
+        {
+            if (powerUp != null)
+                playerData.initialPowerUps.Add(powerUp);
+        }
     }
 }

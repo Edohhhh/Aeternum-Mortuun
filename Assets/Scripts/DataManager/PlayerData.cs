@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
@@ -29,4 +30,7 @@ public class PlayerData
 
     // Transform
     public Vector2 position;
+
+    // PowerUps (referencias directas)
+    public List<PowerUp> initialPowerUps = new();
 }

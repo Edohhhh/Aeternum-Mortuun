@@ -96,20 +96,23 @@ public class CombatSystem : MonoBehaviour
         attackRecoilDir = GetAttackDirection();
         dashingSpeed = dashSpeed;
 
-        
+        // Bloquea movimiento durante el ataque
         if (playerController != null)
         {
             playerController.canMove = false;
         }
 
-        
+        // Dispara animación
         if (playerController.animator != null)
         {
             playerController.animator.ResetTrigger("attackTrigger");
             playerController.animator.SetTrigger("attackTrigger");
         }
 
-        
+        // 🎧 Sonido de espada
+        AudioManager.Instance.PlayWithRandomPitch("swing", 0.95f, 1.05f);
+
+        // Efecto visual de slash
         Vector2 spawnPos = (Vector2)transform.position + attackRecoilDir * hitboxOffset;
         if (slashEffectPrefabs != null && slashEffectPrefabs.Length >= comboIndex)
         {
@@ -122,6 +125,7 @@ public class CombatSystem : MonoBehaviour
             }
         }
 
+        // Instanciar hitbox de daño
         GameObject hitbox = Instantiate(hitboxPrefab, spawnPos, Quaternion.identity, transform);
         AttackHitbox hitboxScript = hitbox.GetComponent<AttackHitbox>();
         hitboxScript.knockbackDir = attackRecoilDir;

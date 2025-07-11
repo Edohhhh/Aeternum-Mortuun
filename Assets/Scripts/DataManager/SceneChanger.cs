@@ -8,7 +8,7 @@ public class SceneChanger : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.RightArrow))
+        if (Input.GetKeyDown(KeyCode.P))
         {
             // 1) Guardar stats actuales:
             var player = Object.FindFirstObjectByType<PlayerController>();
@@ -16,7 +16,7 @@ public class SceneChanger : MonoBehaviour
                 player.SavePlayerData();
 
             // 2) Cargar la siguiente escena:
-            SceneManager.LoadScene("SampleScene 1");
+            SceneManager.LoadScene("PruebaPowerUps");
         }
     }
 }

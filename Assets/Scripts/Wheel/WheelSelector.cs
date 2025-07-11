@@ -20,7 +20,6 @@ public class WheelSelector : MonoBehaviour
     private List<PickerWheel> ruletasInstanciadas = new List<PickerWheel>();
     private PickerWheel ruletaSeleccionada;
 
-
     private void Start()
     {
         InstanciarRuletasAleatorias();
@@ -28,12 +27,14 @@ public class WheelSelector : MonoBehaviour
 
     public void InstanciarRuletasAleatorias()
     {
+        // Limpiar ruletas anteriores
         foreach (Transform child in ruletaContainer)
             Destroy(child.gameObject);
 
         ruletasInstanciadas.Clear();
         ruletaSeleccionada = null;
 
+        // Selección aleatoria de prefabs distintos
         List<GameObject> seleccionadas = new List<GameObject>();
         List<GameObject> copiaPool = new List<GameObject>(ruletaPool);
 
@@ -52,7 +53,10 @@ public class WheelSelector : MonoBehaviour
             PickerWheel wheel = obj.GetComponent<PickerWheel>();
             ruletasInstanciadas.Add(wheel);
 
-            // Vincular cada ruleta con su set de UI
+            // ✅ FORZAR generación de contenido para que los íconos y efectos coincidan
+            wheel.CargarPremiosDesdePool();
+
+            // Vincular UISet con ruleta
             ruletaUISets[i].Inicializar(wheel, this);
         }
     }
@@ -61,7 +65,6 @@ public class WheelSelector : MonoBehaviour
     {
         ruletaSeleccionada = seleccionado.linkedWheel;
 
-        // 🔒 Bloquear el botón "Seleccionar" de todas las otras ruletas
         foreach (var set in ruletaUISets)
         {
             set.selectButton.interactable = false;
@@ -70,7 +73,6 @@ public class WheelSelector : MonoBehaviour
 
         Debug.Log($"🎯 Ruleta seleccionada: {ruletaSeleccionada.name}");
     }
-
 
     public void SeleccionarRuleta(PickerWheel seleccionada)
     {
@@ -88,15 +90,13 @@ public class WheelSelector : MonoBehaviour
         {
             wheel.Spin();
 
-            // 💥 Verificar si se agotaron los usos
-            if (wheel.UsosRestantes == 1) // después de este uso, quedará en 0
+            // Desactivar UI cuando se agoten los usos
+            if (wheel.UsosRestantes == 1)
             {
-                // Esperar al final del spin para desactivar
                 wheel.AddSpinEndListener((_) =>
                 {
                     if (wheel.UsosRestantes <= 0)
                     {
-                        // Buscar su UISet y desactivarlo
                         foreach (var set in ruletaUISets)
                         {
                             if (set.linkedWheel == wheel)
@@ -120,6 +120,8 @@ public class WheelSelector : MonoBehaviour
             {
                 Debug.Log($"✅ Premio confirmado: {premio.Label} x{premio.Amount}");
 
+                wheel.AplicarUltimoPremio();
+
                 foreach (var set in ruletaUISets)
                 {
                     if (set.linkedWheel == wheel)
@@ -136,7 +138,6 @@ public class WheelSelector : MonoBehaviour
             }
         }
     }
-
 
     public void SpinRuletaSeleccionada()
     {

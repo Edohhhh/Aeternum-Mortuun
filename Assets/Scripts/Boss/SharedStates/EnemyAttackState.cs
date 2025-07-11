@@ -36,7 +36,7 @@ public class EnemyAttackState : State<EnemyInputs>
         EnemyHealth health = enemy.GetComponent<EnemyHealth>();
         if (health != null && health.IsStunned)
         {
-            Debug.Log("Enemigo aturdido, no se mueve.");
+        
             return;
         }
 
