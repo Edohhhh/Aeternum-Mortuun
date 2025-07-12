@@ -9,6 +9,10 @@ public enum EnemyInputs
     TimeToPatrol,
     IdleHere,
     SpecialAttack,
-    Stun
+    InAttackRange,
+    OutOfAttackRange,
+    Stun,
+    UnderGroundAttack,
+    SpawnMinions
 
 }
