@@ -187,6 +187,7 @@ MonoBehaviour:
   powerUpPool: {fileID: 11400000, guid: f1919ac05c4121f4d92269e3f55f9af7, type: 2}
   linePrefab: {fileID: 1258666099951334, guid: 93bc1e8842fde884f878e59843c9706d, type: 3}
   linesParent: {fileID: 2845754903725659257}
+  selector: {fileID: 6718008529401278016}
   PickerWheelTransform: {fileID: 3180750416933447464}
   wheelCircle: {fileID: 6979930054425753271}
   wheelPiecePrefab: {fileID: 1013547879587396, guid: a10fef7bc23b5a64a929387e97c9b936, type: 3}
@@ -204,36 +205,42 @@ MonoBehaviour:
     Chance: 73.3
     Index: 0
     _weight: 0
+    Effect: {fileID: 0}
   - Icon: {fileID: -6379153957335788890, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
     Label: 
     Amount: 2
     Chance: 56.6
     Index: 0
     _weight: 0
+    Effect: {fileID: 0}
   - Icon: {fileID: 3622378070614508730, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
     Label: 
     Amount: 3
     Chance: 60
     Index: 0
     _weight: 0
+    Effect: {fileID: 0}
   - Icon: {fileID: -3436129635470280944, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
     Label: 
     Amount: 4
     Chance: 25
     Index: 0
     _weight: 0
+    Effect: {fileID: 0}
   - Icon: {fileID: 7005750741070879577, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
     Label: 
     Amount: 5
     Chance: 10
     Index: 0
     _weight: 0
+    Effect: {fileID: 0}
   - Icon: {fileID: 7005750741070879577, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
     Label: 
     Amount: 5
     Chance: 10
     Index: 0
     _weight: 0
+    Effect: {fileID: 0}
   usosMaximos: 3
 --- !u!1 &647435951967983033
 GameObject:

@@ -46,6 +46,11 @@ public class PortalController : MonoBehaviour
         // 3) Si el jugador está dentro y pulsa F, cambia de escena
         if (playerInside && portalActivated && Input.GetKeyDown(KeyCode.F))
         {
+            var player = Object.FindFirstObjectByType<PlayerController>();
+            if (player != null)
+                player.SavePlayerData();
+
+
             if (!string.IsNullOrEmpty(nextSceneName))
                 SceneManager.LoadScene(nextSceneName);
             else

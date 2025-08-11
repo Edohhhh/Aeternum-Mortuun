@@ -8010,7 +8010,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &328972262
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11604,7 +11604,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5669611174872731208, guid: fdd7a3f11f1cc88489f2916571b9369e, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 18.346184
+      value: 18.54
       objectReference: {fileID: 0}
     - target: {fileID: 5669611174872731208, guid: fdd7a3f11f1cc88489f2916571b9369e, type: 3}
       propertyPath: m_LocalPosition.z
@@ -18392,6 +18392,7 @@ MonoBehaviour:
   powerUpPool: {fileID: 0}
   linePrefab: {fileID: 1258666099951334, guid: 052d5aa0d2632e04c90d4d5027f9dd37, type: 3}
   linesParent: {fileID: 5396449332336509900}
+  selector: {fileID: 0}
   PickerWheelTransform: {fileID: 4737336783272243357}
   wheelCircle: {fileID: 956905475104153858}
   wheelPiecePrefab: {fileID: 1013547879587396, guid: a10fef7bc23b5a64a929387e97c9b936, type: 3}

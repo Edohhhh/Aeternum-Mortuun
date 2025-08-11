@@ -14,6 +14,7 @@ namespace EasyUI.PickerWheelUI
         [Header("Referencias :")]
         [SerializeField] private GameObject linePrefab;
         [SerializeField] private Transform linesParent;
+        [SerializeField] private Transform selector;
 
         private float ruletaUltimoAngulo = 0f;
 
@@ -183,20 +184,33 @@ namespace EasyUI.PickerWheelUI
                     if (usosRestantes <= 0)
                         Debug.Log($"{gameObject.name} se quedó sin usos.");
 
-                    // 🧭 Capturar el ángulo real de frenado
                     ruletaUltimoAngulo = wheelCircle.eulerAngles.z;
 
-                    // ✅ Corregir ángulo e identificar sector bajo la flecha
-                    float correctedAngle = (360f - ruletaUltimoAngulo + pieceAngle / 2f) % 360f;
-                    int landedIndex = Mathf.FloorToInt(correctedAngle / pieceAngle) % wheelPieces.Length;
+                    // 📌 Posición mundial del selector
+                    Vector3 selectorPos = selector.position;
+
+                    // 🔍 Buscar la pieza con centro más cercano
+                    float minDist = float.MaxValue;
+                    int landedIndex = 0;
+
+                    for (int i = 0; i < wheelPiecesParent.childCount; i++)
+                    {
+                        Transform pieceTransform = wheelPiecesParent.GetChild(i).GetChild(0);
+                        float dist = Vector3.Distance(pieceTransform.position, selectorPos);
+                        if (dist < minDist)
+                        {
+                            minDist = dist;
+                            landedIndex = i;
+                        }
+                    }
+
                     ultimoPremio = wheelPieces[landedIndex];
 
-                    Debug.Log($"🎯 Flecha apunta al índice {landedIndex}: {ultimoPremio.Label} (ángulo {ruletaUltimoAngulo:0.0}°)");
+                    Debug.Log($"🎯 Selector está sobre la pieza {landedIndex}: {ultimoPremio.Label} (distancia {minDist:0.00})");
 
                     OnSpinEnd?.Invoke(ultimoPremio);
                     onSpinEndEvent?.Invoke(ultimoPremio);
                 });
-
         }
 
         private int GetRandomPieceIndex()
@@ -354,27 +368,37 @@ namespace EasyUI.PickerWheelUI
         private void OnDrawGizmos()
         {
 #if UNITY_EDITOR
-            if (wheelCircle == null) return;
+            if (wheelCircle == null || selector == null || wheelPieces == null || wheelPieces.Length == 0)
+                return;
 
             // Centro de la ruleta
             Vector3 center = wheelCircle.position;
 
-            // Calcular dirección del ángulo final
-            float angleRad = -ruletaUltimoAngulo * Mathf.Deg2Rad;
-            Vector3 direction = new Vector3(Mathf.Cos(angleRad), Mathf.Sin(angleRad), 0f);
+            // Dirección del selector
+            Vector3 selectorDir = (selector.position - center).normalized;
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawLine(center, center + selectorDir * 2f);
+            UnityEditor.Handles.Label(center + selectorDir * 2.2f, "📍 Selector");
 
-            // Dibujar línea desde el centro hacia la dirección del premio
-            Gizmos.color = Color.green;
-            Gizmos.DrawLine(center, center + direction * 2f);
+            // Dibujar una esfera amarilla sobre el selector
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawSphere(selector.position, 0.1f);
 
-            // Dibujo del punto final
-            Gizmos.color = Color.red;
-            Gizmos.DrawSphere(center + direction * 2f, 0.1f);
-
-            // Mostrar ángulo numérico en consola
-            UnityEditor.Handles.Label(center + direction * 2.2f, $"Ángulo final: {ruletaUltimoAngulo:0.0}°");
+            // Dirección de la pieza ganadora (si ya existe)
+            if (ultimoPremio != null)
+            {
+                int index = Array.IndexOf(wheelPieces, ultimoPremio);
+                if (index >= 0 && index < wheelPiecesParent.childCount)
+                {
+                    Transform pieceTransform = wheelPiecesParent.GetChild(index).GetChild(0);
+                    Vector3 winnerDir = (pieceTransform.position - center).normalized;
+                    Gizmos.color = Color.green;
+                    Gizmos.DrawLine(center, pieceTransform.position);
+                    Gizmos.DrawSphere(pieceTransform.position, 0.1f);
+                    UnityEditor.Handles.Label(pieceTransform.position + Vector3.up * 0.2f, $"🎁 {ultimoPremio.Label}");
+                }
+            }
 #endif
         }
-
     }
 }
