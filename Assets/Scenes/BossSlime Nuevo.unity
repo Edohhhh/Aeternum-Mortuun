@@ -15966,7 +15966,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   canMove: 1
-  moveSpeed: 5
+  moveSpeed: 4
   dashSpeed: 10
   dashIframes: 10
   dashSlideDuration: 0.4
@@ -15975,7 +15975,8 @@ MonoBehaviour:
   animator: {fileID: 0}
   rb: {fileID: 0}
   hitbox: {fileID: 1715398195}
-  initialPowerUps: []
+  initialPowerUps:
+  - {fileID: 11400000, guid: 6525b85d59ae83f4fad5eebd13955e4f, type: 2}
 --- !u!61 &1715398195
 BoxCollider2D:
   m_ObjectHideFlags: 0
