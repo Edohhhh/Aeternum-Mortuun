@@ -7491,6 +7491,52 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1855375110
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1855375112}
+  - component: {fileID: 1855375111}
+  m_Layer: 0
+  m_Name: Synergu
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1855375111
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1855375110}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62bfd3e711c6b1745b1f3d3b3aceeb0e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  synergies:
+  - {fileID: 11400000, guid: 04ebf42a4a1c33d43a9a86a130512bda, type: 2}
+--- !u!4 &1855375112
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1855375110}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.8318074, y: 1.4658867, z: 0.042435084}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1919018559
 GameObject:
   m_ObjectHideFlags: 0
@@ -8951,6 +8997,7 @@ MonoBehaviour:
   powerUpPool: {fileID: 0}
   linePrefab: {fileID: 1258666099951334, guid: 052d5aa0d2632e04c90d4d5027f9dd37, type: 3}
   linesParent: {fileID: 5396449332336509900}
+  selector: {fileID: 0}
   PickerWheelTransform: {fileID: 4737336783272243357}
   wheelCircle: {fileID: 956905475104153858}
   wheelPiecePrefab: {fileID: 1013547879587396, guid: a10fef7bc23b5a64a929387e97c9b936, type: 3}
@@ -9802,3 +9849,4 @@ SceneRoots:
   - {fileID: 1423578248}
   - {fileID: 580835764}
   - {fileID: 533454520}
+  - {fileID: 1855375112}

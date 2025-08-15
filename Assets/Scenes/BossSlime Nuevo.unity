@@ -15976,7 +15976,7 @@ MonoBehaviour:
   rb: {fileID: 0}
   hitbox: {fileID: 1715398195}
   initialPowerUps:
-  - {fileID: 11400000, guid: 6525b85d59ae83f4fad5eebd13955e4f, type: 2}
+  - {fileID: 11400000, guid: 28d359d4c8b56904a92c44831ee66f4f, type: 2}
 --- !u!61 &1715398195
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -17295,6 +17295,52 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!1 &2117364124
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2117364126}
+  - component: {fileID: 2117364125}
+  m_Layer: 0
+  m_Name: Synergu
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2117364125
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2117364124}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62bfd3e711c6b1745b1f3d3b3aceeb0e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  synergies:
+  - {fileID: 11400000, guid: 04ebf42a4a1c33d43a9a86a130512bda, type: 2}
+--- !u!4 &2117364126
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2117364124}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.8318074, y: 1.4658867, z: 0.042435084}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2121315361
 GameObject:
   m_ObjectHideFlags: 0
@@ -19247,3 +19293,4 @@ SceneRoots:
   - {fileID: 1596832797}
   - {fileID: 1464033495}
   - {fileID: 601883703}
+  - {fileID: 2117364126}
