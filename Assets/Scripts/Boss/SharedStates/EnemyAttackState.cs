@@ -34,20 +34,20 @@ public class EnemyAttackState : State<EnemyInputs>
         if (data == null || data.GetPlayer() == null) return;
 
         EnemyHealth health = enemy.GetComponent<EnemyHealth>();
-        if (health != null && health.IsStunned)
-        {
-        
-            return;
-        }
+        if (health != null && health.IsStunned) return;
 
+        //  Dirección normalizada hacia el jugador
         Vector2 direction = (data.GetPlayer().position - enemy.position).normalized;
 
-        // Movimiento sin aceleración
-        currentVelocity = direction * data.GetMaxSpeed();
+        //  Movimiento consistente en todas las máquinas
+        float speed = data.GetMaxSpeed();
+        currentVelocity = direction * speed;
+
+        // rb.MovePosition asegura un movimiento físico correcto
         rb.MovePosition(rb.position + currentVelocity * Time.deltaTime);
 
         // -------------------------
-        // Spawnear ácido
+        // Spawnear ácido con intervalo fijo
         acidSpawnTimer += Time.deltaTime;
         if (acidSpawnTimer >= acidSpawnInterval)
         {

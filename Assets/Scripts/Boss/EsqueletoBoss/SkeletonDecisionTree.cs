@@ -50,7 +50,6 @@ public class SkeletonDecisionTree : MonoBehaviour
     }
 
 
-
     private bool CanSeePlayer()
     {
         var p = boss.GetPlayer();

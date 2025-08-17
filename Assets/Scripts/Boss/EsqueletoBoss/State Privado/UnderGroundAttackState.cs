@@ -17,6 +17,7 @@ public class UnderGroundAttackState : State<EnemyInputs>
         float buryDuration,
         float emergeDuration
     )
+
     {
         this.controller = controller;
         this.buryDuration = buryDuration;
@@ -68,7 +69,7 @@ public class UnderGroundAttackState : State<EnemyInputs>
                     }
 
                     // Reutilizamos el clip "Spawn" para emergir
-                    controller.GetComponent<Animator>()?.SetTrigger("Spawn");
+                    controller.GetComponent<Animator>()?.SetTrigger("Emerge");
                 }
                 break;
 

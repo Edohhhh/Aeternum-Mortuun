@@ -648,7 +648,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &328972262
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1305,7 +1305,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &576635356
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1423,6 +1423,10 @@ PrefabInstance:
       propertyPath: player
       value: 
       objectReference: {fileID: 1715398198}
+    - target: {fileID: 3670277874830084829, guid: 7885cb71a7c6f48498236b9ae52ff298, type: 3}
+      propertyPath: spawnAnimDuration
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7020505024538918472, guid: 7885cb71a7c6f48498236b9ae52ff298, type: 3}
       propertyPath: m_LocalPosition.x
       value: 4.6910696
@@ -3484,7 +3488,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1174474507
 MonoBehaviour:
   m_ObjectHideFlags: 0

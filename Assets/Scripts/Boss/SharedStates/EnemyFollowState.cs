@@ -14,6 +14,7 @@ public class EnemyFollowState : State<EnemyInputs>
         this.enemy = enemy;
         this.data = enemy.GetComponent<IEnemyDataProvider>();
         this.rb = enemy.GetComponent<Rigidbody2D>();
+        this.animator = enemy.GetComponent<Animator>();
     }
 
 
