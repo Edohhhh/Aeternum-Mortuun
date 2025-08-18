@@ -3,72 +3,63 @@ using System.Collections;
 
 public class SpectralCompanion : MonoBehaviour
 {
-    private Transform player;
-    private float moveSpeed;
-    private float fireInterval;
-    private int damage;
-
     public GameObject bulletPrefab;
-    public float bulletSpeed = 6f;
+    public float fireInterval = 3f;
+    public int damage = 1;
+    public float speed = 5f;
+    public Vector3 offset = new Vector3(-0.7f, -0.3f, 0f); // Separación estilo mascota
 
-    public void Initialize(Transform target, float speed, float interval, int dmg)
+    private Transform player;
+    private float fireTimer;
+
+    public void Initialize(Transform playerTransform, float moveSpeed, float interval, int bulletDamage)
     {
-        player = target;
-        moveSpeed = speed;
+        player = playerTransform;
+        speed = moveSpeed;
         fireInterval = interval;
-        damage = dmg;
-
-        StartCoroutine(ShootLoop());
+        damage = bulletDamage;
     }
 
-    private void Update()
+    void Update()
     {
-        if (player == null) return;
-
-        Vector2 dir = (player.position - transform.position);
-        float distance = dir.magnitude;
-
-        float followDistance = 1.2f; // distancia m�nima al player
-
-        if (distance > followDistance)
+        // 🧍 Si el jugador desapareció (por cambio de escena)
+        if (player == null)
         {
-            Vector2 moveDir = dir.normalized;
-            transform.position += (Vector3)(moveDir * moveSpeed * Time.deltaTime);
-        }
-    }
-
-    private IEnumerator ShootLoop()
-    {
-        while (true)
-        {
-            yield return new WaitForSeconds(fireInterval);
-
-            GameObject enemy = FindClosestEnemy();
-            if (enemy != null && bulletPrefab != null)
+            var foundPlayer = GameObject.FindWithTag("Player");
+            if (foundPlayer != null)
             {
-                Vector2 dir = (enemy.transform.position - transform.position).normalized;
-                GameObject bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
-                var spectralBullet = bullet.AddComponent<SpectralBullet>();
-                spectralBullet.Initialize(dir, bulletSpeed, damage);
+                player = foundPlayer.transform;
             }
-        }
-    }
-
-    private GameObject FindClosestEnemy()
-    {
-        float minDist = float.MaxValue;
-        GameObject closest = null;
-
-        foreach (var enemy in GameObject.FindGameObjectsWithTag("Enemy"))
-        {
-            float dist = Vector2.Distance(transform.position, enemy.transform.position);
-            if (dist < minDist)
+            else
             {
-                minDist = dist;
-                closest = enemy;
+                return;
             }
         }
 
-        return closest;
+        // 🐾 Moverse hacia la posición offset del jugador
+        Vector3 targetPosition = player.position + offset;
+        transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
+
+        // 🔫 Disparar si toca
+        fireTimer += Time.deltaTime;
+        if (fireTimer >= fireInterval)
+        {
+            fireTimer = 0f;
+            Shoot();
+        }
+    }
+
+    private void Shoot()
+    {
+        if (bulletPrefab == null) return;
+
+        GameObject bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
+
+        // Pasar el daño directamente al script de la bala
+        SpectralBullet bulletScript = bullet.GetComponent<SpectralBullet>();
+        if (bulletScript != null)
+        {
+            bulletScript.damage = damage;
+        }
     }
 }

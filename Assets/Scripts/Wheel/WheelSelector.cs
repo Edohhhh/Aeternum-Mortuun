@@ -113,31 +113,47 @@ public class WheelSelector : MonoBehaviour
 
     public void ConfirmarRuleta(PickerWheel wheel)
     {
-        if (wheel != null)
+        if (wheel == null)
         {
-            WheelPiece premio = wheel.ObtenerUltimoPremio();
-            if (premio != null)
+            Debug.LogWarning("⚠️ No se asignó ruleta.");
+            return;
+        }
+
+        // Aplica el efecto del premio
+        wheel.AplicarUltimoPremio();
+
+        // Busca al jugador y guarda sus datos actualizados
+        GameObject player = GameObject.FindWithTag("Player");
+        if (player != null)
+        {
+            PlayerController playerController = player.GetComponent<PlayerController>();
+            if (playerController != null)
             {
-                Debug.Log($"✅ Premio confirmado: {premio.Label} x{premio.Amount}");
+                GameDataManager.Instance.SavePlayerData(playerController);
+                Debug.Log("📦 Datos del jugador guardados tras confirmar ruleta.");
+            }
+            else
+            {
+                Debug.LogError("❌ No se encontró PlayerController en el objeto del jugador.");
+            }
+        }
+        else
+        {
+            Debug.LogError("❌ No se encontró GameObject con tag 'Player'.");
+        }
 
-                wheel.AplicarUltimoPremio();
-
-                foreach (var set in ruletaUISets)
-                {
-                    if (set.linkedWheel == wheel)
-                    {
-                        set.ActualizarTextoSpin();
-
-                        if (wheel.UsosRestantes <= 0)
-                        {
-                            set.Activar(false);
-                            Debug.Log($"🔒 Botones desactivados para {wheel.name}");
-                        }
-                    }
-                }
+        // (Opcional) Si querés desactivar botones después de confirmar
+        // podés acceder al UISet y desactivarlos
+        RuletaUISet[] allRuletas = FindObjectsOfType<RuletaUISet>();
+        foreach (var ruleta in allRuletas)
+        {
+            if (ruleta.linkedWheel == wheel)
+            {
+                ruleta.Activar(false);
             }
         }
     }
+
 
     public void SpinRuletaSeleccionada()
     {

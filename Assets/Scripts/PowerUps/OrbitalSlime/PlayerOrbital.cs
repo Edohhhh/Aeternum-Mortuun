@@ -4,57 +4,56 @@ using System.Collections.Generic;
 
 public class PlayerOrbital : MonoBehaviour
 {
-    private Transform player;
-    private float radius;
-    private float speed;
-    private int damage;
+    private Transform target;
+    private float orbitRadius;
+    private float rotationSpeed;
+    private int damagePerSecond;
+
     private float angle;
+    private float damageTimer;
 
-    private Dictionary<GameObject, float> damageCooldowns = new();
-    private float damageInterval = 1f;
-
-    public void Initialize(Transform playerTarget, float orbitRadius, float rotationSpeed, int damagePerSec)
+    public void Initialize(Transform target, float radius, float speed, int dps)
     {
-        player = playerTarget;
-        radius = orbitRadius;
-        speed = rotationSpeed;
-        damage = damagePerSec;
+        this.target = target;
+        orbitRadius = radius;
+        rotationSpeed = speed;
+        damagePerSecond = dps;
     }
 
-    private void Update()
+    void Update()
     {
-        if (player == null) return;
+        if (target == null) return;
 
-        angle += speed * Time.deltaTime;
-        float rad = angle * Mathf.Deg2Rad;
-        Vector2 offset = new Vector2(Mathf.Cos(rad), Mathf.Sin(rad)) * radius;
-        transform.position = (Vector2)player.position + offset;
-    }
+        angle += rotationSpeed * Time.deltaTime;
+        float radians = angle * Mathf.Deg2Rad;
 
-    private void OnTriggerStay2D(Collider2D other)
-    {
-        if (!other.CompareTag("Enemy")) return;
+        Vector3 offset = new Vector3(Mathf.Cos(radians), Mathf.Sin(radians), 0f) * orbitRadius;
+        transform.position = target.position + offset;
 
-        GameObject enemyGO = other.gameObject;
-        if (!damageCooldowns.ContainsKey(enemyGO))
-            damageCooldowns[enemyGO] = 0f;
-
-        damageCooldowns[enemyGO] -= Time.deltaTime;
-        if (damageCooldowns[enemyGO] <= 0f)
+        damageTimer += Time.deltaTime;
+        if (damageTimer >= 1f)
         {
-            damageCooldowns[enemyGO] = damageInterval;
-
-            var health = enemyGO.GetComponent<EnemyHealth>();
-            if (health != null)
-            {
-                health.TakeDamage(damage, transform.position, 0f);
-            }
+            damageTimer = 0f;
+            DamageEnemies();
         }
     }
 
-    private void OnTriggerExit2D(Collider2D other)
+    private void DamageEnemies()
     {
-        if (damageCooldowns.ContainsKey(other.gameObject))
-            damageCooldowns.Remove(other.gameObject);
+        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, 0.3f);
+        foreach (var hit in hits)
+        {
+            if (hit.CompareTag("Enemy"))
+            {
+                var enemy = hit.GetComponent<EnemyHealth>();
+                if (enemy != null)
+                {
+                    Vector2 knockbackDir = (enemy.transform.position - transform.position).normalized;
+                    float knockbackForce = 0f; // o podés poner un valor si querés empujar un poquito
+                    enemy.TakeDamage(damagePerSecond, knockbackDir, knockbackForce);
+
+                }
+            }
+        }
     }
 }
