@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: Orbital
   m_EditorClassIdentifier: 
   duration: 5
-  isPermanent: 1
+  isPermanent: 0
+  effect: {fileID: 11400000, guid: 805f890e7de212e44a586f0cc0c0d0d6, type: 2}
   orbitalPrefab: {fileID: 2223704478143420316, guid: f00823a94fdceaf40a03063e222b2616, type: 3}
   orbitRadius: 1.2
   rotationSpeed: 90

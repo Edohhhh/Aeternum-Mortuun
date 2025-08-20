@@ -85,6 +85,14 @@ public class CombatSystem : MonoBehaviour
 
     }
 
+    private LaserBeamObserver laserBeamObserver;
+
+    private void Start()
+    {
+        // Buscar el observer del laser beam
+        laserBeamObserver = LaserBeamObserver.Instance;
+    }
+
     private void PerformAttack()
     {
         attackTimer = attackCooldown;
@@ -93,17 +101,23 @@ public class CombatSystem : MonoBehaviour
         comboIndex++;
         if (comboIndex > 3) comboIndex = 1;
 
+        // Notificar al observer del laser beam cuando se completa el tercer golpe
+        if (comboIndex == 3 && laserBeamObserver != null)
+        {
+            laserBeamObserver.OnComboCompleted(comboIndex, transform);
+        }
+
         attackRecoilDir = GetAttackDirection();
         dashingSpeed = dashSpeed;
 
-        // Bloquea movimiento durante el ataque
-        if (playerController != null)
-        {
-            playerController.canMove = false;
-        }
+        // ELIMINA esta línea para permitir movimiento durante el laser:
+         if (playerController != null)
+         {
+             playerController.canMove = false;
+         }
 
         // Dispara animación
-        if (playerController.animator != null)
+        if (playerController != null && playerController.animator != null)
         {
             playerController.animator.ResetTrigger("attackTrigger");
             playerController.animator.SetTrigger("attackTrigger");

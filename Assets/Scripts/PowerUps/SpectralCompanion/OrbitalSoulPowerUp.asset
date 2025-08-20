@@ -9,14 +9,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 61e617fed9087a543962751a691e2c5d, type: 3}
-  m_Name: Ghost
+  m_Script: {fileID: 11500000, guid: 4555adaa51d0e459e8834c2d9efaf2aa, type: 3}
+  m_Name: OrbitalSoulPowerUp
   m_EditorClassIdentifier: 
   duration: 5
   isPermanent: 0
-  effect: {fileID: 11400000, guid: c94b5e10259962c44abe38fd39c78e3d, type: 2}
-  companionPrefab: {fileID: 1330439052297854100, guid: 3bd27a0514abaf14f987d8b1437d3b67, type: 3}
+  effect: {fileID: 0}
+  orbitalSoulPrefab: {fileID: 1330439052297854100, guid: 3bd27a0514abaf14f987d8b1437d3b67, type: 3}
+  orbitRadius: 1.2
+  rotationSpeed: 90
+  contactDamage: 1
+  contactDamageInterval: 1
   bulletPrefab: {fileID: 6562718085020059997, guid: bab35c316e4d2774aa3e254de6f5cc17, type: 3}
-  fireInterval: 3
-  damagePerShot: 1
-  speedMultiplier: 0.75
+  shootInterval: 2
+  bulletSpeed: 5
+  bulletDamage: 1
