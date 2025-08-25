@@ -25,7 +25,7 @@ public class EspecialAtackSlime : State<EnemyInputs>
     public override void Awake()
     {
         base.Awake();
-        slime.MarkSpecialUsed(); //  REGISTRA CUÁNDO HIZO EL ESPECIAL
+        
 
         timer = 0f;
 

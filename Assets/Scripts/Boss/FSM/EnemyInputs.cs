@@ -13,6 +13,6 @@ public enum EnemyInputs
     OutOfAttackRange,
     Stun,
     UnderGroundAttack,
-    SpawnMinions
-
+    SpawnMinions,
+    Spawn
 }

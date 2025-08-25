@@ -25,8 +25,7 @@ public class EnemyAttackState : State<EnemyInputs>
 
     public override void Awake()
     {
-        base.Awake();
-        
+        base.Awake(); 
     }
 
     public override void Execute()

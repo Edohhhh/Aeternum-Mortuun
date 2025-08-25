@@ -15976,8 +15976,8 @@ MonoBehaviour:
   rb: {fileID: 0}
   hitbox: {fileID: 1715398195}
   initialPowerUps:
-  - {fileID: 11400000, guid: 324480661807d1d46aa367ce5a502969, type: 2}
-  - {fileID: 11400000, guid: 095255a4888c8c645b43e98db3542ed7, type: 2}
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!61 &1715398195
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -18293,6 +18293,10 @@ PrefabInstance:
     - target: {fileID: 8118559782372147317, guid: 0d58e6fbaa643468b9dc6779f133471c, type: 3}
       propertyPath: m_Name
       value: LaserBeam
+      objectReference: {fileID: 0}
+    - target: {fileID: 8118559782372147317, guid: 0d58e6fbaa643468b9dc6779f133471c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8400863413766150787, guid: 0d58e6fbaa643468b9dc6779f133471c, type: 3}
       propertyPath: m_LocalPosition.x

@@ -16,8 +16,9 @@ public class SkeletonDecisionTree : MonoBehaviour
 
     private void Update()
     {
-        if (boss.IsSpawning() || boss.IsSpawningMinions())
+        if (boss.IsSpawning() || boss.IsSpawningMinions() || boss.IsUnderGrounding())
             return;
+
         rootNode.Execute();
     }
 

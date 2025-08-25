@@ -40,6 +40,12 @@ public class SkeletonController : MonoBehaviour, IEnemyDataProvider
 
     private float lastUnderGroundTime;
     private float lastSpawnMinionsTime;
+    private UnderGroundAttackState _ugStateRef;
+
+    public void RegisterUnderGroundState(UnderGroundAttackState s) => _ugStateRef = s;
+    // Llamados por Animation Events desde los clips de Animator:
+    public void OnBurrowFinished() { _ugStateRef?.OnBurrowAnimFinished(); }
+    public bool IsUnderGrounding() => fsm.GetCurrentState() is UnderGroundAttackState;
 
     private float nextUGReadyTime;
     private float nextSpawnReadyTime;
@@ -52,17 +58,17 @@ public class SkeletonController : MonoBehaviour, IEnemyDataProvider
     private SpawnMinionState spawnMinionState;
     private Rigidbody2D rb;
 
-    
+
     private EsqueletoSpawnState _spawnStateRef;
-    
+
     public void RegisterSpawnState(EsqueletoSpawnState s) => _spawnStateRef = s;
-    
+
     public void OnSpawnFinished()
     {
-        
+
         _spawnStateRef?.NotifySpawnFinished();
     }
-    
+
     public bool IsSpawning() => fsm.GetCurrentState() is EsqueletoSpawnState;
 
     public bool IsSpawningMinions() =>
@@ -80,7 +86,7 @@ public class SkeletonController : MonoBehaviour, IEnemyDataProvider
 
         rb.constraints |= RigidbodyConstraints2D.FreezeRotation;
 
-        nextUGReadyTime = Time.time + underGroundCooldown;    
+        nextUGReadyTime = Time.time + underGroundCooldown;
         nextSpawnReadyTime = float.PositiveInfinity;
 
         var spawn = new EsqueletoSpawnState(this, spawnAnimDuration);
@@ -107,6 +113,8 @@ public class SkeletonController : MonoBehaviour, IEnemyDataProvider
         // transiciones SpawnMinions  Follow/Death
         spawnMin.AddTransition(EnemyInputs.SeePlayer, follow);
         spawnMin.AddTransition(EnemyInputs.Die, death);
+
+        underGround.AddTransition(EnemyInputs.Spawn, spawn);
 
         lastUnderGroundTime = -underGroundCooldown;
         lastSpawnMinionsTime = -spawnMinionsCooldown;
@@ -158,6 +166,7 @@ public class SkeletonController : MonoBehaviour, IEnemyDataProvider
     }
 
 
+
     public void DoUnderGroundAttack()
     {
         if (fsm.GetCurrentState() is UnderGroundAttackState || fsm.GetCurrentState() is SpawnMinionState)
@@ -172,7 +181,7 @@ public class SkeletonController : MonoBehaviour, IEnemyDataProvider
         if (fsm.GetCurrentState() is SpawnMinionState || fsm.GetCurrentState() is UnderGroundAttackState)
             return;
 
-        
+
         if (float.IsPositiveInfinity(nextSpawnReadyTime))
             nextSpawnReadyTime = Time.time; // habilita primera llamada
 
