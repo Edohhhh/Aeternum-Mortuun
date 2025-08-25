@@ -16,7 +16,7 @@ public class SkeletonDecisionTree : MonoBehaviour
 
     private void Update()
     {
-        if (boss.IsSpawning() || boss.IsSpawningMinions() || boss.IsUnderGrounding())
+        if (boss.IsSpawning() || boss.IsSpawningMinions() || boss.IsUnderGrounding() || boss.IsMeleeing())
             return;
 
         rootNode.Execute();
@@ -25,20 +25,16 @@ public class SkeletonDecisionTree : MonoBehaviour
     private void CreateTree()
     {
         var deathAction = new ActionNode(() => boss.Transition(EnemyInputs.Die));
-        var ugAction = new ActionNode(() => {
-            boss.MarkUnderGroundUsed();
-            boss.Transition(EnemyInputs.UnderGroundAttack);
-        });
-        var spawnMAction = new ActionNode(() => {
-            boss.MarkSpawnMinionsUsed();
-            boss.Transition(EnemyInputs.SpawnMinions);
-        });
+
+        var meleeAction = new ActionNode(() => { boss.MarkMeleeUsed(); boss.Transition(EnemyInputs.MeleeAttack); });
+        var ugAction = new ActionNode(() => { boss.MarkUnderGroundUsed(); boss.Transition(EnemyInputs.UnderGroundAttack); });
+        var spawnMAction = new ActionNode(() => { boss.MarkSpawnMinionsUsed(); boss.Transition(EnemyInputs.SpawnMinions); });
         var followAction = new ActionNode(() => boss.Transition(EnemyInputs.SeePlayer));
         var idleAction = new ActionNode(() => boss.Transition(EnemyInputs.LostPlayer));
 
-        // Preguntas (QuestionNodes) en orden de prioridad
         var canSee = new QuestionNode(followAction, idleAction, CanSeePlayer);
-        var canSpawn = new QuestionNode(spawnMAction, canSee, boss.CanUseSpawnMinions);
+        var canMelee = new QuestionNode(meleeAction, canSee, () => boss.IsPlayerInMeleeRange() && boss.CanMeleeAttack());
+        var canSpawn = new QuestionNode(spawnMAction, canMelee, boss.CanUseSpawnMinions);        // <- antes apuntaba a canSee
         var canUndrGr = new QuestionNode(ugAction, canSpawn, boss.CanUseUnderGroundAttack);
         var isDead = new QuestionNode(deathAction, canUndrGr, IsDead);
 

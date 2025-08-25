@@ -14,5 +14,6 @@ public enum EnemyInputs
     Stun,
     UnderGroundAttack,
     SpawnMinions,
-    Spawn
+    Spawn,
+    MeleeAttack
 }

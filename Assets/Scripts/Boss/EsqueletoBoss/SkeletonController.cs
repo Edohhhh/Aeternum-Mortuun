@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class SkeletonController : MonoBehaviour, IEnemyDataProvider
+public class SkeletonController : MonoBehaviour, IEnemyDataProvider, IMeleeHost
 {
     [Header("References")]
     [SerializeField] private Transform player;
@@ -38,6 +38,26 @@ public class SkeletonController : MonoBehaviour, IEnemyDataProvider
     [Tooltip("Duración de emerger (s)")]
     [SerializeField] private float undergroundEmergeDuration = 0.5f;
 
+    [SerializeField] private float meleeAttackRange = 1.2f;
+    [SerializeField] private float meleeCooldown = 0.7f;
+    private float nextMeleeAllowedTime = 0f;
+
+    [SerializeField] private EnemyAttack attack;
+
+    public bool CanMeleeAttack() => Time.time >= nextMeleeAllowedTime;
+    public bool IsPlayerInMeleeRange()
+    {
+        if (player == null) return false;
+        return Vector2.Distance(transform.position, player.position) <= meleeAttackRange;
+    }
+    public void MarkMeleeUsed() => nextMeleeAllowedTime = Time.time + meleeCooldown;
+    private MeleeAttackState _meleeRef;
+    public void RegisterMeleeState(MeleeAttackState s) => _meleeRef = s;
+
+    // Reenvío de Animation Events del clip de golpe
+    public void OnMeleeHit() => _meleeRef?.OnMeleeHit();
+    public void OnMeleeFinished() => _meleeRef?.OnMeleeFinished();
+
     private float lastUnderGroundTime;
     private float lastSpawnMinionsTime;
     private UnderGroundAttackState _ugStateRef;
@@ -46,6 +66,8 @@ public class SkeletonController : MonoBehaviour, IEnemyDataProvider
     // Llamados por Animation Events desde los clips de Animator:
     public void OnBurrowFinished() { _ugStateRef?.OnBurrowAnimFinished(); }
     public bool IsUnderGrounding() => fsm.GetCurrentState() is UnderGroundAttackState;
+
+    public bool IsMeleeing() => fsm.GetCurrentState() is MeleeAttackState;
 
     private float nextUGReadyTime;
     private float nextSpawnReadyTime;
@@ -94,6 +116,7 @@ public class SkeletonController : MonoBehaviour, IEnemyDataProvider
         var underGround = new UnderGroundAttackState(this, undergroundBuryDuration, undergroundEmergeDuration);
         var spawnMin = new SpawnMinionState(this, minionPrefab, minionSpawnPoints, 1.5f);
         var death = new EnemyDeathState(this);
+        var melee = new MeleeAttackState(this /* IMeleeHost */);
 
         // FSM arranca en SpawnState
         fsm = new FSM<EnemyInputs>(spawn);
@@ -114,6 +137,9 @@ public class SkeletonController : MonoBehaviour, IEnemyDataProvider
         spawnMin.AddTransition(EnemyInputs.SeePlayer, follow);
         spawnMin.AddTransition(EnemyInputs.Die, death);
 
+        follow.AddTransition(EnemyInputs.MeleeAttack, melee);
+        melee.AddTransition(EnemyInputs.SeePlayer, follow);
+
         underGround.AddTransition(EnemyInputs.Spawn, spawn);
 
         lastUnderGroundTime = -underGroundCooldown;
@@ -131,6 +157,7 @@ public class SkeletonController : MonoBehaviour, IEnemyDataProvider
         if (IsSpawning() || IsSpawningMinions() || fsm.GetCurrentState() is UnderGroundAttackState)
             return;
 
+
         // 3) Detección normal
         float dist = Vector2.Distance(transform.position, player.position);
         if (dist <= detectionRadius)
@@ -140,6 +167,8 @@ public class SkeletonController : MonoBehaviour, IEnemyDataProvider
 
         bool walking = fsm.GetCurrentState() is EnemyFollowState;
         animator.SetBool("isWalking", walking);
+
+
 
         // 4) Flip del sprite
         if (player != null)
@@ -199,6 +228,12 @@ public class SkeletonController : MonoBehaviour, IEnemyDataProvider
     public float GetMaxSpeed() => maxSpeed;
     public float GetAcceleration() => acceleration;
     public float GetCurrentHealth() => health != null ? health.GetCurrentHealth() : 0f;
+
+    // IMeleeHost (resto)
+    public Transform Transform => transform;
+    public Animator Animator => animator;
+    public Rigidbody2D Body => rb;
+    public EnemyAttack Attack => attack;
 }
 //public class SkeletonController : MonoBehaviour, IEnemyDataProvider
 //{

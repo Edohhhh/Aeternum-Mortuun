@@ -15,7 +15,7 @@ public class UnderGroundAttackState : State<EnemyInputs>
     // Distancia lateral al reaparecer
     private const float APPEAR_OFFSET = 0.9f;
 
-    private const float SNAPSHOT_LEAD = 0.2f;
+    private const float SNAPSHOT_LEAD = 0.3f;
 
     // Tiempo oculto bajo tierra
     private const float HIDE_SECONDS = 3f;
