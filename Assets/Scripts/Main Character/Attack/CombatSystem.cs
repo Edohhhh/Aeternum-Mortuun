@@ -26,6 +26,10 @@ public class CombatSystem : MonoBehaviour
     private float comboTimer;
     private bool bufferedAttack;
 
+    // Componentes para los nuevos sistemas
+    private LaserBeamObserver laserBeamObserver;
+    private ThornsPathObserver thornsPathObserver;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -34,8 +38,6 @@ public class CombatSystem : MonoBehaviour
 
     private void Update()
     {
-
-       
         attackTimer -= Time.deltaTime;
         comboTimer -= Time.deltaTime;
 
@@ -59,10 +61,8 @@ public class CombatSystem : MonoBehaviour
 
         if (dashingSpeed > 0f)
         {
-            
             rb.linearVelocity = attackRecoilDir * dashSpeed * Time.deltaTime;
 
-            
             dashingSpeed = Mathf.Lerp(dashingSpeed, 0f, 15f * Time.deltaTime);
 
             if (dashingSpeed < 1f)
@@ -82,15 +82,15 @@ public class CombatSystem : MonoBehaviour
                 }
             }
         }
-
     }
-
-    private LaserBeamObserver laserBeamObserver;
 
     private void Start()
     {
         // Buscar el observer del laser beam
         laserBeamObserver = LaserBeamObserver.Instance;
+
+        // Buscar el observer del thorns path
+        thornsPathObserver = ThornsPathObserver.Instance;
     }
 
     private void PerformAttack()
@@ -107,14 +107,20 @@ public class CombatSystem : MonoBehaviour
             laserBeamObserver.OnComboCompleted(comboIndex, transform);
         }
 
+        // Notificar al observer del thorns path cuando se completa el tercer golpe
+        if (comboIndex == 3 && thornsPathObserver != null)
+        {
+            thornsPathObserver.OnComboCompleted(comboIndex, transform);
+        }
+
         attackRecoilDir = GetAttackDirection();
         dashingSpeed = dashSpeed;
 
-        // ELIMINA esta línea para permitir movimiento durante el laser:
-         if (playerController != null)
-         {
-             playerController.canMove = false;
-         }
+        // Bloquea movimiento durante el ataque
+        if (playerController != null)
+        {
+            playerController.canMove = false;
+        }
 
         // Dispara animación
         if (playerController != null && playerController.animator != null)
@@ -146,7 +152,6 @@ public class CombatSystem : MonoBehaviour
 
         Debug.Log("Ataque combo " + comboIndex);
     }
-
 
     private Vector2 GetAttackDirection()
     {
