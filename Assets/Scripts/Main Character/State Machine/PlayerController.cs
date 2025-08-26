@@ -6,6 +6,9 @@ public class PlayerController : MonoBehaviour
     [HideInInspector] public bool canMove = true;
     public float moveSpeed = 90f;
 
+    [Header("Combate")]
+    public int baseDamage = 1;
+
     [Header("Dash")]
     public float dashSpeed = 300f;
     public int dashIframes = 10;
@@ -30,6 +33,17 @@ public class PlayerController : MonoBehaviour
     private float dashCooldownTimer;
 
     public bool isInvulnerable { get; set; }
+
+    // ====== NUEVO: configuración de ataque / hitbox ======
+    [Header("Ataque (Hitbox)")]
+    [SerializeField] private GameObject hitboxPrefab;  // el prefab puede tener el AttackHitbox en un hijo
+    [SerializeField] private Transform attackOrigin;
+    [SerializeField] private float attackRange = 0.7f;
+    [SerializeField] private float hitboxLifetime = 0.10f;
+    [SerializeField] private float knockbackForce = 100f;
+
+    private Vector2 lastAimDir = Vector2.right;
+    // =====================================================
 
     private void Awake()
     {
@@ -84,6 +98,7 @@ public class PlayerController : MonoBehaviour
 
         if (!canMove)
         {
+            // Nota: en Rigidbody2D la propiedad estándar es 'velocity'
             rb.linearVelocity = Vector2.zero;
             if (animator != null) animator.SetBool("isMoving", false);
             return;
@@ -91,6 +106,9 @@ public class PlayerController : MonoBehaviour
 
         stateMachine.CurrentState.HandleInput();
         stateMachine.CurrentState.LogicUpdate();
+
+        // (Opcional) Test rápido sin animación:
+        // if (Input.GetButtonDown("Fire1")) SpawnAttackHitbox();
     }
 
     private void FixedUpdate()
@@ -99,6 +117,46 @@ public class PlayerController : MonoBehaviour
     }
 
     public Vector2 GetMoveInput() => moveInput;
+
+    // ====== NUEVO: Spawner de la hitbox (llamar desde Animation Event en el frame de impacto) ======
+
+
+    public void SpawnAttackHitbox()
+    {
+        // Dirección ejemplo (mouse)
+        Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 dir = ((Vector2)mouseWorld - (Vector2)transform.position).normalized;
+        if (dir.sqrMagnitude < 0.0001f) dir = Vector2.right;
+
+        Vector2 spawnPos = (Vector2)attackOrigin.position + dir * attackRange;
+
+        // 👇 Parentéalo al Player al instanciar, así ya nace como hijo del player
+        var go = Instantiate(hitboxPrefab, spawnPos, Quaternion.identity, transform);
+
+        // 👇 BUSCÁ EN HIJOS el componente AttackHitbox
+        var hb = go.GetComponentInChildren<AttackHitbox>(true);
+        if (hb == null) { Debug.LogError("AttackHitbox no está en el root ni en hijos del prefab."); return; }
+
+        // Snapshot del daño actual del player
+        hb.damage = Mathf.Max(1, baseDamage);
+        hb.knockbackDir = dir;
+        hb.knockbackForce = knockbackForce;
+        hb.lifeTime = hitboxLifetime;
+    }
+
+    private Vector2 GetAimDirection()
+    {
+        // Apunta al mouse (top-down). Cambiá por la lógica que prefieras (input, mira, etc.)
+        Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 dir = ((Vector2)mouseWorld - (Vector2)transform.position).normalized;
+
+        if (dir.sqrMagnitude < 0.0001f)
+            dir = lastAimDir;
+
+        lastAimDir = dir;
+        return dir;
+    }
+    // =================================================================================================
 
     public void SavePlayerData()
     {
@@ -115,6 +173,9 @@ public class PlayerController : MonoBehaviour
         dashSlideDuration = data.dashSlideDuration;
         dashDuration = data.dashDuration;
         dashCooldown = data.dashCooldown;
+
+        // Cargar daño persistido
+        baseDamage = (data.baseDamage > 0) ? data.baseDamage : baseDamage;
 
         transform.position = data.position;
 

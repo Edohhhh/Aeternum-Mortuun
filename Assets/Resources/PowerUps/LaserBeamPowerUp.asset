@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   duration: 5
   isPermanent: 0
-  effect: {fileID: 0}
+  effect: {fileID: 11400000, guid: db840a4f4d223e04bb4b52b7d865f043, type: 2}
   laserBeamPrefab: {fileID: 8118559782372147317, guid: 0d58e6fbaa643468b9dc6779f133471c, type: 3}
-  activationProbability: 0.1
+  activationProbability: 1
   laserDuration: 4
-  damagePerSecond: 0.5
+  damagePerSecond: 3
   maxDistance: 1

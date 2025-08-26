@@ -54,6 +54,8 @@ public class GameDataManager : MonoBehaviour
         playerData.dashDuration = player.dashDuration;
         playerData.dashCooldown = player.dashCooldown;
 
+        playerData.baseDamage = player.baseDamage;
+
         // Salud
         var health = player.GetComponent<PlayerHealth>();
         if (health != null)

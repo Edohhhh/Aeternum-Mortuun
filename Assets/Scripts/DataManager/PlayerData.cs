@@ -19,6 +19,7 @@ public class PlayerData
     public float dashCooldown;
 
     // Attack
+    public int baseDamage;
 
 
     // Health

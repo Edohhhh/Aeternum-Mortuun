@@ -15967,17 +15967,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   canMove: 1
   moveSpeed: 4
+  baseDamage: 1
   dashSpeed: 10
   dashIframes: 10
   dashSlideDuration: 0.4
-  dashDuration: 0.5
+  dashDuration: 0.3
   dashCooldown: 0.75
   animator: {fileID: 0}
   rb: {fileID: 0}
   hitbox: {fileID: 1715398195}
   initialPowerUps:
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 11400000, guid: d24a2c224da294a9d88d1184c9582fbd, type: 2}
+  - {fileID: 11400000, guid: fe13c221851adca42b727a4903a11377, type: 2}
+  hitboxPrefab: {fileID: 4335963568038847909, guid: cef6cbe95f78f9c478521dd7f4133bd4, type: 3}
+  attackOrigin: {fileID: 0}
+  attackRange: 0.7
+  hitboxLifetime: 0.1
+  knockbackForce: 100
 --- !u!61 &1715398195
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -16863,6 +16869,7 @@ MonoBehaviour:
     dashSlideDuration: 0
     dashDuration: 0
     dashCooldown: 0
+    baseDamage: 0
     maxHealth: 0
     currentHealth: 0
     regenerationRate: 0
