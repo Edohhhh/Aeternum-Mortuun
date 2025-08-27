@@ -9,9 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 38397916479326a428199b8586bca1d4, type: 3}
-  m_Name: LaserBeam
+  m_Script: {fileID: 11500000, guid: aaa8a2de1ad584332a14529e1357becd, type: 3}
+  m_Name: NormalBook
   m_EditorClassIdentifier: 
-  label: Excalibur
-  icon: {fileID: 7511617788268671622, guid: 8f66222187e68cc42bb5cb49fcbc6096, type: 3}
-  powerUp: {fileID: 11400000, guid: eca52cc6fcef64cc5b24c52170419da3, type: 2}
+  duration: 5
+  isPermanent: 0
+  effect: {fileID: 0}

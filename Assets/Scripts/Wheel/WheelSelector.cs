@@ -122,7 +122,7 @@ public class WheelSelector : MonoBehaviour
         // Aplica el efecto del premio
         wheel.AplicarUltimoPremio();
 
-        // Busca al jugador y guarda sus datos actualizados
+        // Guardar datos del jugador
         GameObject player = GameObject.FindWithTag("Player");
         if (player != null)
         {
@@ -142,14 +142,16 @@ public class WheelSelector : MonoBehaviour
             Debug.LogError("❌ No se encontró GameObject con tag 'Player'.");
         }
 
-        // (Opcional) Si querés desactivar botones después de confirmar
-        // podés acceder al UISet y desactivarlos
+        // ✅ Disparar carga de la próxima sala (con delay de 3 segundos)
+        RoomManager.Instance.LoadNextRoomWithDelay();
+
+        // Desactivar UI de la ruleta usada
         RuletaUISet[] allRuletas = FindObjectsOfType<RuletaUISet>();
-        foreach (var ruleta in allRuletas)
+        foreach (var set in allRuletas)
         {
-            if (ruleta.linkedWheel == wheel)
+            if (set.linkedWheel == wheel)
             {
-                ruleta.Activar(false);
+                set.Activar(false);
             }
         }
     }

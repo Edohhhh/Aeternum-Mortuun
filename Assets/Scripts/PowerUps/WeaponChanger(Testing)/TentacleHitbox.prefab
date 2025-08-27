@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1291500556819830731}
   - component: {fileID: 3255450359020033132}
   m_Layer: 0
-  m_Name: ATAQUE MORTAAAAAl
+  m_Name: TentacleHitbox
   m_TagString: PlayerAttack
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -102,8 +102,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d24c1958fc23ea54d9ccc03db962a769, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 1
-  lifeTime: 0.1
+  damage: 2
+  lifeTime: 2
   knockbackDir: {x: 0, y: 0}
   knockbackForce: 9.9
 --- !u!58 &1291500556819830731
