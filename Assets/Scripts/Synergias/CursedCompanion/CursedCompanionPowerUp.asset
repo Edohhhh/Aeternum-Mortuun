@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd6278d56b4884eb7af34810666fce08, type: 3}
+  m_Name: CursedCompanionPowerUp
+  m_EditorClassIdentifier: 
+  duration: 5
+  isPermanent: 0
+  effect: {fileID: 0}
+  companionPrefab: {fileID: 4044226431327515090, guid: 90f5dcc5b82db43ac8fa789447fb923f, type: 3}
+  bulletPrefab: {fileID: 4742262254832795040, guid: 785710dac41f14c14a7d751c036b15a4, type: 3}
+  fireInterval: 5
+  burstInterval: 0.1
+  bulletsPerBurst: 3
+  damagePerShot: 1
+  speedMultiplier: 0.75
