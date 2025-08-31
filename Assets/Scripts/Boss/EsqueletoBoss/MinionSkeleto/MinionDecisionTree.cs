@@ -13,22 +13,24 @@ public class MinionDecisionTree : MonoBehaviour
 
     private void Update()
     {
-        // <-- aquí añadimos la guardia
-        if (minion.IsSpawning())
+        if (minion.IsSpawning() || minion.IsMeleeing())
             return;
 
-        // Sólo cuando ya salió del spawn ejecutamos el árbol
         rootNode.Execute();
     }
 
     private void CreateTree()
     {
         var death = new ActionNode(() => minion.Transition(EnemyInputs.Die));
+        var melee = new ActionNode(() => { minion.MarkMeleeUsed(); minion.Transition(EnemyInputs.MeleeAttack); });
         var follow = new ActionNode(() => minion.Transition(EnemyInputs.SeePlayer));
         var idle = new ActionNode(() => minion.Transition(EnemyInputs.LostPlayer));
 
         var canSee = new QuestionNode(follow, idle, CanSeePlayer);
-        rootNode = new QuestionNode(death, canSee, IsDead);
+        var canMelee = new QuestionNode(melee, canSee, () => minion.IsPlayerInMeleeRange() && minion.CanMeleeAttack());
+
+        // prioridad: morir > melee > follow/idle
+        rootNode = new QuestionNode(death, canMelee, IsDead);
     }
 
     private bool IsDead() => minion.GetCurrentHealth() <= 0f;

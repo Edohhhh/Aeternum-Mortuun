@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class MinionController : MonoBehaviour, IEnemyDataProvider
+public class MinionController : MonoBehaviour, IEnemyDataProvider, IMeleeHost
 {
     [Header("References")][SerializeField] private Transform player;
     [Header("Stats")][SerializeField] private float detectionRadius = 4f;
@@ -10,6 +10,12 @@ public class MinionController : MonoBehaviour, IEnemyDataProvider
     [Header("Spawn")]
     [Tooltip("No se usa con Animation Event")]
     [SerializeField] private float spawnAnimDuration = 1f;
+
+    [SerializeField] private float meleeAttackRange = 1.0f;
+    [SerializeField] private float meleeCooldown = 0.7f;
+    private float nextMeleeAllowedTime = 0f;
+
+    [SerializeField] private EnemyAttack attack;
 
     private FSM<EnemyInputs> fsm;
     private Animator animator;
@@ -23,6 +29,23 @@ public class MinionController : MonoBehaviour, IEnemyDataProvider
     public void OnMinionSpawnFinished() => _spawnStateRef?.NotifySpawnFinished();
 
     public bool IsSpawning() => fsm.GetCurrentState() is MinionSpawnState;
+
+    private MeleeAttackState _meleeRef;
+    public void RegisterMeleeState(MeleeAttackState s) => _meleeRef = s;
+
+    // events desde Animator (clip Melee del minion)
+    public void OnMeleeHit() => _meleeRef?.OnMeleeHit();
+    public void OnMeleeFinished() => _meleeRef?.OnMeleeFinished();
+
+    // helpers para el árbol
+    public bool IsMeleeing() => fsm.GetCurrentState() is MeleeAttackState;
+    public bool CanMeleeAttack() => Time.time >= nextMeleeAllowedTime;
+    public bool IsPlayerInMeleeRange()
+    {
+        if (player == null) return false;
+        return Vector2.Distance(transform.position, player.position) <= meleeAttackRange;
+    }
+    public void MarkMeleeUsed() => nextMeleeAllowedTime = Time.time + meleeCooldown;
 
     private void Start()
     {
@@ -47,6 +70,7 @@ public class MinionController : MonoBehaviour, IEnemyDataProvider
         var idle = new EnemyIdleState(transform);
         var follow = new EnemyFollowState(transform, player, maxSpeed);
         var death = new EnemyDeathState(this);
+        var melee = new MeleeAttackState(this);
 
         fsm = new FSM<EnemyInputs>(spawn);
 
@@ -58,13 +82,16 @@ public class MinionController : MonoBehaviour, IEnemyDataProvider
 
         follow.AddTransition(EnemyInputs.LostPlayer, idle);
         follow.AddTransition(EnemyInputs.Die, death);
+
+        follow.AddTransition(EnemyInputs.MeleeAttack, melee);
+        melee.AddTransition(EnemyInputs.SeePlayer, follow);
     }
 
     private void Update()
     {
         fsm.Update();
 
-        if (IsSpawning())
+        if (IsSpawning() || IsMeleeing())
             return;
 
         float dist = Vector2.Distance(transform.position, player.position);
@@ -95,6 +122,12 @@ public class MinionController : MonoBehaviour, IEnemyDataProvider
         yield return new WaitForSeconds(0.5f);
         Destroy(gameObject);
     }
+
+    // IMeleeHost
+    public Transform Transform => transform;
+    public Animator Animator => animator;
+    public Rigidbody2D Body => rb;
+    public EnemyAttack Attack => attack;
 }
 //public class MinionController : MonoBehaviour, IEnemyDataProvider
 //{
