@@ -14,7 +14,7 @@ public class SynergyResolver : MonoBehaviour
 
     private IEnumerator WaitAndCheck()
     {
-        // Espera un momento a que PlayerController termine de aplicar perks
+        // PlayerController termine de aplicar efectos perks
         yield return new WaitForSeconds(0.1f);
 
         var player = Object.FindAnyObjectByType<PlayerController>();
@@ -34,18 +34,26 @@ public class SynergyResolver : MonoBehaviour
         {
             if (current.Contains(synergy.perkA) && current.Contains(synergy.perkB))
             {
-                Debug.Log($"?? Sinergia detectada: {synergy.perkA.name} + {synergy.perkB.name} ? {synergy.result.name}");
 
+                // eliminar efectos activos de A y B
+                synergy.perkA.Remove(player);
+                synergy.perkB.Remove(player);
+
+                // Que se saque de la lista y deje de apicar los efecrtso
                 current.Remove(synergy.perkA);
                 current.Remove(synergy.perkB);
-                current.Add(synergy.result);
 
+                // Agregar perk sinergiada
+                current.Add(synergy.result);
                 synergy.result.Apply(player);
+
                 modified = true;
             }
         }
 
         if (modified)
+        {
             player.initialPowerUps = current.ToArray();
+        }
     }
 }
