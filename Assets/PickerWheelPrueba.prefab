@@ -47,7 +47,7 @@ GameObject:
   - component: {fileID: 7305758470852654209}
   - component: {fileID: 3138501941816612765}
   m_Layer: 0
-  m_Name: PickerWheel
+  m_Name: PickerWheelPrueba
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -65,9 +65,9 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 8147262719970255687}
   - {fileID: 6979930054425753271}
   - {fileID: 4476563408190496434}
-  - {fileID: 8147262719970255687}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -180}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -184,9 +184,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa4bebc7bfe9d394592353853ce4bc26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  powerUpPools: []
-  powerUpPool: {fileID: 11400000, guid: 990c36f0dfd896f468bd2e7e38db5f67, type: 2}
-  linePrefab: {fileID: 1258666099951334, guid: ee8d4b94c42efd34eb323e0b8c83c810, type: 3}
+  powerUpPools:
+  - pool: {fileID: 11400000, guid: 16c4ea578a038a54ea6fe29ea85fa786, type: 2}
+    weight: 50
+  - pool: {fileID: 11400000, guid: f627dc7b1b3a4e34e9b6e86b241a12ef, type: 2}
+    weight: 50
+  powerUpPool: {fileID: 11400000, guid: 741a22992651e1646a7ace4cfab2b8e7, type: 2}
+  linePrefab: {fileID: 1258666099951334, guid: 93bc1e8842fde884f878e59843c9706d, type: 3}
   linesParent: {fileID: 2845754903725659257}
   selector: {fileID: 6718008529401278016}
   PickerWheelTransform: {fileID: 3180750416933447464}
@@ -269,17 +273,17 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 647435951967983033}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: -0, y: 0, z: -0.9999985, w: -0.001743336}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 8147262719970255687}
+  m_Father: {fileID: 4476563408190496434}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 17, y: 215}
-  m_SizeDelta: {x: -474.4991, y: -452.2545}
+  m_AnchoredPosition: {x: -4.5, y: -259.3}
+  m_SizeDelta: {x: 12.2, y: 115.4847}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1200383427413697135
 CanvasRenderer:
@@ -309,7 +313,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -8132037803387117410, guid: f056c20e309ed1546a1988447361a570, type: 3}
+  m_Sprite: {fileID: -8557479758017970, guid: 40c50fde4ac33bf40a6d7821d0da8ae4, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -364,6 +368,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 6718008529401278016}
   - {fileID: 4505221503046832265}
   m_Father: {fileID: 3180750416933447464}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 180.2}
@@ -475,7 +480,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -7802554505307008920, guid: 7f5543e3de8c1584cbc5f6017107a074, type: 3}
+  m_Sprite: {fileID: -6883452442219484794, guid: e8e0cb0cb4de0fc458c95354af8013dd, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -593,13 +598,12 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7309957590616470047}
-  - {fileID: 6718008529401278016}
   m_Father: {fileID: 3180750416933447464}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.000015258789, y: 0.000030517578}
-  m_SizeDelta: {x: 576, y: 576}
+  m_AnchoredPosition: {x: 0.000015258789, y: 4}
+  m_SizeDelta: {x: 576, y: 633.3953}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5292041902852453178
 CanvasRenderer:
@@ -629,7 +633,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 1743938237099436844, guid: 5867bbad29528a84085df49283063248, type: 3}
+  m_Sprite: {fileID: -8325020249086681751, guid: fcfb690868498534f8e6030cb5ed2de0, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -736,7 +740,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 61630906952745925, guid: 3518b0eeb085f064d8683879cca6c1ca, type: 3}
+  m_Sprite: {fileID: -4751604880310040226, guid: 38021ce9c0c70fd48a30924a6099b19b, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1

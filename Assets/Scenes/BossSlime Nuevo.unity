@@ -303,11 +303,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cefd56feb0c797d488aced68d8b3b5ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ruletaPool:
-  - {fileID: 531529343062115860, guid: d4edcc3a4331d0947aee436da2c36d77, type: 3}
-  - {fileID: 531529343062115860, guid: 927f21ff82c266b4c99971b2a71679dc, type: 3}
-  - {fileID: 531529343062115860, guid: 73f7d2c6f7e4c78419f1bbbd0e0d8a54, type: 3}
-  - {fileID: 531529343062115860, guid: a580b7c257daf5f4f9158abc8a545742, type: 3}
+  ruletaWeightedPool:
+  - prefab: {fileID: 531529343062115860, guid: d4edcc3a4331d0947aee436da2c36d77, type: 3}
+    weight: 46.1
+  - prefab: {fileID: 531529343062115860, guid: 73f7d2c6f7e4c78419f1bbbd0e0d8a54, type: 3}
+    weight: 18.3
+  - prefab: {fileID: 531529343062115860, guid: 927f21ff82c266b4c99971b2a71679dc, type: 3}
+    weight: 25.5
+  - prefab: {fileID: 531529343062115860, guid: a580b7c257daf5f4f9158abc8a545742, type: 3}
+    weight: 0
+  - prefab: {fileID: 531529343062115860, guid: b2900017f85b68f42a792aa741f69ba9, type: 3}
+    weight: 100
   ruletaContainer: {fileID: 1067953921}
   selectedLabel: {fileID: 0}
   ruletaUISets:
@@ -18407,6 +18413,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa4bebc7bfe9d394592353853ce4bc26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  powerUpPools: []
   powerUpPool: {fileID: 0}
   linePrefab: {fileID: 1258666099951334, guid: 052d5aa0d2632e04c90d4d5027f9dd37, type: 3}
   linesParent: {fileID: 5396449332336509900}

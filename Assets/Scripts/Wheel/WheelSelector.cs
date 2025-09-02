@@ -3,10 +3,17 @@ using System.Collections.Generic;
 using TMPro;
 using EasyUI.PickerWheelUI;
 
+[System.Serializable]
+public class WeightedRuleta
+{
+    public GameObject prefab;
+    [Range(0f, 100f)] public float weight = 1f; // porcentaje/ponderación de aparición
+}
+
 public class WheelSelector : MonoBehaviour
 {
-    [Header("Prefabs de ruletas disponibles")]
-    [SerializeField] private List<GameObject> ruletaPool; // mínimo 3
+    [Header("Ruletas ponderadas (elige 3 sin reemplazo por porcentaje)")]
+    [SerializeField] private List<WeightedRuleta> ruletaWeightedPool; // mínima 3 válidas (peso > 0 y prefab asignado)
 
     [Header("Contenedor con HorizontalLayoutGroup")]
     [SerializeField] private Transform ruletaContainer;
@@ -34,31 +41,95 @@ public class WheelSelector : MonoBehaviour
         ruletasInstanciadas.Clear();
         ruletaSeleccionada = null;
 
-        // Selección aleatoria de prefabs distintos
-        List<GameObject> seleccionadas = new List<GameObject>();
-        List<GameObject> copiaPool = new List<GameObject>(ruletaPool);
-
-        for (int i = 0; i < 3 && copiaPool.Count > 0; i++)
+        // Validar y clonar lista filtrada (prefab != null, weight > 0)
+        List<WeightedRuleta> candidatos = new List<WeightedRuleta>();
+        foreach (var w in ruletaWeightedPool)
         {
-            int idx = Random.Range(0, copiaPool.Count);
-            seleccionadas.Add(copiaPool[idx]);
-            copiaPool.RemoveAt(idx);
+            if (w != null && w.prefab != null && w.weight > 0f)
+                candidatos.Add(w);
         }
 
+        if (candidatos.Count < 3)
+        {
+            Debug.LogError("❌ Necesitas al menos 3 ruletas válidas (prefab asignado y weight > 0) en 'ruletaWeightedPool'.");
+            return;
+        }
+
+        // Elegir 3 distintas por ponderación (sin reemplazo)
+        List<WeightedRuleta> seleccionadas = PickDistinctWeighted(candidatos, 3);
+
+        // Instanciar y configurar
         for (int i = 0; i < seleccionadas.Count; i++)
         {
-            GameObject obj = Instantiate(seleccionadas[i], ruletaContainer);
+            GameObject obj = Instantiate(seleccionadas[i].prefab, ruletaContainer);
             obj.name = $"Ruleta {i + 1}";
 
             PickerWheel wheel = obj.GetComponent<PickerWheel>();
+            if (wheel == null)
+            {
+                Debug.LogError($"❌ El prefab '{seleccionadas[i].prefab.name}' no tiene PickerWheel.");
+                continue;
+            }
+
             ruletasInstanciadas.Add(wheel);
 
-            // ✅ FORZAR generación de contenido para que los íconos y efectos coincidan
-            wheel.CargarPremiosDesdePool();
+            // ⚠️ Usa el método nuevo. Si no agregaste el alias, llamá a este:
+            wheel.CargarPremiosDesdePoolsPonderados();
+            // Si preferís no tocar PickerWheel, podés dejar el alias:
+            // wheel.CargarPremiosDesdePool();
 
-            // Vincular UISet con ruleta
-            ruletaUISets[i].Inicializar(wheel, this);
+            // Vincular UISet si existe
+            if (i < ruletaUISets.Count && ruletaUISets[i] != null)
+            {
+                ruletaUISets[i].Inicializar(wheel, this);
+            }
+            else
+            {
+                Debug.LogWarning($"⚠️ No hay UI set para la ruleta {i + 1}. Revisa la lista 'ruletaUISets'.");
+            }
         }
+    }
+
+    // --- Selección ponderada sin reemplazo ---
+    private List<WeightedRuleta> PickDistinctWeighted(List<WeightedRuleta> source, int k)
+    {
+        List<WeightedRuleta> pool = new List<WeightedRuleta>(source);
+        List<WeightedRuleta> result = new List<WeightedRuleta>(k);
+
+        for (int picks = 0; picks < k; picks++)
+        {
+            float total = 0f;
+            foreach (var w in pool) total += Mathf.Max(0f, w.weight);
+
+            if (total <= 0f)
+            {
+                Debug.LogWarning("⚠️ Suma de pesos <= 0 durante la selección. Usando primer elemento como fallback.");
+                result.Add(pool[0]);
+                pool.RemoveAt(0);
+                continue;
+            }
+
+            float r = Random.Range(0f, total);
+            float acc = 0f;
+            int chosenIndex = -1;
+
+            for (int i = 0; i < pool.Count; i++)
+            {
+                acc += Mathf.Max(0f, pool[i].weight);
+                if (r <= acc)
+                {
+                    chosenIndex = i;
+                    break;
+                }
+            }
+
+            if (chosenIndex < 0) chosenIndex = pool.Count - 1; // Fallback por borde
+
+            result.Add(pool[chosenIndex]);
+            pool.RemoveAt(chosenIndex);
+        }
+
+        return result;
     }
 
     public void SeleccionarRuletaDesdeBoton(RuletaUISet seleccionado)
@@ -142,7 +213,7 @@ public class WheelSelector : MonoBehaviour
             Debug.LogError("❌ No se encontró GameObject con tag 'Player'.");
         }
 
-        // ✅ Disparar carga de la próxima sala (con delay de 3 segundos)
+        // Cargar siguiente sala
         RoomManager.Instance.LoadNextRoomWithDelay();
 
         // Desactivar UI de la ruleta usada
@@ -155,7 +226,6 @@ public class WheelSelector : MonoBehaviour
             }
         }
     }
-
 
     public void SpinRuletaSeleccionada()
     {
