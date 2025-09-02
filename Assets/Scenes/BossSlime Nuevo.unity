@@ -8101,10 +8101,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1980, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
@@ -8585,10 +8585,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1980, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
@@ -10682,10 +10682,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1980, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
@@ -15937,6 +15937,12 @@ MonoBehaviour:
   attackRange: 0.7
   hitboxLifetime: 0.1
   knockbackForce: 100
+  spawnHitboxViaAnimationEvent: 0
+  knockbackDecay: 18
+  knockbackMaxSpeed: 22
+  knockbackStackWindow: 0.08
+  knockbackInterruptsDash: 1
+  knockbackInterruptsRecoil: 1
 --- !u!61 &1715398195
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -16121,7 +16127,9 @@ MonoBehaviour:
   - {fileID: 5981503115607741876, guid: 4fc220dea784a134a93fe3100cb0d0f0, type: 3}
   hitboxPrefab: {fileID: 4335963568038847909, guid: cef6cbe95f78f9c478521dd7f4133bd4, type: 3}
   hitboxOffset: 0.99
-  dashSpeed: 400
+  recoilDistance: 0.5
+  recoilDuration: 0.08
+  allowMovementDuringAttack: 0
 --- !u!61 &1715398201
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -17073,10 +17081,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1980, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3

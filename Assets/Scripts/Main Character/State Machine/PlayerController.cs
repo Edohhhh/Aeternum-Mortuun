@@ -30,25 +30,51 @@ public class PlayerController : MonoBehaviour
     public KnockbackState KnockbackState { get; private set; }
 
     private Vector2 moveInput;
+    private Vector2 lastNonZeroMoveInput = Vector2.right; // se actualiza solo cuando NO hay dash
     private float dashCooldownTimer;
-
     public bool isInvulnerable { get; set; }
 
-    // ====== NUEVO: configuración de ataque / hitbox ======
-    [Header("Ataque (Hitbox)")]
-    [SerializeField] private GameObject hitboxPrefab;  // el prefab puede tener el AttackHitbox en un hijo
+    // Dash flags / dir
+    [HideInInspector] public bool IsDashing { get; set; }
+    public Vector2 RequestedDashDir { get; private set; } = Vector2.right;
+
+    // ====== Ataque (Hitbox por Animation Event - opcional) ======
+    [Header("Ataque (Hitbox - opcional por Animation Event)")]
+    [SerializeField] private GameObject hitboxPrefab;
     [SerializeField] private Transform attackOrigin;
     [SerializeField] private float attackRange = 0.7f;
     [SerializeField] private float hitboxLifetime = 0.10f;
     [SerializeField] private float knockbackForce = 100f;
-
+    [SerializeField] private bool spawnHitboxViaAnimationEvent = false;
     private Vector2 lastAimDir = Vector2.right;
-    // =====================================================
+    // ============================================================
+
+    // ====== Knockback sensible ======
+    [Header("Knockback (Player)")]
+    [Tooltip("Decaimiento del knockback (unidades de velocidad por segundo).")]
+    public float knockbackDecay = 18f;
+    [Tooltip("Límite superior de velocidad por knockback (magnitud).")]
+    public float knockbackMaxSpeed = 22f;
+    [Tooltip("Ventana (s) para apilar impulsos si hay golpes muy rápidos.")]
+    public float knockbackStackWindow = 0.08f;
+    [Tooltip("Si true, el knockback corta el dash al impactar.")]
+    public bool knockbackInterruptsDash = true;
+    [Tooltip("Si true, el knockback corta el recoil del ataque.")]
+    public bool knockbackInterruptsRecoil = true;
+
+    private Vector2 knockVel;          // velocidad acumulada por knockback
+    private float knockWindowTimer;    // ventana para apilar hits
+    private bool knockActive;          // hay knockback en curso
+    // =================================
+
+    // Ref al CombatSystem para coordinar con recoil
+    private CombatSystem combat;
 
     private void Awake()
     {
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
+        combat = GetComponent<CombatSystem>();
         stateMachine = new StateMachine();
 
         IdleState = new IdleState(this, stateMachine);
@@ -70,94 +96,155 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void Update()
+    private void Update()
     {
         // Flip sprite hacia el cursor
         Vector2 playerScreenPos = Camera.main.WorldToScreenPoint(transform.position);
         Vector2 mousePos = Input.mousePosition;
-        GetComponent<SpriteRenderer>().flipX = mousePos.x < playerScreenPos.x;
+        var sr = GetComponent<SpriteRenderer>();
+        if (sr != null) sr.flipX = mousePos.x < playerScreenPos.x;
 
         // Dash cooldown
         dashCooldownTimer -= Time.deltaTime;
 
-        // Input de movimiento
+        // Input de movimiento (solo si puede moverse)
         if (canMove)
         {
             float moveX = Input.GetAxisRaw("Horizontal");
             float moveY = Input.GetAxisRaw("Vertical");
             moveInput = new Vector2(moveX, moveY).normalized;
+
+            // ⭐ Guardar la última dirección NO cero SOLO cuando NO estoy dashing
+            if (!IsDashing && moveInput.sqrMagnitude > 0.0001f)
+                lastNonZeroMoveInput = moveInput;
         }
 
-        // Iniciar dash
-        if (Input.GetButtonDown("Jump") && dashCooldownTimer <= 0f && moveInput != Vector2.zero)
+        // Iniciar dash usando input actual o el último guardado
+        if (Input.GetButtonDown("Jump") &&
+            dashCooldownTimer <= 0f &&
+            canMove &&
+            (moveInput.sqrMagnitude > 0.0001f || lastNonZeroMoveInput.sqrMagnitude > 0.0001f))
         {
             dashCooldownTimer = dashCooldown;
+            RequestedDashDir = (moveInput.sqrMagnitude > 0.0001f ? moveInput : lastNonZeroMoveInput).normalized;
             stateMachine.ChangeState(DashState);
             return;
         }
 
+        // Si no puede moverse, frenar y salir
         if (!canMove)
         {
-            // Nota: en Rigidbody2D la propiedad estándar es 'velocity'
             rb.linearVelocity = Vector2.zero;
+            moveInput = Vector2.zero;
             if (animator != null) animator.SetBool("isMoving", false);
             return;
         }
 
         stateMachine.CurrentState.HandleInput();
         stateMachine.CurrentState.LogicUpdate();
-
-        // (Opcional) Test rápido sin animación:
-        // if (Input.GetButtonDown("Fire1")) SpawnAttackHitbox();
     }
 
     private void FixedUpdate()
     {
+        // ⛔ PRIORIDAD 1: Knockback (si está activo, nadie más escribe la velocidad)
+        if (knockActive)
+        {
+            // Aplicar velocidad de knockback
+            rb.linearVelocity = knockVel;
+
+            // Decaimiento suave hacia 0
+            knockVel = Vector2.MoveTowards(knockVel, Vector2.zero, knockbackDecay * Time.fixedDeltaTime);
+            if (knockWindowTimer > 0f) knockWindowTimer -= Time.fixedDeltaTime;
+
+            // Cierre del knockback
+            if (knockVel.sqrMagnitude < 0.0001f && knockWindowTimer <= 0f)
+            {
+                knockActive = false;
+                rb.linearVelocity = Vector2.zero;
+                canMove = true; // liberar control (si nadie más bloquea)
+            }
+            return;
+        }
+
+        // ⛔ PRIORIDAD 2: Recoil bloqueado (no dejar que la FSM mueva)
+        bool recoilBloqueado = (combat != null && combat.IsRecoiling() && !combat.allowMovementDuringAttack);
+        if (!canMove || recoilBloqueado)
+        {
+            rb.linearVelocity = Vector2.zero;
+            return;
+        }
+
+        // FSM normal
         stateMachine.CurrentState.PhysicsUpdate();
     }
 
     public Vector2 GetMoveInput() => moveInput;
 
-    // ====== NUEVO: Spawner de la hitbox (llamar desde Animation Event en el frame de impacto) ======
+    // ====== API PÚBLICA: aplicar knockback al Player ======
+    public void ApplyKnockback(Vector2 direction, float strength)
+    {
+        if (strength <= 0f) return;
 
+        // Interrupciones opcionales
+        if (knockbackInterruptsDash && IsDashing)
+        {
+            // Volvé a Idle; tu DashState hará su cleanup en Exit()
+            stateMachine.ChangeState(IdleState);
+        }
+        if (knockbackInterruptsRecoil && combat != null)
+        {
+            combat.ForceStopRecoil(); // corta el micro-dash del ataque
+        }
 
+        // Bloquear movimiento del jugador (stun leve)
+        canMove = false;
+
+        // Acumular impulso durante una pequeña ventana
+        Vector2 impulse = direction.sqrMagnitude > 0.0001f ? direction.normalized * strength : Vector2.zero;
+        knockVel += impulse;
+        knockVel = Vector2.ClampMagnitude(knockVel, knockbackMaxSpeed);
+        knockWindowTimer = knockbackStackWindow;
+
+        knockActive = true;
+    }
+    // ======================================================
+
+    // ====== Hitbox por Animation Event (opcional) ======
     public void SpawnAttackHitbox()
     {
-        // Dirección ejemplo (mouse)
+        if (!spawnHitboxViaAnimationEvent) return;
+
         Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector2 dir = ((Vector2)mouseWorld - (Vector2)transform.position).normalized;
-        if (dir.sqrMagnitude < 0.0001f) dir = Vector2.right;
+        if (dir.sqrMagnitude < 0.0001f) dir = lastAimDir;
 
         Vector2 spawnPos = (Vector2)attackOrigin.position + dir * attackRange;
 
-        // 👇 Parentéalo al Player al instanciar, así ya nace como hijo del player
         var go = Instantiate(hitboxPrefab, spawnPos, Quaternion.identity, transform);
-
-        // 👇 BUSCÁ EN HIJOS el componente AttackHitbox
         var hb = go.GetComponentInChildren<AttackHitbox>(true);
         if (hb == null) { Debug.LogError("AttackHitbox no está en el root ni en hijos del prefab."); return; }
 
-        // Snapshot del daño actual del player
         hb.damage = Mathf.Max(1, baseDamage);
         hb.knockbackDir = dir;
         hb.knockbackForce = knockbackForce;
         hb.lifeTime = hitboxLifetime;
+
+        lastAimDir = dir;
     }
+    // ====================================================
 
     private Vector2 GetAimDirection()
     {
-        // Apunta al mouse (top-down). Cambiá por la lógica que prefieras (input, mira, etc.)
         Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector2 dir = ((Vector2)mouseWorld - (Vector2)transform.position).normalized;
-
         if (dir.sqrMagnitude < 0.0001f)
             dir = lastAimDir;
 
         lastAimDir = dir;
         return dir;
     }
-    // =================================================================================================
 
+    // ====== Persistencia ======
     public void SavePlayerData()
     {
         GameDataManager.Instance.SavePlayerData(this);
@@ -174,7 +261,6 @@ public class PlayerController : MonoBehaviour
         dashDuration = data.dashDuration;
         dashCooldown = data.dashCooldown;
 
-        // Cargar daño persistido
         baseDamage = (data.baseDamage > 0) ? data.baseDamage : baseDamage;
 
         transform.position = data.position;
@@ -190,7 +276,6 @@ public class PlayerController : MonoBehaviour
             health.UpdateUI();
         }
 
-        // PowerUps (referencias directas)
         initialPowerUps = data.initialPowerUps.ToArray();
         foreach (var powerUp in initialPowerUps)
         {
