@@ -6,9 +6,10 @@ public class GolemLaserState : State<EnemyInputs>
     private Phase phase;
 
     private readonly GolemController golem;
+    private GolemBeam beamInstance;
     private RigidbodyConstraints2D saved;
     private float timer;
-
+    
     public GolemLaserState(GolemController g) { golem = g; }
 
     public override void Awake()
@@ -68,20 +69,49 @@ public class GolemLaserState : State<EnemyInputs>
             golem.Body.constraints = saved;  // restaurar EXACTAMENTE
 
         golem.RegisterLaserState(null);
+        if (beamInstance) Object.Destroy(beamInstance.gameObject);
         base.Sleep();
     }
 
     // ---------- llamados por Animation Events del clip ----------
+
     public void OnChargeEnd()
     {
-        // termina la fase de carga → empieza el rayo
         if (phase != Phase.Prepare) return;
         phase = Phase.Fire;
         timer = 0f;
 
-        // (más adelante: instanciar el prefab aquí)
-        Debug.Log("GOLEM LASER: FIRE (comienza el rayo)");
+        // Instanciar el rayo
+        if (golem != null && golem.Transform && golem.GetPlayer() && golem.laserPrefab != null)
+        {
+            beamInstance = Object.Instantiate(golem.laserPrefab, golem.Transform.position, Quaternion.identity);
+            // Inicializar con parámetros del controller
+            beamInstance.Initialize(
+                golem.Transform,
+                golem.GetPlayer(),
+                golem.BeamDuration,             // 3s
+                golem.BeamDmg,                  // 1f (o lo que uses)
+                0.25f,                          // intervalo de daño (cámbialo si querés)
+                golem.BeamMaxRange,
+                golem.BeamThickness,
+                golem.BeamKnockback,
+                golem.BeamPlayerMask,
+                golem.BeamObstacleMask
+            );
+        }
+
+        Debug.Log("GOLEM LASER: FIRE");
     }
+    //public void OnChargeEnd()
+    //{
+    //    // termina la fase de carga → empieza el rayo
+    //    if (phase != Phase.Prepare) return;
+    //    phase = Phase.Fire;
+    //    timer = 0f;
+
+    //    // (más adelante: instanciar el prefab aquí)
+    //    Debug.Log("GOLEM LASER: FIRE (comienza el rayo)");
+    //}
 
     public void OnLaserFinished()
     {

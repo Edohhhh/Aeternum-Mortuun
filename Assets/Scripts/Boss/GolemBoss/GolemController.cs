@@ -22,7 +22,21 @@ public class GolemController : MonoBehaviour, IEnemyDataProvider, IMeleeHost
     [SerializeField] private float laserInitialDelay = 15f;   
     [SerializeField] private float laserCooldown = 12f;
     [SerializeField] public float laserRecoverTime = 2f;
-    
+
+    [Header("Laser Prefab")]
+    [SerializeField] public GolemBeam laserPrefab;          // arrastrá el prefab acá desde el inspector
+    public GolemBeam LaserPrefab => laserPrefab;
+
+    [Header("Laser Tuning")]
+    [SerializeField] private float beamDuration = 3f;      // duración visual del rayo
+    [SerializeField] private float beamDamage = 1f;      // daño por tick/impacto
+    [SerializeField] private float beamMaxRange = 12f;     // alcance máx.
+    [SerializeField] private float beamThickness = 0.6f;    // grosor visual/colisión
+    [SerializeField] private float beamKnockback = 6f;      // 0 para desactivar empuje
+    [SerializeField] private LayerMask beamPlayerMask;       // capa Player
+    [SerializeField] private LayerMask beamObstacleMask;     // muros
+
+
 
     private float nextLaserReadyTime;
 
@@ -153,6 +167,14 @@ public class GolemController : MonoBehaviour, IEnemyDataProvider, IMeleeHost
     public Rigidbody2D Body => rb;
     public EnemyAttack Attack => attack;
 
+    // Laser 
+    public float BeamDuration => beamDuration;
+    public float BeamDmg => beamDamage;
+    public float BeamMaxRange => beamMaxRange;
+    public float BeamThickness => beamThickness;
+    public float BeamKnockback => beamKnockback;
+    public LayerMask BeamPlayerMask => beamPlayerMask;
+    public LayerMask BeamObstacleMask => beamObstacleMask;
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;

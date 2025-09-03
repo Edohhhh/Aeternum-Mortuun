@@ -60,8 +60,8 @@ public class GameDataManager : MonoBehaviour
         var health = player.GetComponent<PlayerHealth>();
         if (health != null)
         {
-            playerData.maxHealth = (int)health.maxHealth;
-            playerData.currentHealth = (int)health.currentHealth;
+            playerData.maxHealth = (float)health.maxHealth;
+            playerData.currentHealth = (float)health.currentHealth;
             playerData.regenerationRate = health.regenerationRate;
             playerData.regenDelay = health.regenDelay;
             playerData.invulnerableTime = health.invulnerableTime;
