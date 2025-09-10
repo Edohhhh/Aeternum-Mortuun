@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c45a1d0867b4ab849b5902f89362514b, type: 3}
+  m_Name: AvengerSoulPowerUp
+  m_EditorClassIdentifier: 
+  duration: 5
+  isPermanent: 0
+  effect: {fileID: 0}
+  spiritPrefabs:
+  - {fileID: 3168142845046551104, guid: 9ad80917322f6d543a9a356cbe71a908, type: 3}
+  - {fileID: 3168142845046551104, guid: 0da8381ae1474a9488333709f1fd5d09, type: 3}
+  delayAfterHit: 1

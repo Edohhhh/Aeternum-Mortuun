@@ -21,7 +21,7 @@ public class GolemController : MonoBehaviour, IEnemyDataProvider, IMeleeHost
     [Header("Laser Special")]
     [SerializeField] private float laserInitialDelay = 15f;   
     [SerializeField] private float laserCooldown = 12f;
-    [SerializeField] public float laserRecoverTime = 2f;
+    [SerializeField] public float laserRecoverTime = 0f;
 
     [Header("Laser Prefab")]
     [SerializeField] public GolemBeam laserPrefab;          // arrastrá el prefab acá desde el inspector
@@ -36,6 +36,35 @@ public class GolemController : MonoBehaviour, IEnemyDataProvider, IMeleeHost
     [SerializeField] private LayerMask beamPlayerMask;       // capa Player
     [SerializeField] private LayerMask beamObstacleMask;     // muros
 
+    //[Header("Heavy Attack")]
+    //[SerializeField] private float heavyCooldown = 15f;
+    //[SerializeField] private float heavyAirTime = 0.6f;     // tiempo fijo en el aire
+    //[SerializeField] private float heavyArcHeight = 0.6f;   // altura del arco visual
+    //[SerializeField] private float heavyStunTime = 4f;      // se queda stuneado
+    //[SerializeField] private float heavyDamage = 2f;
+    //[SerializeField] private float heavyDamageRadius = 1.5f;
+
+    //private float heavyElapsed;
+
+    // Expuestos al estado
+    //public float HeavyAirTime => heavyAirTime;
+    //public float HeavyArcHeight => heavyArcHeight;
+    //public float HeavyStunTime => heavyStunTime;
+    //public float HeavyDamage => heavyDamage;
+    //public float HeavyDamageRadius => heavyDamageRadius;
+
+    //private GolemHeavyAttackState _heavyRef;
+    //public void RegisterHeavyState(GolemHeavyAttackState s) => _heavyRef = s;
+    //public bool IsHeavyAttacking() => fsm.GetCurrentState() is GolemHeavyAttackState;
+
+    // Animator Events del clip Heavy
+    //public void OnHeavyJumpStart() => _heavyRef?.OnJumpStart();
+    //public void OnHeavyImpact() => _heavyRef?.OnImpact();
+    //public void OnHeavyFinished() => _heavyRef?.OnFinished();
+
+    // Gating del heavy (con timer interno)
+    //public bool CanUseHeavy() => heavyElapsed >= heavyCooldown;
+    //public void MarkHeavyUsed() => heavyElapsed = 0f;
 
 
     private float nextLaserReadyTime;
@@ -104,6 +133,7 @@ public class GolemController : MonoBehaviour, IEnemyDataProvider, IMeleeHost
         var follow = new EnemyFollowState(transform, player, maxSpeed);
         var melee = new MeleeAttackState(this);
         var laser = new GolemLaserState(this);
+        //var heavy = new GolemHeavyAttackState(this);    
         var death = new EnemyDeathState(this);
 
         fsm = new FSM<EnemyInputs>(idle);
@@ -121,18 +151,25 @@ public class GolemController : MonoBehaviour, IEnemyDataProvider, IMeleeHost
         follow.AddTransition(EnemyInputs.SpecialAttack, laser);
         laser.AddTransition(EnemyInputs.SeePlayer, follow);
         laser.AddTransition(EnemyInputs.Die, death);
+
+        //follow.AddTransition(EnemyInputs.HeavyAttack, heavy);
+        //heavy.AddTransition(EnemyInputs.SeePlayer, follow);
+        //heavy.AddTransition(EnemyInputs.Die, death);
     }
 
     private void Update()
     {
         // Mientras golpea, no meter inputs de ver/seguir
-        if (IsMeleeing() || IsLasering())
+        if (IsMeleeing() || IsLasering() /*|| IsHeavyAttacking()*/)
         {
+            fsm.Update();
+            if (!IsLasering()) /*heavyElapsed += Time.deltaTime;*/
             fsm.Update();
             return;
         }
 
         fsm.Update();
+        //heavyElapsed += Time.deltaTime;
 
         // Ver / perder jugador
         float dist = player ? Vector2.Distance(transform.position, player.position) : 999f;

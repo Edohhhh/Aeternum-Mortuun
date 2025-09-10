@@ -16,4 +16,5 @@ public enum EnemyInputs
     SpawnMinions,
     Spawn,
     MeleeAttack
+    //HeavyAttack
 }

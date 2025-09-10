@@ -54,11 +54,21 @@ public class GolemLaserState : State<EnemyInputs>
                 // aquí luego instanciamos el prefab del rayo y/o lo actualizamos
                 // de momento, solo apuntamos la cara al jugador
                 FacePlayer();
+                if (beamInstance == null)
+                {
+                    golem.Transition(EnemyInputs.SeePlayer);
+                    return;
+                }
+                if (timer >= golem.BeamDuration)
+                {
+                    OnLaserFinished();
+                    return;
+                }
                 break;
+                
 
             case Phase.Recover:
-                if (timer >= golem.laserRecoverTime)   // 2s por defecto
-                    golem.Transition(EnemyInputs.SeePlayer);
+                if (timer >= golem.laserRecoverTime) golem.Transition(EnemyInputs.SeePlayer);
                 break;
         }
     }
@@ -69,7 +79,13 @@ public class GolemLaserState : State<EnemyInputs>
             golem.Body.constraints = saved;  // restaurar EXACTAMENTE
 
         golem.RegisterLaserState(null);
-        if (beamInstance) Object.Destroy(beamInstance.gameObject);
+        if (beamInstance)
+        {
+            // por si todavía existe, lo apagamos y limpiamos
+            beamInstance.StopNow(true);
+            beamInstance = null;
+        }
+        //if (beamInstance) Object.Destroy(beamInstance.gameObject);
         base.Sleep();
     }
 
@@ -116,9 +132,17 @@ public class GolemLaserState : State<EnemyInputs>
     public void OnLaserFinished()
     {
         // termina el rayo → fase de recuperación
-        if (phase == Phase.Recover) return;
+        //if (phase == Phase.Recover) return;
         phase = Phase.Recover;
         timer = 0f;
+
+        if (beamInstance)
+        {
+            beamInstance.StopNow(true);   // o beamInstance.life = 0f; si usás la alternativa
+            beamInstance = null;
+        }
+
+        golem.Transition(EnemyInputs.SeePlayer);
 
         Debug.Log("GOLEM LASER: RECOVER (termina el rayo)");
     }
