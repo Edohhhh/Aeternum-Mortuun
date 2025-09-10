@@ -82,7 +82,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 5
   m_Sprite: {fileID: 3187788920892281843, guid: 2c0be08eea2949f4bac29589f96d70a2, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -213,6 +213,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 0.5
+  useCollisionDamage: 1
+  attackPoint: {fileID: 0}
+  hitRadius: 0.8
+  playerMask:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!95 &-3212271171263960301
 Animator:
   serializedVersion: 7

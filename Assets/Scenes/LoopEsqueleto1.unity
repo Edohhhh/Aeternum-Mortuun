@@ -225,11 +225,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cefd56feb0c797d488aced68d8b3b5ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ruletaPool:
-  - {fileID: 531529343062115860, guid: d4edcc3a4331d0947aee436da2c36d77, type: 3}
-  - {fileID: 531529343062115860, guid: 927f21ff82c266b4c99971b2a71679dc, type: 3}
-  - {fileID: 531529343062115860, guid: 73f7d2c6f7e4c78419f1bbbd0e0d8a54, type: 3}
-  - {fileID: 531529343062115860, guid: a580b7c257daf5f4f9158abc8a545742, type: 3}
+  ruletaWeightedPool:
+  - prefab: {fileID: 531529343062115860, guid: d4edcc3a4331d0947aee436da2c36d77, type: 3}
+    weight: 46.1
+  - prefab: {fileID: 531529343062115860, guid: 73f7d2c6f7e4c78419f1bbbd0e0d8a54, type: 3}
+    weight: 18.3
+  - prefab: {fileID: 531529343062115860, guid: 927f21ff82c266b4c99971b2a71679dc, type: 3}
+    weight: 25.5
+  - prefab: {fileID: 531529343062115860, guid: a580b7c257daf5f4f9158abc8a545742, type: 3}
+    weight: 0
+  - prefab: {fileID: 531529343062115860, guid: b2900017f85b68f42a792aa741f69ba9, type: 3}
+    weight: 100
   ruletaContainer: {fileID: 1067953921}
   selectedLabel: {fileID: 0}
   ruletaUISets:
@@ -678,10 +684,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1980, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
@@ -1124,7 +1130,7 @@ PrefabInstance:
       objectReference: {fileID: 1051072447}
     - target: {fileID: 3090698038634401969, guid: 8bc3e2cbeb4a8412f8a93c0783f032af, type: 3}
       propertyPath: nextSceneName
-      value: LoopSlime2
+      value: LoopEsqueleto2
       objectReference: {fileID: 0}
     - target: {fileID: 4228299132235185309, guid: 8bc3e2cbeb4a8412f8a93c0783f032af, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1370,10 +1376,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1980, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
@@ -3792,10 +3798,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1980, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
@@ -7188,6 +7194,12 @@ MonoBehaviour:
   attackRange: 0.7
   hitboxLifetime: 0.1
   knockbackForce: 100
+  spawnHitboxViaAnimationEvent: 0
+  knockbackDecay: 18
+  knockbackMaxSpeed: 22
+  knockbackStackWindow: 0.08
+  knockbackInterruptsDash: 1
+  knockbackInterruptsRecoil: 1
 --- !u!61 &1715398195
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -7372,7 +7384,9 @@ MonoBehaviour:
   - {fileID: 5981503115607741876, guid: 4fc220dea784a134a93fe3100cb0d0f0, type: 3}
   hitboxPrefab: {fileID: 4335963568038847909, guid: cef6cbe95f78f9c478521dd7f4133bd4, type: 3}
   hitboxOffset: 0.99
-  dashSpeed: 400
+  recoilDistance: 0.22
+  recoilDuration: 0.07
+  allowMovementDuringAttack: 0
 --- !u!61 &1715398201
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -8140,10 +8154,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1980, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
@@ -9396,6 +9410,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa4bebc7bfe9d394592353853ce4bc26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  powerUpPools: []
   powerUpPool: {fileID: 0}
   linePrefab: {fileID: 1258666099951334, guid: 052d5aa0d2632e04c90d4d5027f9dd37, type: 3}
   linesParent: {fileID: 5396449332336509900}
