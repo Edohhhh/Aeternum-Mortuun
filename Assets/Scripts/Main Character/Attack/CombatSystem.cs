@@ -8,47 +8,32 @@ public class CombatSystem : MonoBehaviour
     private float attackTimer;
 
     [Header("Efectos / Hitbox")]
-    public GameObject[] slashEffectPrefabs;   
+    public GameObject[] slashEffectPrefabs;
     public GameObject hitboxPrefab;
     public float hitboxOffset = 0.5f;
 
-    [Header("Recoil (simple)")]
-    [Tooltip("Distancia que avanza el jugador al atacar (unidades de mundo).")]
+    [Header("Recoil")]
     public float recoilDistance = 0.22f;
-    [Tooltip("Duración total del micro-dash antes de frenar en seco.")]
     public float recoilDuration = 0.07f;
 
     [Header("Movimiento durante ataque")]
-    [Tooltip("Si está activo, el jugador PUEDE moverse mientras ataca/recoilea. Si está desactivado, se bloquea el movimiento y el recoil aplica el micro-dash en física.")]
     public bool allowMovementDuringAttack = false;
 
     private Rigidbody2D rb;
     private PlayerController playerController;
 
-  
     private Vector2 lastAttackDir = Vector2.right;
     private Coroutine recoilRoutine;
     private bool bufferedAttack;
 
-   
-    private int comboIndex = 0;      
+    private int comboIndex = 0;
     private float comboResetTime = 1f;
     private float comboTimer;
-
-  
-    private LaserBeamObserver laserBeamObserver;
-    private ThornsPathObserver thornsPathObserver;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         playerController = GetComponent<PlayerController>();
-    }
-
-    private void Start()
-    {
-        laserBeamObserver = LaserBeamObserver.Instance;
-        thornsPathObserver = ThornsPathObserver.Instance;
     }
 
     private void Update()
@@ -64,9 +49,13 @@ public class CombatSystem : MonoBehaviour
 
         if (Input.GetButtonDown("Fire1"))
         {
+            // 🚫 no atacar si el jugador está dashing
+            if (playerController != null && playerController.IsDashing)
+                return;
+
             if (IsRecoiling())
             {
-                bufferedAttack = true; 
+                bufferedAttack = true;
             }
             else if (attackTimer <= 0f)
             {
@@ -77,38 +66,31 @@ public class CombatSystem : MonoBehaviour
 
     private void PerformAttack()
     {
-        attackTimer = attackCooldown;
+        // 🚫 seguridad extra
+        if (playerController != null && playerController.IsDashing)
+            return;
 
-        // Combo
+        attackTimer = attackCooldown;
         comboTimer = comboResetTime;
         comboIndex++;
         if (comboIndex > 3) comboIndex = 1;
 
-        if (comboIndex == 3 && laserBeamObserver != null)
-            laserBeamObserver.OnComboCompleted(comboIndex, transform);
-        if (comboIndex == 3 && thornsPathObserver != null)
-            thornsPathObserver.OnComboCompleted(comboIndex, transform);
-
-      
         lastAttackDir = GetAttackDirection();
 
-        
         if (!allowMovementDuringAttack && playerController != null)
             playerController.canMove = false;
 
-      
         if (playerController != null && playerController.animator != null)
         {
             playerController.animator.ResetTrigger("attackTrigger");
             playerController.animator.SetTrigger("attackTrigger");
         }
 
-       
         if (AudioManager.Instance != null)
             AudioManager.Instance.PlayWithRandomPitch("swing", 0.95f, 1.05f);
 
-        
         Vector2 spawnPos = (Vector2)transform.position + lastAttackDir * hitboxOffset;
+
         if (slashEffectPrefabs != null && slashEffectPrefabs.Length >= comboIndex)
         {
             var slashPrefab = slashEffectPrefabs[comboIndex - 1];
@@ -120,7 +102,6 @@ public class CombatSystem : MonoBehaviour
             }
         }
 
-        
         if (hitboxPrefab != null)
         {
             var hitbox = Instantiate(hitboxPrefab, spawnPos, Quaternion.identity, transform);
@@ -129,10 +110,9 @@ public class CombatSystem : MonoBehaviour
                 hitboxScript.knockbackDir = lastAttackDir;
         }
 
-        
         StartRecoil(lastAttackDir);
     }
-   
+
     public void ForceStopRecoil()
     {
         if (recoilRoutine != null)
@@ -141,8 +121,6 @@ public class CombatSystem : MonoBehaviour
             recoilRoutine = null;
         }
         if (rb != null) rb.linearVelocity = Vector2.zero;
-
-       
     }
 
     private void StartRecoil(Vector2 dir)
@@ -153,16 +131,13 @@ public class CombatSystem : MonoBehaviour
 
     private IEnumerator Co_Recoil(Vector2 dir)
     {
-        
         int steps = Mathf.Max(1, Mathf.RoundToInt(recoilDuration / Time.fixedDeltaTime));
         float stepDist = recoilDistance / steps;
 
-        
         rb.linearVelocity = Vector2.zero;
 
         if (allowMovementDuringAttack)
         {
-           
             for (int i = 0; i < steps; i++)
             {
                 rb.MovePosition(rb.position + dir * stepDist);
@@ -171,14 +146,12 @@ public class CombatSystem : MonoBehaviour
         }
         else
         {
-            
             for (int i = 0; i < steps; i++)
             {
                 rb.MovePosition(rb.position + dir * stepDist);
                 yield return new WaitForFixedUpdate();
             }
 
-           
             rb.linearVelocity = Vector2.zero;
             if (playerController != null)
                 playerController.canMove = true;
