@@ -654,7 +654,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &328972262
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1172,6 +1172,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5819306723178939942, guid: 8bc3e2cbeb4a8412f8a93c0783f032af, type: 3}
+      propertyPath: m_SortingOrder
+      value: 20
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1330,7 +1334,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &576635356
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3760,7 +3764,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1174474507
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7173,6 +7177,7 @@ MonoBehaviour:
   regenDelay: 3
   invulnerableTime: 1
   healthUI: {fileID: 9783276}
+  healAmount: 1
 --- !u!114 &1715398194
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -953,6 +953,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5819306723178939942, guid: 8bc3e2cbeb4a8412f8a93c0783f032af, type: 3}
+      propertyPath: m_SortingOrder
+      value: 20
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4366,6 +4370,7 @@ MonoBehaviour:
   regenDelay: 3
   invulnerableTime: 1
   healthUI: {fileID: 9783276}
+  healAmount: 1
 --- !u!114 &1715398194
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4586,7 +4591,7 @@ MonoBehaviour:
   - {fileID: 5981503115607741876, guid: 4fc220dea784a134a93fe3100cb0d0f0, type: 3}
   hitboxPrefab: {fileID: 4335963568038847909, guid: cef6cbe95f78f9c478521dd7f4133bd4, type: 3}
   hitboxOffset: 0.99
-  recoilDistance: 0.5
+  recoilDistance: 0.3
   recoilDuration: 0.08
   allowMovementDuringAttack: 0
 --- !u!61 &1715398201
@@ -5931,11 +5936,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4000000000000004, guid: e32ad17b471b44d1bc4f102947bdebc5, type: 3}
       propertyPath: m_SortingOrder
-      value: -2
+      value: 189
       objectReference: {fileID: 0}
     - target: {fileID: 4000000000000005, guid: e32ad17b471b44d1bc4f102947bdebc5, type: 3}
       propertyPath: m_SortingOrder
-      value: -2
+      value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 4000000000000006, guid: e32ad17b471b44d1bc4f102947bdebc5, type: 3}
       propertyPath: m_SortingOrder

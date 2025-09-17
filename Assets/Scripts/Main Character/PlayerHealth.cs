@@ -26,6 +26,9 @@ public class PlayerHealth : MonoBehaviour
     public HealthUI healthUI;
     private PlayerController playerController;
 
+    [Header("Debug/Testing")]
+    public float healAmount = 1f; // cuanto cura al apretar Q
+
     private void Awake()
     {
         playerController = GetComponent<PlayerController>();
@@ -36,6 +39,16 @@ public class PlayerHealth : MonoBehaviour
         currentHealth = maxHealth;
         if (healthUI != null)
             healthUI.Initialize(maxHealth);
+    }
+
+    private void Update()
+    {
+        // --- Atajo para curar con Q ---
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            ModifyHealthFlat(healAmount);
+            UnityEngine.Debug.Log($"[Heal] Player healed {healAmount}. Current health: {currentHealth}");
+        }
     }
 
     public void TakeDamage(float amount, Vector2 sourcePosition)

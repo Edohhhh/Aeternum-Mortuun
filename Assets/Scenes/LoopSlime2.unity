@@ -953,6 +953,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5819306723178939942, guid: 8bc3e2cbeb4a8412f8a93c0783f032af, type: 3}
+      propertyPath: m_SortingOrder
+      value: 20
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4366,6 +4370,7 @@ MonoBehaviour:
   regenDelay: 3
   invulnerableTime: 1
   healthUI: {fileID: 9783276}
+  healAmount: 1
 --- !u!114 &1715398194
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5912,6 +5917,14 @@ PrefabInstance:
     - target: {fileID: 1000000000000001, guid: e32ad17b471b44d1bc4f102947bdebc5, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3000000000000004, guid: e32ad17b471b44d1bc4f102947bdebc5, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.21
+      objectReference: {fileID: 0}
+    - target: {fileID: 3000000000000004, guid: e32ad17b471b44d1bc4f102947bdebc5, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.44
       objectReference: {fileID: 0}
     - target: {fileID: 4000000000000000, guid: e32ad17b471b44d1bc4f102947bdebc5, type: 3}
       propertyPath: m_SortingOrder
