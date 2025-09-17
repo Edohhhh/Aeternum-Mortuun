@@ -6,6 +6,7 @@ public class MinionController : MonoBehaviour, IEnemyDataProvider, IMeleeHost
     [Header("References")][SerializeField] private Transform player;
     [Header("Stats")][SerializeField] private float detectionRadius = 4f;
     [SerializeField] private float maxSpeed = 2.5f;
+    [SerializeField] private float acceleration = 10f;
 
     [Header("Spawn")]
     [Tooltip("No se usa con Animation Event")]
@@ -120,7 +121,7 @@ public class MinionController : MonoBehaviour, IEnemyDataProvider, IMeleeHost
     public float GetAttackDistance() => detectionRadius;
     public float GetDamage() => 0f;
     public float GetMaxSpeed() => maxSpeed;
-    public float GetAcceleration() => 0f;
+    public float GetAcceleration() => acceleration;
 
     public IEnumerator DelayedDeath()
     {

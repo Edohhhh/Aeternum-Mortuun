@@ -7263,8 +7263,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 1715398198}
   detectionRadius: 10
-  maxSpeed: 10
-  acceleration: 25
+  maxSpeed: 3
+  acceleration: 5
   meleeAttackRange: 1.5
   meleeCooldown: 0.9
   attack: {fileID: 1659021016}
@@ -7494,6 +7494,7 @@ MonoBehaviour:
   rb: {fileID: 0}
   hitbox: {fileID: 1715398195}
   initialPowerUps: []
+  lastNonZeroMoveInput: {x: 1, y: 0}
   hitboxPrefab: {fileID: 0}
   attackOrigin: {fileID: 0}
   attackRange: 0.7
