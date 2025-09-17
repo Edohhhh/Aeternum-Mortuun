@@ -56,6 +56,12 @@ public class MiniMiniSlimeController : MonoBehaviour, IEnemyDataProvider
         health.OnDeath += HandleDeath;
     }
 
+    private void FixedUpdate()
+    {
+        // Llama el fixed tick del FSM (cada estado puede implementar FixedExecute)
+        fsm.FixedUpdate();
+    }
+
     private void Update()
     {
         fsm.Update();

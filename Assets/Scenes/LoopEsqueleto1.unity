@@ -1453,6 +1453,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1715398198}
     - target: {fileID: 3670277874830084829, guid: 7885cb71a7c6f48498236b9ae52ff298, type: 3}
+      propertyPath: maxSpeed
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3670277874830084829, guid: 7885cb71a7c6f48498236b9ae52ff298, type: 3}
+      propertyPath: acceleration
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3670277874830084829, guid: 7885cb71a7c6f48498236b9ae52ff298, type: 3}
       propertyPath: meleeCooldown
       value: 0.7
       objectReference: {fileID: 0}
@@ -7189,6 +7197,7 @@ MonoBehaviour:
   rb: {fileID: 0}
   hitbox: {fileID: 1715398195}
   initialPowerUps: []
+  lastNonZeroMoveInput: {x: 1, y: 0}
   hitboxPrefab: {fileID: 0}
   attackOrigin: {fileID: 0}
   attackRange: 0.7

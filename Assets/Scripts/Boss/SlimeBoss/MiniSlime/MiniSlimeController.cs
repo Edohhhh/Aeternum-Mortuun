@@ -60,6 +60,12 @@ public class MiniSlimeController : MonoBehaviour, IEnemyDataProvider
         fsm = new FSM<EnemyInputs>(idle);
     }
 
+    private void FixedUpdate()
+    {
+        // Llama el fixed tick del FSM (cada estado puede implementar FixedExecute)
+        fsm.FixedUpdate();
+    }
+
     private void Update()
     {
         fsm.Update();

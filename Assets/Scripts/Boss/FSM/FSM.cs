@@ -27,7 +27,12 @@ public class FSM<T>
         _currentState.Execute();
     }
 
-   
+    public void FixedUpdate()
+    {
+        _currentState.FixedExecute();
+    }
+
+
     public void Transition(T input)
     {
         State<T> newState = _currentState.GetTransition(input); 

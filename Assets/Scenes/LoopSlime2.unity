@@ -4390,6 +4390,7 @@ MonoBehaviour:
   rb: {fileID: 0}
   hitbox: {fileID: 1715398195}
   initialPowerUps: []
+  lastNonZeroMoveInput: {x: 1, y: 0}
   hitboxPrefab: {fileID: 4335963568038847909, guid: cef6cbe95f78f9c478521dd7f4133bd4, type: 3}
   attackOrigin: {fileID: 0}
   attackRange: 0.7
@@ -5328,7 +5329,7 @@ PrefabInstance:
       objectReference: {fileID: 1715398198}
     - target: {fileID: 3928819613699127562, guid: 21dc0317654d69040a7da0ea29363176, type: 3}
       propertyPath: maxSpeed
-      value: 15
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 3928819613699127562, guid: 21dc0317654d69040a7da0ea29363176, type: 3}
       propertyPath: acidPrefab
@@ -5336,7 +5337,7 @@ PrefabInstance:
       objectReference: {fileID: 1093883677944505973, guid: 286e6770387798c4fadfb952e9f67b04, type: 3}
     - target: {fileID: 3928819613699127562, guid: 21dc0317654d69040a7da0ea29363176, type: 3}
       propertyPath: acceleration
-      value: 20
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 3928819613699127562, guid: 21dc0317654d69040a7da0ea29363176, type: 3}
       propertyPath: attackDistance

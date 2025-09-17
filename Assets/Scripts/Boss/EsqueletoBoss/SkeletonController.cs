@@ -146,6 +146,12 @@ public class SkeletonController : MonoBehaviour, IEnemyDataProvider, IMeleeHost
         lastSpawnMinionsTime = -spawnMinionsCooldown;
     }
 
+    private void FixedUpdate()
+    {
+        // Tick fijo del FSM (para que EnemyFollowState.FixedExecute corra a paso fijo)
+        fsm.FixedUpdate();
+    }
+
     private void Update()
     {
         rb.constraints |= RigidbodyConstraints2D.FreezeRotation;

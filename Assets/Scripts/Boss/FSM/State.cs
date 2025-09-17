@@ -15,7 +15,8 @@ public class State<T>
 
     public virtual void Execute() { }
 
-    
+    public virtual void FixedExecute() { }
+
     public virtual void Sleep() { }
 
     

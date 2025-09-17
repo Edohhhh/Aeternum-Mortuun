@@ -87,6 +87,12 @@ public class MinionController : MonoBehaviour, IEnemyDataProvider, IMeleeHost
         melee.AddTransition(EnemyInputs.SeePlayer, follow);
     }
 
+    private void FixedUpdate()
+    {
+        // Tick fijo del FSM (para que EnemyFollowState.FixedExecute corra a paso fijo)
+        fsm.FixedUpdate();
+    }
+
     private void Update()
     {
         fsm.Update();

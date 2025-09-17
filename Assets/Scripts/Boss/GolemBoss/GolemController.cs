@@ -157,6 +157,12 @@ public class GolemController : MonoBehaviour, IEnemyDataProvider, IMeleeHost
         //heavy.AddTransition(EnemyInputs.Die, death);
     }
 
+    private void FixedUpdate()
+    {
+        // Tick fijo del FSM (para que EnemyFollowState.FixedExecute corra a paso fijo)
+        fsm.FixedUpdate();
+    }
+
     private void Update()
     {
         // Mientras golpea, no meter inputs de ver/seguir
