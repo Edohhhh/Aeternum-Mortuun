@@ -13,10 +13,13 @@ public class CombatSystem : MonoBehaviour
     public float hitboxOffset = 0.5f;
 
     [Header("Recoil")]
+    [Tooltip("Distancia que avanza el jugador al atacar (unidades de mundo).")]
     public float recoilDistance = 0.22f;
+    [Tooltip("Duración total del micro-dash antes de frenar en seco.")]
     public float recoilDuration = 0.07f;
 
     [Header("Movimiento durante ataque")]
+    [Tooltip("Si está activo, el jugador PUEDE moverse mientras ataca/recoilea. Si está desactivado, queda bloqueado hasta que termine el recoil.")]
     public bool allowMovementDuringAttack = false;
 
     private Rigidbody2D rb;
@@ -49,12 +52,13 @@ public class CombatSystem : MonoBehaviour
 
         if (Input.GetButtonDown("Fire1"))
         {
-            // 🚫 no atacar si el jugador está dashing
-            if (playerController != null && playerController.IsDashing)
+            // 🚫 Bloqueo: no atacar si estoy dashing o recoileando
+            if (playerController != null && (playerController.IsDashing || IsRecoiling()))
                 return;
 
             if (IsRecoiling())
             {
+                // Guardar ataque en buffer
                 bufferedAttack = true;
             }
             else if (attackTimer <= 0f)
@@ -66,8 +70,8 @@ public class CombatSystem : MonoBehaviour
 
     private void PerformAttack()
     {
-        // 🚫 seguridad extra
-        if (playerController != null && playerController.IsDashing)
+        // 🚫 Seguridad extra: no atacar si estoy dashing o recoileando
+        if (playerController != null && (playerController.IsDashing || IsRecoiling()))
             return;
 
         attackTimer = attackCooldown;
@@ -77,18 +81,22 @@ public class CombatSystem : MonoBehaviour
 
         lastAttackDir = GetAttackDirection();
 
+        // 🔒 bloquear movimiento durante recoil
         if (!allowMovementDuringAttack && playerController != null)
             playerController.canMove = false;
 
+        // Animación
         if (playerController != null && playerController.animator != null)
         {
             playerController.animator.ResetTrigger("attackTrigger");
             playerController.animator.SetTrigger("attackTrigger");
         }
 
+        // Sonido
         if (AudioManager.Instance != null)
             AudioManager.Instance.PlayWithRandomPitch("swing", 0.95f, 1.05f);
 
+        // Efecto visual
         Vector2 spawnPos = (Vector2)transform.position + lastAttackDir * hitboxOffset;
 
         if (slashEffectPrefabs != null && slashEffectPrefabs.Length >= comboIndex)
@@ -102,6 +110,7 @@ public class CombatSystem : MonoBehaviour
             }
         }
 
+        // Hitbox
         if (hitboxPrefab != null)
         {
             var hitbox = Instantiate(hitboxPrefab, spawnPos, Quaternion.identity, transform);
@@ -110,6 +119,7 @@ public class CombatSystem : MonoBehaviour
                 hitboxScript.knockbackDir = lastAttackDir;
         }
 
+        // Iniciar recoil
         StartRecoil(lastAttackDir);
     }
 
@@ -121,6 +131,7 @@ public class CombatSystem : MonoBehaviour
             recoilRoutine = null;
         }
         if (rb != null) rb.linearVelocity = Vector2.zero;
+        if (playerController != null) playerController.canMove = true; // seguridad
     }
 
     private void StartRecoil(Vector2 dir)
@@ -138,6 +149,7 @@ public class CombatSystem : MonoBehaviour
 
         if (allowMovementDuringAttack)
         {
+            // El jugador puede mover mientras ataca
             for (int i = 0; i < steps; i++)
             {
                 rb.MovePosition(rb.position + dir * stepDist);
@@ -146,6 +158,7 @@ public class CombatSystem : MonoBehaviour
         }
         else
         {
+            // 🔒 Bloqueado hasta terminar recoil
             for (int i = 0; i < steps; i++)
             {
                 rb.MovePosition(rb.position + dir * stepDist);
@@ -153,12 +166,15 @@ public class CombatSystem : MonoBehaviour
             }
 
             rb.linearVelocity = Vector2.zero;
+
+            // ✅ liberar movimiento recién al final
             if (playerController != null)
                 playerController.canMove = true;
         }
 
         recoilRoutine = null;
 
+        // Ataque buffered (solo se ejecuta al terminar recoil)
         if (bufferedAttack && attackTimer <= 0f)
         {
             bufferedAttack = false;
