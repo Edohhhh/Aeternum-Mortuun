@@ -184,6 +184,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa4bebc7bfe9d394592353853ce4bc26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  powerUpPools: []
   powerUpPool: {fileID: 11400000, guid: 741a22992651e1646a7ace4cfab2b8e7, type: 2}
   linePrefab: {fileID: 1258666099951334, guid: 93bc1e8842fde884f878e59843c9706d, type: 3}
   linesParent: {fileID: 2845754903725659257}
@@ -196,7 +197,7 @@ MonoBehaviour:
   tickAudioClip: {fileID: 8300000, guid: 43186eb953e63e546b2c31cb280f58d8, type: 3}
   volume: 0.03
   pitch: 1
-  spinDuration: 2
+  spinDuration: 5
   wheelSize: 1
   wheelPieces:
   - Icon: {fileID: 1753655533966520807, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
