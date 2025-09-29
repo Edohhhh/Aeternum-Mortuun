@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using TMPro;
 using EasyUI.PickerWheelUI;
+using System.Collections;
 
 [System.Serializable]
 public class WeightedRuleta
@@ -23,6 +24,10 @@ public class WheelSelector : MonoBehaviour
 
     [Header("UI sets (uno por ruleta)")]
     [SerializeField] private List<RuletaUISet> ruletaUISets;
+
+    [Header("Efectos de celebración")]
+    [SerializeField] private GameObject confettiPrefab; 
+
 
     private List<PickerWheel> ruletasInstanciadas = new List<PickerWheel>();
     private PickerWheel ruletaSeleccionada;
@@ -190,8 +195,29 @@ public class WheelSelector : MonoBehaviour
             return;
         }
 
-        // Aplica el efecto del premio
+        
         wheel.AplicarUltimoPremio();
+
+       
+        if (confettiPrefab != null)
+        {
+            confettiPrefab.SetActive(true);
+
+            
+            ParticleSystem ps = confettiPrefab.GetComponent<ParticleSystem>();
+            float duracion = 2f; 
+
+            if (ps != null)
+            {
+                duracion = ps.main.duration + ps.main.startLifetime.constantMax;
+            }
+
+            StartCoroutine(DesactivarConfetti(confettiPrefab, duracion));
+        }
+        else
+        {
+            Debug.LogWarning("⚠️ No se encontró GameObject llamado 'ConfettiPrefabs'.");
+        }
 
         // Guardar datos del jugador
         GameObject player = GameObject.FindWithTag("Player");
@@ -225,6 +251,13 @@ public class WheelSelector : MonoBehaviour
                 set.Activar(false);
             }
         }
+    }
+
+    // --- Coroutine para desactivar el confetti ---
+    private IEnumerator DesactivarConfetti(GameObject confetti, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        confetti.SetActive(false);
     }
 
     public void SpinRuletaSeleccionada()

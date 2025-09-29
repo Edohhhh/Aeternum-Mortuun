@@ -177,8 +177,8 @@ namespace EasyUI.PickerWheelUI
 
             wheelCircle
                 .DORotate(targetRotation, spinDuration, RotateMode.FastBeyond360)
-                .SetEase(Ease.InOutQuart)
-                .SetUpdate(true)
+               .SetEase(Ease.OutQuad) // arranque más suave, frenada progresiva
+               .SetUpdate(true)
                 .OnUpdate(() =>
                 {
                     float diff = Mathf.Abs(prevAngle - currentAngle);
@@ -385,7 +385,7 @@ namespace EasyUI.PickerWheelUI
                     Effect = entry.effect
                 };
 
-                Debug.Log($"🧩 [{i}] Cargado: {entry.effect.label} (Icon: {(entry.effect.icon != null ? "✅" : "❌")})");
+           
             }
 
             // Actualizar ángulos
@@ -432,7 +432,7 @@ namespace EasyUI.PickerWheelUI
 
                 string status = ok ? "✅ OK" : "⚠️ ERROR";
 
-                Debug.Log($"🧩 Pieza {i} → Label: '{label}' | Effect: '{effectLabel}' | PowerUp: '{powerUpName}' | {iconStatus} → {status}");
+                
             }
         }
 

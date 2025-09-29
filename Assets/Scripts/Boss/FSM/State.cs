@@ -10,7 +10,7 @@ public class State<T>
     
     public virtual void Awake()
     {
-        Debug.Log("Awake state: " + this.GetType().Name);
+      
     }
 
     public virtual void Execute() { }

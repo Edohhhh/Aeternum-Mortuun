@@ -53,8 +53,6 @@ public class PlayerHealth : MonoBehaviour
 
     public void TakeDamage(float amount, Vector2 sourcePosition)
     {
-        UnityEngine.Debug.Log($"[TakeDamage] Llamado con amount: {amount} desde: {sourcePosition}");
-        UnityEngine.Debug.Log(new StackTrace(1, true));
 
         if (IsInvulnerable || playerController.stateMachine.CurrentState == playerController.KnockbackState)
             return;

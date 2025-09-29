@@ -98,7 +98,7 @@ public class ChargeSlimeState : State<EnemyInputs>, ICollisionHandler
             Vector2 normal = collision.contacts[0].normal;
             currentDirection = Vector2.Reflect(currentDirection, normal).normalized;
 
-            Debug.Log($"ChargeState: Rebote con normal {normal}, nueva dirección {currentDirection}");
+            
         }
     }
 
