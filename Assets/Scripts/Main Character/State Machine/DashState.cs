@@ -67,5 +67,8 @@ public class DashState : IPlayerState
             LayerMask.NameToLayer("Enemy"),
             false
         );
+
+        // 🔥 Reiniciar cooldown del dash al salir
+        ctx.dashCooldownTimer = ctx.dashCooldown;
     }
 }

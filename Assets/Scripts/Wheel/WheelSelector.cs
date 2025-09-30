@@ -26,7 +26,11 @@ public class WheelSelector : MonoBehaviour
     [SerializeField] private List<RuletaUISet> ruletaUISets;
 
     [Header("Efectos de celebración")]
-    [SerializeField] private GameObject confettiPrefab; 
+    [SerializeField] private GameObject confettiPrefab;
+
+    [Header("Controlador de la UI de ruletas")]
+    [SerializeField] private EasyUI.PickerWheelUI.WheelUIController wheelUIController;
+
 
 
     private List<PickerWheel> ruletasInstanciadas = new List<PickerWheel>();
@@ -195,31 +199,24 @@ public class WheelSelector : MonoBehaviour
             return;
         }
 
-        
+        // Aplicar premio de la ruleta
         wheel.AplicarUltimoPremio();
 
-       
+        // 🎉 Efecto de confetti
         if (confettiPrefab != null)
         {
             confettiPrefab.SetActive(true);
 
-            
             ParticleSystem ps = confettiPrefab.GetComponent<ParticleSystem>();
-            float duracion = 2f; 
+            float duracion = 2f;
 
             if (ps != null)
-            {
                 duracion = ps.main.duration + ps.main.startLifetime.constantMax;
-            }
 
             StartCoroutine(DesactivarConfetti(confettiPrefab, duracion));
         }
-        else
-        {
-            Debug.LogWarning("⚠️ No se encontró GameObject llamado 'ConfettiPrefabs'.");
-        }
 
-        // Guardar datos del jugador
+        // 📦 Guardar datos del jugador
         GameObject player = GameObject.FindWithTag("Player");
         if (player != null)
         {
@@ -239,19 +236,27 @@ public class WheelSelector : MonoBehaviour
             Debug.LogError("❌ No se encontró GameObject con tag 'Player'.");
         }
 
-        // Cargar siguiente sala
-        RoomManager.Instance.LoadNextRoomWithDelay();
+        // 🚪 Cargar siguiente sala
+        //RoomManager.Instance.LoadNextRoomWithDelay();
 
-        // Desactivar UI de la ruleta usada
-        RuletaUISet[] allRuletas = FindObjectsOfType<RuletaUISet>();
-        foreach (var set in allRuletas)
+        // 🔒 Desactivar UI de todas las ruletas
+        foreach (var set in ruletaUISets)
         {
-            if (set.linkedWheel == wheel)
-            {
+            if (set != null)
                 set.Activar(false);
-            }
+        }
+
+        // ✅ Avisar al controlador de UI de ruletas que cierre HUD y reanude el juego
+        if (wheelUIController != null)
+        {
+            wheelUIController.ConfirmarPremio();
+        }
+        else
+        {
+            Debug.LogWarning("⚠️ No se asignó WheelUIController en WheelSelector.");
         }
     }
+
 
     // --- Coroutine para desactivar el confetti ---
     private IEnumerator DesactivarConfetti(GameObject confetti, float delay)

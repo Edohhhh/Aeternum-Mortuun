@@ -33,7 +33,7 @@ public class PlayerController : MonoBehaviour
 
     private Vector2 moveInput;
     public Vector2 lastNonZeroMoveInput = Vector2.right;
-    private float dashCooldownTimer;
+    [HideInInspector] public float dashCooldownTimer;
     public bool isInvulnerable { get; set; }
 
     [HideInInspector] public bool IsDashing { get; set; }
@@ -106,7 +106,6 @@ public class PlayerController : MonoBehaviour
             !IsDashing &&
             (moveInput.sqrMagnitude > 0.0001f || lastNonZeroMoveInput.sqrMagnitude > 0.0001f))
         {
-            dashCooldownTimer = dashCooldown;
             RequestedDashDir = (moveInput.sqrMagnitude > 0.0001f ? moveInput : lastNonZeroMoveInput).normalized;
             stateMachine.ChangeState(DashState);
         }
@@ -167,6 +166,7 @@ public class PlayerController : MonoBehaviour
         knockActive = true;
     }
 
+    // ==== Guardado y carga de datos del jugador ====
     public void SavePlayerData()
     {
         GameDataManager.Instance.SavePlayerData(this);

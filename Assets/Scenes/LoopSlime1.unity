@@ -321,6 +321,7 @@ MonoBehaviour:
   - {fileID: 1174474507}
   - {fileID: 328972266}
   confettiPrefab: {fileID: 1364281512}
+  wheelUIController: {fileID: 1749465130}
 --- !u!4 &86721582
 Transform:
   m_ObjectHideFlags: 0
@@ -16241,9 +16242,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   buttonsContainer: {fileID: 1112052322}
   linkedWheel: {fileID: 0}
-  selectButton: {fileID: 650794606}
-  spinButton: {fileID: 1454570255}
-  confirmButton: {fileID: 1209306226}
+  selectButton: {fileID: 0}
+  spinButton: {fileID: 0}
+  confirmButton: {fileID: 0}
   spinButtonText: {fileID: 0}
 --- !u!1 &402130076
 GameObject:
@@ -16744,9 +16745,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   buttonsContainer: {fileID: 227393773}
   linkedWheel: {fileID: 0}
-  selectButton: {fileID: 1277897338}
-  spinButton: {fileID: 1282924683}
-  confirmButton: {fileID: 1503765941}
+  selectButton: {fileID: 0}
+  spinButton: {fileID: 0}
+  confirmButton: {fileID: 0}
   spinButtonText: {fileID: 0}
 --- !u!114 &576635357
 MonoBehaviour:
@@ -17009,17 +17010,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 7388899521843816278, guid: 77b5745183fd4e5468a3dcf1eecf9c3f, type: 3}
   m_PrefabInstance: {fileID: 6847903264630361806}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &650794606 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2328181690343267211, guid: 77b5745183fd4e5468a3dcf1eecf9c3f, type: 3}
-  m_PrefabInstance: {fileID: 6847903264630361806}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &685435514
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -21171,9 +21161,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   buttonsContainer: {fileID: 481479847}
   linkedWheel: {fileID: 0}
-  selectButton: {fileID: 686288812}
-  spinButton: {fileID: 836495441}
-  confirmButton: {fileID: 402130077}
+  selectButton: {fileID: 0}
+  spinButton: {fileID: 0}
+  confirmButton: {fileID: 0}
   spinButtonText: {fileID: 0}
 --- !u!114 &1174474508
 MonoBehaviour:
@@ -21802,17 +21792,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 5661197307755017348, guid: 0eb3d83e56ae52b498f5ef9df70bba2a, type: 3}
   m_PrefabInstance: {fileID: 2661540361368181226}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1454570255 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7927290380063401252, guid: 0eb3d83e56ae52b498f5ef9df70bba2a, type: 3}
-  m_PrefabInstance: {fileID: 2661540361368181226}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1455472015
 GameObject:
   m_ObjectHideFlags: 0
@@ -22272,6 +22251,7 @@ MonoBehaviour:
   hitbox: {fileID: 1715398195}
   initialPowerUps: []
   lastNonZeroMoveInput: {x: 1, y: 0}
+  dashCooldownTimer: 0
   knockbackDecay: 18
   knockbackMaxSpeed: 22
   knockbackStackWindow: 0.08
@@ -22935,6 +22915,7 @@ MonoBehaviour:
   - {fileID: 328972261}
   - {fileID: 1174474506}
   - {fileID: 576635355}
+  - {fileID: 309051787}
   startActive: 0
   wheelSelector: {fileID: 86721581}
 --- !u!4 &1749465131
