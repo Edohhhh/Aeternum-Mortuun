@@ -15,7 +15,7 @@ public class EnemyManager : MonoBehaviour
 
     public void RegisterEnemy()
     {
-        Debug.Log("Enemy registered.");
+   
     }
 
     public void UnregisterEnemy()

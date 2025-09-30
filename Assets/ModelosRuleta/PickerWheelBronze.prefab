@@ -46,6 +46,8 @@ GameObject:
   - component: {fileID: 3180750416933447464}
   - component: {fileID: 7305758470852654209}
   - component: {fileID: 3138501941816612765}
+  - component: {fileID: -1325020040424610066}
+  - component: {fileID: 8617364017898882343}
   m_Layer: 0
   m_Name: PickerWheelBronze
   m_TagString: Untagged
@@ -197,7 +199,7 @@ MonoBehaviour:
   tickAudioClip: {fileID: 8300000, guid: 43186eb953e63e546b2c31cb280f58d8, type: 3}
   volume: 0.03
   pitch: 1
-  spinDuration: 10
+  spinDuration: 5
   wheelSize: 1
   wheelPieces:
   - Icon: {fileID: 1753655533966520807, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
@@ -243,6 +245,33 @@ MonoBehaviour:
     _weight: 0
     Effect: {fileID: 0}
   usosMaximos: 3
+--- !u!225 &-1325020040424610066
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 531529343062115860}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &8617364017898882343
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 531529343062115860}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ae333a9355889c488011bf99698de91, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spinButtonPrefab: {fileID: 3396605155496464306, guid: 950daf75e5e139a47866228cea70c32c, type: 3}
+  confirmButtonPrefab: {fileID: 5840280684821596975, guid: 1020ba2d2cd13c94db8ea4f5a1ee68c7, type: 3}
+  selectButtonPrefab: {fileID: 581228975544991128, guid: d94d5364990de3448a2693bd1692ee16, type: 3}
 --- !u!1 &647435951967983033
 GameObject:
   m_ObjectHideFlags: 0
