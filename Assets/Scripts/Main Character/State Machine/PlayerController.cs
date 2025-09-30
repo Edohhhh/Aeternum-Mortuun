@@ -106,6 +106,9 @@ public class PlayerController : MonoBehaviour
             !IsDashing &&
             (moveInput.sqrMagnitude > 0.0001f || lastNonZeroMoveInput.sqrMagnitude > 0.0001f))
         {
+            // 🔥 Reiniciar cooldown al APRETAR dash
+            dashCooldownTimer = dashCooldown;
+
             RequestedDashDir = (moveInput.sqrMagnitude > 0.0001f ? moveInput : lastNonZeroMoveInput).normalized;
             stateMachine.ChangeState(DashState);
         }

@@ -17,9 +17,10 @@ public class DashState : IPlayerState
     {
         ctx.IsDashing = true;
 
-        // 🔄 Usar el input directo (como antes)
-        dashDir = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized;
-        if (dashDir == Vector2.zero) dashDir = ctx.lastNonZeroMoveInput; // fallback al último movimiento
+        // Usa la dirección ya calculada por PlayerController
+        dashDir = ctx.RequestedDashDir.sqrMagnitude > 0.0001f
+            ? ctx.RequestedDashDir.normalized
+            : (ctx.lastNonZeroMoveInput.sqrMagnitude > 0.0001f ? ctx.lastNonZeroMoveInput.normalized : Vector2.right);
 
         dashTimer = ctx.dashDuration;
         ctx.isInvulnerable = true;
@@ -33,11 +34,11 @@ public class DashState : IPlayerState
             true
         );
 
-        AudioManager.Instance.Play("dash");
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.Play("dash");
     }
 
     public void HandleInput() { }
-
     public void LogicUpdate() { }
 
     public void PhysicsUpdate()
@@ -46,9 +47,7 @@ public class DashState : IPlayerState
 
         dashTimer -= Time.fixedDeltaTime;
         if (dashTimer <= 0f)
-        {
             sm.ChangeState(ctx.IdleState);
-        }
     }
 
     public void Exit()
@@ -67,8 +66,5 @@ public class DashState : IPlayerState
             LayerMask.NameToLayer("Enemy"),
             false
         );
-
-        // 🔥 Reiniciar cooldown del dash al salir
-        ctx.dashCooldownTimer = ctx.dashCooldown;
     }
 }

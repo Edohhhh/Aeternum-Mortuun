@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class IdleState : IPlayerState
 {
@@ -13,8 +13,11 @@ public class IdleState : IPlayerState
 
     public void Enter()
     {
-        ctx.animator.SetBool("isMoving", false);
-        ctx.animator.SetFloat("moveY", 0);
+        if (ctx.animator != null)
+        {
+            ctx.animator.SetBool("isMoving", false);
+            ctx.animator.SetFloat("moveY", 0);
+        }
         ctx.rb.linearVelocity = Vector2.zero;
     }
 
@@ -22,11 +25,7 @@ public class IdleState : IPlayerState
     {
         if (!ctx.canMove) return;
 
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            sm.ChangeState(ctx.DashState);
-            return;
-        }
+        // 🔸 Dash se maneja SOLO en PlayerController.Update()
 
         Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized;
         if (input != Vector2.zero)
