@@ -6,7 +6,7 @@ public class Buttons : MonoBehaviour
 
     public void PlayGame()
     {
-        SceneManager.LoadScene("LoopSlime2");
+        SceneManager.LoadScene("LoopSlime1");
     }
 
     public void QuitGame()
