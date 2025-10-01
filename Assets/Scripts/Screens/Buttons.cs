@@ -6,7 +6,7 @@ public class MenuButtons : MonoBehaviour
 
     public void PlayAgain()
     {
-        SceneManager.LoadScene("BossSlime");
+        SceneManager.LoadScene("LoopSlime1");
     }
 
     public void Menu()
