@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3776c956bb381e4593c8bdf8a355b12, type: 3}
+  m_Name: CursedRoulettePool2
+  m_EditorClassIdentifier: 
+  entries:
+  - effect: {fileID: 11400000, guid: 5ec49369cfde9425d8b8092a079a84ce, type: 2}
+    chance: 5
+  - effect: {fileID: 11400000, guid: 32b90828aa92d45fc87a1c0b54261d8f, type: 2}
+    chance: 15
+  - effect: {fileID: 11400000, guid: 7bd49ab22c6f54aaa8342f058461db6b, type: 2}
+    chance: 10
+  - effect: {fileID: 11400000, guid: 7bd49ab22c6f54aaa8342f058461db6b, type: 2}
+    chance: 10
+  - effect: {fileID: 11400000, guid: fa13216afea214f8384f609ea06b89ac, type: 2}
+    chance: 5
+  - effect: {fileID: 11400000, guid: c6873ae05c7ca41d6971ec6f37ff14a8, type: 2}
+    chance: 15

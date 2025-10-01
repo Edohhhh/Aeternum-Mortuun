@@ -186,7 +186,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa4bebc7bfe9d394592353853ce4bc26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  powerUpPools: []
+  powerUpPools:
+  - pool: {fileID: 11400000, guid: 990c36f0dfd896f468bd2e7e38db5f67, type: 2}
+    weight: 50
+  - pool: {fileID: 11400000, guid: 7bf5cc9075f43428cbc342f5d1c681c6, type: 2}
+    weight: 25
+  - pool: {fileID: 11400000, guid: 45601f8f4591946c2bdc8b725a4e92e9, type: 2}
+    weight: 25
   powerUpPool: {fileID: 11400000, guid: 990c36f0dfd896f468bd2e7e38db5f67, type: 2}
   linePrefab: {fileID: 1258666099951334, guid: ee8d4b94c42efd34eb323e0b8c83c810, type: 3}
   linesParent: {fileID: 2845754903725659257}

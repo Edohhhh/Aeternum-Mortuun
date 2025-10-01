@@ -6,9 +6,11 @@ public class AvengerSpirit : MonoBehaviour
     public int damage = 1;
 
     private Transform target;
+    private SpriteRenderer spriteRenderer;
 
     private void Start()
     {
+        spriteRenderer = GetComponent<SpriteRenderer>();
         FindTarget();
     }
 
@@ -20,7 +22,24 @@ public class AvengerSpirit : MonoBehaviour
             return;
         }
 
+        // Mover hacia el target
         transform.position = Vector3.MoveTowards(transform.position, target.position, speed * Time.deltaTime);
+
+        // Hacer que mire hacia la dirección del enemigo (izquierda o derecha)
+        if (spriteRenderer != null)
+        {
+            // Comparar posiciones X para determinar la dirección
+            if (target.position.x > transform.position.x)
+            {
+                // El enemigo está a la derecha, no hacer flip (mirar a la derecha)
+                spriteRenderer.flipX = false;
+            }
+            else
+            {
+                // El enemigo está a la izquierda, hacer flip (mirar a la izquierda)
+                spriteRenderer.flipX = true;
+            }
+        }
     }
 
     private void FindTarget()
