@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class DashTrapObserver : MonoBehaviour
 {
@@ -10,8 +11,26 @@ public class DashTrapObserver : MonoBehaviour
     private float dashWindow = 1f;
     private float dashTimer = 0f;
 
+    private void Awake()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // Buscar al nuevo Player en la nueva escena
+        player = FindFirstObjectByType<PlayerController>();
+    }
+
     private void Update()
     {
+        if (player == null) return;
+
         if (player.stateMachine.CurrentState == player.DashState)
         {
             dashTimer = dashWindow;

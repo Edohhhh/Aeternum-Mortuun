@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public enum Difficulty { Easy, Medium, Hard }
 
@@ -80,7 +81,9 @@ public class RoomRandomizer : MonoBehaviour
         }
         else
         {
+
             Debug.Log("[RoomRandomizer] No quedan más salas en la run.");
+            SceneManager.LoadScene("Victory");
             return null;
         }
     }
