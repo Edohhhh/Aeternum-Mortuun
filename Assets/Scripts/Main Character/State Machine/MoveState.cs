@@ -22,8 +22,7 @@ public class MoveState : IPlayerState
     {
         if (!ctx.canMove) return;
 
-        // 🔸 Dash se maneja SOLO en PlayerController.Update()
-
+        // Dash se maneja únicamente desde PlayerController.Update()
         input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized;
 
         if (input == Vector2.zero)

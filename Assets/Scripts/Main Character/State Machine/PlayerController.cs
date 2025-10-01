@@ -39,7 +39,7 @@ public class PlayerController : MonoBehaviour
     [HideInInspector] public bool IsDashing { get; set; }
     public Vector2 RequestedDashDir { get; private set; } = Vector2.right;
 
-    // ===== Knockback =====
+    // Knockback
     [Header("Knockback (Player)")]
     public float knockbackDecay = 18f;
     public float knockbackMaxSpeed = 22f;
@@ -78,7 +78,7 @@ public class PlayerController : MonoBehaviour
     {
         dashCooldownTimer -= Time.deltaTime;
 
-        // 🚫 Bloquear TODO input mientras dure el recoil
+        // 🔒 Bloquear todo input mientras dure el RecoilState (ataque)
         if (stateMachine.CurrentState == RecoilState)
         {
             stateMachine.CurrentState.LogicUpdate();
@@ -86,12 +86,15 @@ public class PlayerController : MonoBehaviour
         }
 
         // Flip sprite hacia el cursor
-        Vector2 playerScreenPos = Camera.main.WorldToScreenPoint(transform.position);
-        Vector2 mousePos = Input.mousePosition;
         var sr = GetComponent<SpriteRenderer>();
-        if (sr != null) sr.flipX = mousePos.x < playerScreenPos.x;
+        if (sr != null)
+        {
+            Vector2 playerScreenPos = Camera.main.WorldToScreenPoint(transform.position);
+            Vector2 mousePos = Input.mousePosition;
+            sr.flipX = mousePos.x < playerScreenPos.x;
+        }
 
-        // Leer input de movimiento
+        // Input movimiento
         float moveX = Input.GetAxisRaw("Horizontal");
         float moveY = Input.GetAxisRaw("Vertical");
         moveInput = new Vector2(moveX, moveY).normalized;
@@ -99,36 +102,41 @@ public class PlayerController : MonoBehaviour
         if (!IsDashing && moveInput.sqrMagnitude > 0.0001f)
             lastNonZeroMoveInput = moveInput;
 
-        // Dash (solo si no estoy en recoil ni ya dashing)
+        // DASH: sólo desde acá, respetando cooldown y sin permitirlo en RecoilState
         if (Input.GetButtonDown("Jump") &&
             dashCooldownTimer <= 0f &&
             canMove &&
             !IsDashing &&
+            stateMachine.CurrentState != RecoilState &&
             (moveInput.sqrMagnitude > 0.0001f || lastNonZeroMoveInput.sqrMagnitude > 0.0001f))
         {
-            // 🔥 Reiniciar cooldown al APRETAR dash
-            dashCooldownTimer = dashCooldown;
-
+            dashCooldownTimer = dashCooldown; // fija cooldown al apretar
             RequestedDashDir = (moveInput.sqrMagnitude > 0.0001f ? moveInput : lastNonZeroMoveInput).normalized;
             stateMachine.ChangeState(DashState);
+            return; // evita doble procesamiento este frame
         }
 
         // FSM
         stateMachine.CurrentState.HandleInput();
         stateMachine.CurrentState.LogicUpdate();
 
-        // Animación opcional
+       
+        // Animator: NO marcar isMoving durante Dash/Knockback/Recoil/Attack
         if (animator != null)
         {
+            bool enAtaque = animator.GetBool("isAttacking");
             bool bloqueado = stateMachine.CurrentState == RecoilState ||
-                             stateMachine.CurrentState == KnockbackState;
+                             stateMachine.CurrentState == KnockbackState ||
+                             stateMachine.CurrentState == DashState ||
+                             enAtaque;
+
             animator.SetBool("isMoving", !bloqueado && canMove && moveInput.sqrMagnitude > 0.0001f);
         }
     }
 
     private void FixedUpdate()
     {
-        // Knockback por fuerza acumulada
+        // Knockback acumulativo (bloquea physics de la FSM mientras dure)
         if (knockActive)
         {
             rb.linearVelocity = knockVel;
@@ -141,9 +149,17 @@ public class PlayerController : MonoBehaviour
                 rb.linearVelocity = Vector2.zero;
                 canMove = true;
             }
+            return;
         }
 
-        // FSM siempre activa su PhysicsUpdate
+        // Si no puedo moverme, no aplico movimiento
+        if (!canMove)
+        {
+            rb.linearVelocity = Vector2.zero;
+            return;
+        }
+
+        // FSM physics
         stateMachine.CurrentState.PhysicsUpdate();
     }
 

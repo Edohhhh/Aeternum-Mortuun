@@ -17,7 +17,6 @@ public class DashState : IPlayerState
     {
         ctx.IsDashing = true;
 
-        // Usa la dirección ya calculada por PlayerController
         dashDir = ctx.RequestedDashDir.sqrMagnitude > 0.0001f
             ? ctx.RequestedDashDir.normalized
             : (ctx.lastNonZeroMoveInput.sqrMagnitude > 0.0001f ? ctx.lastNonZeroMoveInput.normalized : Vector2.right);
