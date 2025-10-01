@@ -23,30 +23,30 @@ public class BurnOnHitObserver : MonoBehaviour
     {
         if (enemy == null) return;
 
+        // Check cooldown
         if (cooldowns.TryGetValue(enemy, out float lastTime))
         {
             if (Time.time - lastTime < cooldownPerEnemy)
-                return; // aún en cooldown
+                return;
         }
 
-        if (!activeBurns.ContainsKey(enemy))
-        {
-            Coroutine routine = StartCoroutine(BurnRoutine(enemy));
-            activeBurns[enemy] = routine;
-            cooldowns[enemy] = Time.time;
-        }
+        // Already burning?
+        if (activeBurns.ContainsKey(enemy)) return;
+
+        Coroutine routine = StartCoroutine(BurnRoutine(enemy));
+        activeBurns[enemy] = routine;
+        cooldowns[enemy] = Time.time;
     }
 
     private IEnumerator BurnRoutine(GameObject enemy)
     {
         float elapsed = 0f;
 
-        while (elapsed < duration && enemy != null)
-        {
-            var health = enemy.GetComponent<EnemyHealth>();
-            if (health != null)
-                health.TakeDamage(damagePerSecond, enemy.transform.position, 0f);
+        var health = enemy.GetComponent<EnemyHealth>();
 
+        while (elapsed < duration && health != null && health.GetCurrentHealth() > 0)
+        {
+            health.TakeDamage(damagePerSecond, enemy.transform.position, 0f);
             yield return new WaitForSeconds(1f);
             elapsed += 1f;
         }

@@ -20,17 +20,10 @@ public class BurnOnHitPowerUp : PowerUp
         observer.duration = burnDuration;
         observer.cooldownPerEnemy = cooldownPerEnemy;
 
+        // Agregar el auto-hook manager
+        observerInstance.AddComponent<BurnHookManager>();
+
         Object.DontDestroyOnLoad(observerInstance);
-
-        // Hookear todos los enemigos activos en la escena
-        foreach (var enemy in GameObject.FindGameObjectsWithTag("Enemy"))
-        {
-            if (enemy.GetComponent<EnemyHealth>() != null && enemy.GetComponent<EnemyBurnHook>() == null)
-            {
-                enemy.AddComponent<EnemyBurnHook>();
-
-            }
-        }
     }
 
     public override void Remove(PlayerController player)
@@ -40,5 +33,11 @@ public class BurnOnHitPowerUp : PowerUp
             Object.Destroy(observerInstance);
             observerInstance = null;
         }
+
+        foreach (var extra in Object.FindObjectsByType<BurnOnHitObserver>(FindObjectsSortMode.None))
+        {
+            Object.Destroy(extra.gameObject);
+        }
+
     }
 }

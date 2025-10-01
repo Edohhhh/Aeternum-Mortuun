@@ -4,6 +4,7 @@ public class EnemyBurnHook : MonoBehaviour
 {
     private EnemyHealth health;
     private float lastHealth;
+    private bool waitingForNextBurn = false;
 
     private void Awake()
     {
@@ -14,19 +15,27 @@ public class EnemyBurnHook : MonoBehaviour
 
     private void Update()
     {
-        if (health == null) return;
+        if (health == null || BurnOnHitObserver.Instance == null) return;
 
         float current = health.GetCurrentHealth();
-        if (current < lastHealth)
+
+        // Detectar daño nuevo
+        if (current < lastHealth && !waitingForNextBurn)
         {
             lastHealth = current;
-            BurnOnHitObserver.Instance?.ApplyBurn(gameObject);
+            BurnOnHitObserver.Instance.ApplyBurn(gameObject);
+            StartCoroutine(BurnCooldown());
         }
         else if (current > lastHealth)
         {
             lastHealth = current;
         }
     }
+
+    private System.Collections.IEnumerator BurnCooldown()
+    {
+        waitingForNextBurn = true;
+        yield return new WaitForSeconds(BurnOnHitObserver.Instance.cooldownPerEnemy);
+        waitingForNextBurn = false;
+    }
 }
-
-

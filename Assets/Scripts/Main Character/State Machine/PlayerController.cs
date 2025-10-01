@@ -195,30 +195,35 @@ public class PlayerController : MonoBehaviour
     {
         var data = GameDataManager.Instance.playerData;
 
-        moveSpeed = data.moveSpeed;
-        dashSpeed = data.dashSpeed;
-        dashIframes = data.dashIframes;
-        dashSlideDuration = data.dashSlideDuration;
-        dashDuration = data.dashDuration;
-        dashCooldown = data.dashCooldown;
-
-        baseDamage = (data.baseDamage > 0) ? data.baseDamage : baseDamage;
-
-        transform.position = data.position;
-
+        // --- Stats de vida ---
         var health = GetComponent<PlayerHealth>();
         if (health != null)
         {
             health.maxHealth = data.maxHealth;
-            health.currentHealth = data.currentHealth;
+            health.currentHealth = health.maxHealth; // full life
             health.regenerationRate = data.regenerationRate;
             health.regenDelay = data.regenDelay;
             health.invulnerableTime = data.invulnerableTime;
-            health.UpdateUI();
+
+            if (health.healthUI != null)
+            {
+                health.healthUI.Initialize(health.maxHealth);
+                health.healthUI.UpdateHearts(health.currentHealth);
+            }
         }
 
-        initialPowerUps = data.initialPowerUps.ToArray();
-        foreach (var powerUp in initialPowerUps)
-            if (powerUp != null) powerUp.Apply(this);
+        // --- Restaurar perks guardadas ---
+        if (data.initialPowerUps != null && data.initialPowerUps.Count > 0)
+        {
+            // Crear un array nuevo con el tamaño justo
+            initialPowerUps = data.initialPowerUps.ToArray();
+
+            // Reaplicar perks al jugador
+            foreach (var powerUp in initialPowerUps)
+            {
+                if (powerUp != null)
+                    powerUp.Apply(this);
+            }
+        }
     }
 }
