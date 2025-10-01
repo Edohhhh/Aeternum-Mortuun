@@ -8,9 +8,6 @@ public class PortalController : MonoBehaviour
     [Tooltip("Punto de destino al que debe moverse el portal")]
     [SerializeField] private Transform targetPoint;
 
-    [Tooltip("Nombre de la escena a cargar al entrar y pulsar F")]
-    [SerializeField] private string nextSceneName;
-
     [Header("Movement")]
     [Tooltip("Velocidad a la que el portal se desplaza hacia targetPoint")]
     [SerializeField] private float moveSpeed = 5f;
@@ -20,20 +17,20 @@ public class PortalController : MonoBehaviour
 
     private void Reset()
     {
-        // Asegura que el collider está como trigger
+        // Asegura que el collider est? como trigger
         var col = GetComponent<Collider2D>();
         col.isTrigger = true;
     }
 
     private void Update()
     {
-        // 1) Activa portal cuando no quede ningún "Enemy" en la escena
+        // 1) Activa portal cuando no quede ning?n "Enemy" en la escena
         if (!portalActivated && GameObject.FindGameObjectsWithTag("Enemy").Length == 0)
         {
             portalActivated = true;
         }
 
-        // 2) Si está activado, muévelo hacia el punto
+        // 2) Si est? activado, mu?velo hacia el punto
         if (portalActivated && targetPoint != null)
         {
             transform.position = Vector3.MoveTowards(
@@ -43,18 +40,31 @@ public class PortalController : MonoBehaviour
             );
         }
 
-        // 3) Si el jugador está dentro y pulsa F, cambia de escena
+        // 3) Si el jugador est? dentro y pulsa F, cambia de escena
         if (playerInside && portalActivated && Input.GetKeyDown(KeyCode.F))
         {
             var player = Object.FindFirstObjectByType<PlayerController>();
             if (player != null)
                 player.SavePlayerData();
 
+            string nextScene = RoomRandomizer.Instance.GetNextRoom();
 
-            if (!string.IsNullOrEmpty(nextSceneName))
-                SceneManager.LoadScene(nextSceneName);
+            if (!string.IsNullOrEmpty(nextScene))
+            {
+                if (ScreenFader.Instance != null)
+                {
+                    ScreenFader.Instance.FadeAndLoadScene(nextScene, 0.6f); // 0.6s por defecto, ajustalo
+                }
+                else
+                {
+                    // fallback si no existe el fader
+                    SceneManager.LoadScene(nextScene);
+                }
+            }
             else
-                Debug.LogWarning("[PortalController] nextSceneName no está asignado.");
+            {
+                Debug.LogWarning("[PortalController] No quedan m?s salas en la run.");
+            }
         }
     }
 

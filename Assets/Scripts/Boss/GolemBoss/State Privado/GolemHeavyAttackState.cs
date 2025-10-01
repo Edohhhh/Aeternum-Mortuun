@@ -1,155 +1,258 @@
-//using UnityEngine;
+using UnityEngine;
 
-//public class GolemHeavyAttackState : State<EnemyInputs>
-//{
-//    private enum Phase { Windup, Jump, Impact, Stun }
-//    private Phase phase;
+public class GolemHeavyAttackState : State<EnemyInputs>
+{
+    private enum Phase { Windup, Jump, Impact }
+    private Phase phase;
 
-//    private readonly GolemController golem;
-//    private RigidbodyConstraints2D savedConstraints;
+    private readonly GolemController golem;
 
-//    // timing
-//    private float timer;
-//    private Vector2 jumpStart, jumpTarget;
-//    private bool impacted;
+    // Físicas guardadas
+    private RigidbodyConstraints2D savedConstraints;
+    private bool savedSimulated;
+    private float savedGravity;
 
-//    // cache
-//    private Transform tr;
-//    private Rigidbody2D body;
-//    private Animator anim;
-//    private SpriteRenderer sr;
+    // control
+    private float timer;
+    private bool impacted;
+    private bool jumpStarted;
+    private bool finished; // evita doble salida
 
-//    public GolemHeavyAttackState(GolemController g) { golem = g; }
+    // trayectoria
+    private Vector2 jumpStart;
+    private Vector2 jumpTarget;
 
-//    public override void Awake()
-//    {
-//        base.Awake();
-//        tr = golem.Transform;
-//        body = golem.Body;
-//        anim = golem.Animator;
-//        sr = golem.GetComponent<SpriteRenderer>();
+    private float airTimeThisJump;
+    private float arcThisJump;
 
-//        // marcar cooldown (contador interno se resetea)
-//        golem.MarkHeavyUsed();
+    public GolemHeavyAttackState(GolemController g) { golem = g; }
 
-//        // frenar movimiento
-//        if (body)
-//        {
-//            savedConstraints = body.constraints;
-//            body.linearVelocity = Vector2.zero;
-//            body.constraints = savedConstraints
-//                | RigidbodyConstraints2D.FreezePosition
-//                | RigidbodyConstraints2D.FreezeRotation;
-//        }
+    public override void Awake()
+    {
+        base.Awake();
+        Debug.Log("Awake state: GolemHeavyAttackState");
 
-//        // Dispara la anim del heavy (clip con 3 events: JumpStart, Impact, Finished)
-//        anim.ResetTrigger("Heavy");
-//        anim.SetTrigger("Heavy");
+        impacted = false;
+        jumpStarted = false;
+        finished = false;
+        timer = 0f;
+        phase = Phase.Windup;
 
-//        // setup fase
-//        phase = Phase.Windup;
-//        timer = 0f;
-//        impacted = false;
+        // Sellar cooldown al entrar al estado (único lugar)
+        golem.MarkHeavyUsed();
 
-//        // registrar para recibir eventos
-//        golem.RegisterHeavyState(this);
-//    }
+        // Congelar y neutralizar gravedad para que no se mueva ni caiga
+        if (golem.Body != null)
+        {
+            savedConstraints = golem.Body.constraints;
+            savedSimulated = golem.Body.simulated;
+            savedGravity = golem.Body.gravityScale;
 
-//    public override void Execute()
-//    {
-//        timer += Time.deltaTime;
+            golem.Body.linearVelocity = Vector2.zero;
+            golem.Body.gravityScale = 0f; // sin caída durante todo el heavy
+            golem.Body.constraints = savedConstraints
+                                        | RigidbodyConstraints2D.FreezePosition
+                                        | RigidbodyConstraints2D.FreezeRotation;
+        }
 
-//        switch (phase)
-//        {
-//            case Phase.Windup:
-//                FacePlayer();
-//                break;
+        // Disparo anim "Heavy"
+        golem.Animator.ResetTrigger("Heavy");
+        golem.Animator.SetTrigger("Heavy");
 
-//            case Phase.Jump:
-//                // Duración fija del aire
-//                float t = Mathf.Clamp01(timer / golem.HeavyAirTime);
-//                // interpolación + arquito simple
-//                Vector2 pos = Vector2.Lerp(jumpStart, jumpTarget, t);
-//                float arc = golem.HeavyArcHeight * 4f * t * (1f - t);
-//                tr.position = new Vector2(pos.x, pos.y + arc);
+        // para recibir eventos
+        golem.RegisterHeavyState(this);
+    }
 
-//                if (t >= 1f && !impacted)
-//                    DoImpact();
-//                break;
+    public override void Execute()
+    {
+        switch (phase)
+        {
+            case Phase.Windup:
+                if (golem.Body) golem.Body.linearVelocity = Vector2.zero;
+                LookAtPlayer();
+                break;
 
-//            case Phase.Impact:
-//                // Pequeña ventana por si querés un “golpe” corto antes del stun
-//                if (timer >= 0.1f) StartStun();
-//                break;
+            case Phase.Jump:
+                timer += Time.deltaTime;
+                UpdateParabola();
 
-//            case Phase.Stun:
-//                if (timer >= golem.HeavyStunTime)
-//                    golem.Transition(EnemyInputs.SeePlayer);
-//                break;
-//        }
-//    }
+                // Fallback por tiempo ante falta de evento de impacto
+                if (!impacted && timer >= Mathf.Max(0.01f, golem.HeavyAirTime))
+                    DoImpact();
+                break;
 
-//    public override void Sleep()
-//    {
-//        // restaurar movimiento
-//        if (body) body.constraints = savedConstraints;
+            case Phase.Impact:
+                // mantener pose/posición congeladas hasta el evento OnHeavyFinished
+                if (golem.Body) golem.Body.linearVelocity = Vector2.zero;
+                break;
+        }
+    }
 
-//        golem.RegisterHeavyState(null);
-//        base.Sleep();
-//    }
+    public override void Sleep()
+    {
+        // Restaurar físicas
+        if (golem.Body != null)
+        {
+            golem.Body.constraints = savedConstraints | RigidbodyConstraints2D.FreezeRotation;
+            golem.Body.simulated = savedSimulated;
+            golem.Body.gravityScale = savedGravity;
+            golem.Body.linearVelocity = Vector2.zero;
+        }
 
-//    // ---------- Animation Events ----------
-//    public void OnJumpStart()
-//    {
-//        if (phase != Phase.Windup) return;
+        golem.RegisterHeavyState(null);
+        base.Sleep();
+    }
 
-//        // snapshot de la posición del player
-//        var p = golem.GetPlayer();
-//        jumpStart = tr.position;
-//        jumpTarget = p ? (Vector2)p.position : jumpStart; // si no hay player, se queda
-//        timer = 0f;
-//        phase = Phase.Jump;
-//    }
+    // ================= Animation Events =================
 
-//    public void OnImpact()
-//    {
-//        if (phase == Phase.Jump && !impacted)
-//            DoImpact();
-//    }
+    public void OnJumpStart()
+    {
+        if (phase != Phase.Windup || jumpStarted) return;
+        jumpStarted = true;
 
-//    public void OnFinished()
-//    {
-//        if (phase == Phase.Impact) StartStun();
-//    }
-//    // --------------------------------------
+        jumpStart = golem.Transform.position;
 
-//    private void DoImpact()
-//    {
-//        impacted = true;
-//        timer = 0f;
-//        phase = Phase.Impact;
+        // 1) Punto base = posición actual del player (o fallback)
+        var p = golem.GetPlayer();
+        Vector2 aim = p ? (Vector2)p.position : (Vector2)golem.Transform.position + Vector2.right;
 
-//        // Daño en área
-//        Vector2 center = tr.position;
-//        var hits = Physics2D.OverlapCircleAll(center, golem.HeavyDamageRadius, golem.BeamPlayerMask);
-//        foreach (var h in hits)
-//        {
-//            var hp = h.GetComponent<PlayerHealth>() ?? h.GetComponentInParent<PlayerHealth>();
-//            if (hp) hp.TakeDamage(golem.HeavyDamage, center);
-//        }
-//    }
+        // 2) Si el player tiene Rigidbody2D, predecimos un poco hacia adelante
+        if (p != null)
+        {
+            var prb = p.GetComponent<Rigidbody2D>();
+            if (prb != null)
+            {
+                // Nota: usar linearVelocity (no velocity) para evitar el warning CS0618
+                aim += prb.linearVelocity * golem.HeavyLeadTime;
+            }
 
-//    private void StartStun()
-//    {
-//        phase = Phase.Stun;
-//        timer = 0f;
-//    }
+            // 3) Mezcla suave entre "posición actual" y "posición predicha"
+            //    0 = cae en donde está ahora; 1 = cae donde estará según la velocidad
+            Vector2 currentPos = p.position;
+            aim = Vector2.Lerp(currentPos, aim, golem.HeavyPredictBlend);
+        }
 
-//    private void FacePlayer()
-//    {
-//        var p = golem.GetPlayer();
-//        if (!p) return;
-//        Vector2 dir = p.position - tr.position;
-//        if (sr) sr.flipX = dir.x < 0f;
-//    }
-//}
+        // 4) Clampeamos la distancia física del salto (no más allá de lo que puede)
+        Vector2 toAim = aim - jumpStart;
+        float maxRange = golem.HeavyRange; // tu máximo físico de salto
+        if (toAim.sqrMagnitude > maxRange * maxRange)
+            aim = jumpStart + toAim.normalized * maxRange;
+
+        jumpTarget = aim;
+
+        // Liberamos SOLO la posición para animar el salto manualmente
+        if (golem.Body != null)
+        {
+            golem.Body.constraints = RigidbodyConstraints2D.FreezeRotation;
+            golem.Body.linearVelocity = Vector2.zero;
+        }
+
+        phase = Phase.Jump;
+        timer = 0f;
+    }
+    //public void OnJumpStart()
+    //{
+    //    if (phase != Phase.Windup || jumpStarted) return;
+    //    jumpStarted = true;
+
+    //    jumpStart = golem.Transform.position;
+
+    //    // Objetivo: posición del player acotada a heavyRange
+    //    var p = golem.GetPlayer();
+    //    Vector2 target = p ? (Vector2)p.position : (Vector2)golem.Transform.position + Vector2.right;
+    //    Vector2 toTarget = target - jumpStart;
+
+    //    float range = golem.HeavyRange;
+    //    if (toTarget.magnitude > range)
+    //        target = jumpStart + toTarget.normalized * range;
+
+    //    jumpTarget = target;
+
+    //    // Liberar SOLO la posición para animar el salto a mano
+    //    if (golem.Body != null)
+    //    {
+    //        golem.Body.constraints = RigidbodyConstraints2D.FreezeRotation;
+    //        golem.Body.linearVelocity = Vector2.zero;
+    //    }
+
+    //    phase = Phase.Jump;
+    //    timer = 0f;
+    //}
+
+    public void OnImpact()
+    {
+        if (impacted) return;
+        DoImpact();
+    }
+
+    public void OnFinished()
+    {
+        if (finished) return;
+        // Si por timing llega sin haber marcado impacto, lo marcamos
+        if (phase == Phase.Jump && !impacted) DoImpact();
+
+        // Descongelar YA (no esperamos a Sleep)
+        if (golem.Body != null)
+        {
+            golem.Body.constraints = savedConstraints | RigidbodyConstraints2D.FreezeRotation;
+            golem.Body.gravityScale = savedGravity;
+            golem.Body.linearVelocity = Vector2.zero;
+        }
+
+        // Volver a caminar
+        if (golem.Animator)
+        {
+            golem.Animator.ResetTrigger("Heavy");
+            golem.Animator.CrossFade("Walking", 0.01f); // o el clip base que uses
+        }
+
+        finished = true;
+        golem.Transition(EnemyInputs.SeePlayer);
+    }
+
+    // ================= helpers =================
+
+
+    private void UpdateParabola()
+    {
+        float t = Mathf.Clamp01(timer / Mathf.Max(0.01f, golem.HeavyAirTime));
+        Vector2 pos = Vector2.Lerp(jumpStart, jumpTarget, t);
+        float arc = golem.HeavyArcHeight * 4f * t * (1f - t); // parábola simple
+
+        golem.Transform.position = new Vector3(pos.x, pos.y + arc, golem.Transform.position.z);
+        LookAtPlayer();
+    }
+
+    private void DoImpact()
+    {
+        impacted = true;
+        phase = Phase.Impact;
+
+        // congelar posición en el frame de impacto (pose del golpe)
+        if (golem.Body)
+        {
+            golem.Body.linearVelocity = Vector2.zero;
+            golem.Body.constraints = RigidbodyConstraints2D.FreezePosition
+                                     | RigidbodyConstraints2D.FreezeRotation;
+        }
+
+        // daño en área
+        Vector2 c = golem.Transform.position;
+        var hits = Physics2D.OverlapCircleAll(c, golem.HeavyDamageRadius, golem.HeavyPlayerMask);
+        foreach (var h in hits)
+        {
+            var hp = h.GetComponent<PlayerHealth>() ?? h.GetComponentInParent<PlayerHealth>();
+            if (hp != null) hp.TakeDamage(golem.HeavyDamage, c);
+        }
+
+        // FX opcionales aquí (polvo, screenshake, etc.)
+    }
+
+    private void LookAtPlayer()
+    {
+        var p = golem.GetPlayer(); if (!p) return;
+        Vector2 d = p.position - golem.Transform.position;
+        var sr = golem.GetComponent<SpriteRenderer>();
+        if (sr) sr.flipX = d.x < 0;
+    }
+}

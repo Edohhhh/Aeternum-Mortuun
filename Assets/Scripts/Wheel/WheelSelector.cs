@@ -170,7 +170,7 @@ public class WheelSelector : MonoBehaviour
         {
             wheel.Spin();
 
-            // Desactivar UI cuando se agoten los usos
+            // Cuando le queda 1 spin, preparar para bloquear el spin y dejar Confirmar
             if (wheel.UsosRestantes == 1)
             {
                 wheel.AddSpinEndListener((_) =>
@@ -181,8 +181,15 @@ public class WheelSelector : MonoBehaviour
                         {
                             if (set.linkedWheel == wheel)
                             {
-                                set.Activar(false);
-                                Debug.Log($"❌ Botones de {wheel.name} desactivados (usos agotados)");
+                                // 🚫 Deshabilitar solo Spin
+                                if (set.spinButton != null)
+                                    set.spinButton.interactable = false;
+
+                                // ✅ Mantener Confirm activo
+                                if (set.confirmButton != null)
+                                    set.confirmButton.interactable = true;
+
+                                Debug.Log($"ℹ️ {wheel.name} sin spins → Confirmar habilitado, Spin bloqueado");
                             }
                         }
                     }
@@ -190,6 +197,7 @@ public class WheelSelector : MonoBehaviour
             }
         }
     }
+
 
     public void ConfirmarRuleta(PickerWheel wheel)
     {

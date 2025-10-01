@@ -15,6 +15,6 @@ public enum EnemyInputs
     UnderGroundAttack,
     SpawnMinions,
     Spawn,
-    MeleeAttack
-    //HeavyAttack
+    MeleeAttack,
+    HeavyAttack
 }
