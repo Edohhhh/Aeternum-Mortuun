@@ -920,17 +920,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7fbbc2a935cf38c4cb6da98763a6ca26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  startRoom:
+    id: 0
+    roomName: LoopSlime1
   easyRooms:
-  - LoopSlime1
-  - LoopSlime1
+  - id: 1
+    roomName: LoopSlime1
+  - id: 2
+    roomName: LoopSlime1
   mediumRooms:
-  - LoopEsqueleto1
-  - LoopMiniSlimes
-  - LoopMiniEsqueletos
+  - id: 3
+    roomName: LoopEsqueleto1
+  - id: 4
+    roomName: LoopMiniSlimes
+  - id: 5
+    roomName: LoopMiniEsqueletos
   hardRooms:
-  - BossGolem
-  - BossTopo
-  - LoopMiniEsqueletosYSlimes
+  - id: 6
+    roomName: BossGolem
+  - id: 7
+    roomName: BossTopo
+  - id: 8
+    roomName: LoopMiniEsqueletosYSlimes
   easyCount: 2
   mediumCount: 3
   hardCount: 3

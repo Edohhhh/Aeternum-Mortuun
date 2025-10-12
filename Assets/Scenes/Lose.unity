@@ -1325,6 +1325,76 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1887348036}
   m_CullTransparentMesh: 1
+--- !u!1 &2047278381
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2047278383}
+  - component: {fileID: 2047278382}
+  m_Layer: 0
+  m_Name: RoomRandomizer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2047278382
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2047278381}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fbbc2a935cf38c4cb6da98763a6ca26, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  startRoom:
+    id: 0
+    roomName: LoopSlime1
+  easyRooms:
+  - id: 1
+    roomName: LoopSlime1
+  - id: 2
+    roomName: LoopSlime1
+  mediumRooms:
+  - id: 3
+    roomName: LoopEsqueleto1
+  - id: 4
+    roomName: LoopMiniSlimes
+  - id: 5
+    roomName: LoopMiniEsqueletos
+  hardRooms:
+  - id: 6
+    roomName: BossGolem
+  - id: 7
+    roomName: BossTopo
+  - id: 8
+    roomName: LoopMiniEsqueletosYSlimes
+  easyCount: 0
+  mediumCount: 3
+  hardCount: 3
+  generatedRun: []
+--- !u!4 &2047278383
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2047278381}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 84.643295, y: 410.5975, z: -5.425287}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -1333,3 +1403,4 @@ SceneRoots:
   - {fileID: 1625970865}
   - {fileID: 1524669517}
   - {fileID: 1402110829}
+  - {fileID: 2047278383}

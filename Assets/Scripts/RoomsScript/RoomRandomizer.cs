@@ -1,6 +1,14 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+
+[System.Serializable]
+public class RoomData
+{
+    public int id;
+    public string roomName;
+}
 
 public enum Difficulty { Easy, Medium, Hard }
 
@@ -8,21 +16,22 @@ public class RoomRandomizer : MonoBehaviour
 {
     public static RoomRandomizer Instance { get; private set; }
 
+    [Header("Sala inicial fija")]
+    [Tooltip("Sala que siempre aparecerá al inicio de la run")]
+    public RoomData startRoom;
+
     [Header("Listas de escenas por dificultad")]
-    public List<string> easyRooms = new List<string>();
-    public List<string> mediumRooms = new List<string>();
-    public List<string> hardRooms = new List<string>();
+    public List<RoomData> easyRooms = new List<RoomData>();
+    public List<RoomData> mediumRooms = new List<RoomData>();
+    public List<RoomData> hardRooms = new List<RoomData>();
 
     [Header("Configuración de la run")]
-    [Tooltip("Cantidad de salas fáciles a incluir en la run")]
     public int easyCount = 2;
-    [Tooltip("Cantidad de salas medias a incluir en la run")]
     public int mediumCount = 2;
-    [Tooltip("Cantidad de salas difíciles a incluir en la run")]
     public int hardCount = 1;
 
     [Header("Debug - Lista generada (orden final)")]
-    public List<string> generatedRun = new List<string>();
+    public List<RoomData> generatedRun = new List<RoomData>();
 
     private int currentIndex = 0;
 
@@ -34,7 +43,7 @@ public class RoomRandomizer : MonoBehaviour
             return;
         }
         Instance = this;
-        DontDestroyOnLoad(gameObject); // Mantener entre escenas
+        DontDestroyOnLoad(gameObject);
     }
 
     private void Start()
@@ -42,46 +51,52 @@ public class RoomRandomizer : MonoBehaviour
         GenerateRun();
     }
 
-    /// <summary>
-    /// Genera una nueva run en base a las cantidades configuradas
-    /// </summary>
     public void GenerateRun()
     {
         generatedRun.Clear();
         currentIndex = 0;
 
-        // Agregar salas según cantidades pedidas
+        // Si hay una sala fija asignada, agregarla al principio
+        if (startRoom != null)
+        {
+            generatedRun.Add(startRoom);
+        }
+
+        // Luego agregar las salas aleatorias
         AddRandomRooms(easyRooms, easyCount);
         AddRandomRooms(mediumRooms, mediumCount);
         AddRandomRooms(hardRooms, hardCount);
 
+        // Evitar IDs duplicados (mantiene el orden)
+        HashSet<int> usedIDs = new HashSet<int>();
+        generatedRun = generatedRun
+            .Where(r => usedIDs.Add(r.id))
+            .ToList();
+
         Debug.Log("[RoomRandomizer] Run generada con " + generatedRun.Count + " salas.");
     }
 
-    private void AddRandomRooms(List<string> sourceList, int count)
+    private void AddRandomRooms(List<RoomData> sourceList, int count)
     {
-        for (int i = 0; i < count; i++)
+        if (sourceList.Count == 0) return;
+
+        List<RoomData> shuffled = sourceList.OrderBy(x => Random.value).ToList();
+        for (int i = 0; i < count && i < shuffled.Count; i++)
         {
-            if (sourceList.Count == 0) continue;
-            string room = sourceList[Random.Range(0, sourceList.Count)];
-            generatedRun.Add(room);
+            generatedRun.Add(shuffled[i]);
         }
     }
 
-    /// <summary>
-    /// Devuelve la siguiente sala en orden, o null si ya no quedan
-    /// </summary>
     public string GetNextRoom()
     {
         if (currentIndex < generatedRun.Count)
         {
-            string room = generatedRun[currentIndex];
+            string room = generatedRun[currentIndex].roomName;
             currentIndex++;
             return room;
         }
         else
         {
-
             Debug.Log("[RoomRandomizer] No quedan más salas en la run.");
             SceneManager.LoadScene("Victory");
             return null;
