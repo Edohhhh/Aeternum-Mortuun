@@ -171,6 +171,7 @@ public class PlayerStatsHUD : MonoBehaviour
         HidePerkIcons(); // Limpiar iconos anteriores
 
         var perks = DM.playerData.initialPowerUps;
+        var tooltip = FindObjectOfType<InventoryTooltipUI>(true); // 🧠 Buscar el tooltip en la escena
 
         foreach (var powerUp in perks)
         {
@@ -188,8 +189,36 @@ public class PlayerStatsHUD : MonoBehaviour
 
                     var image = iconGO.AddComponent<Image>();
                     image.sprite = perkIcons[index];
-
                     instantiatedIcons.Add(iconGO);
+
+                    // 🧩 Agregar EventTrigger para tooltip
+                    var trigger = iconGO.AddComponent<UnityEngine.EventSystems.EventTrigger>();
+
+                    // Mouse entra → mostrar tooltip
+                    var entryEnter = new UnityEngine.EventSystems.EventTrigger.Entry
+                    {
+                        eventID = UnityEngine.EventSystems.EventTriggerType.PointerEnter
+                    };
+                    entryEnter.callback.AddListener((_) =>
+                    {
+                        if (tooltip != null && powerUp.effect != null)
+                        {
+                            tooltip.Show(powerUp.effect.label, powerUp.effect.description);
+                        }
+                    });
+                    trigger.triggers.Add(entryEnter);
+
+                    // Mouse sale → ocultar tooltip
+                    var entryExit = new UnityEngine.EventSystems.EventTrigger.Entry
+                    {
+                        eventID = UnityEngine.EventSystems.EventTriggerType.PointerExit
+                    };
+                    entryExit.callback.AddListener((_) =>
+                    {
+                        if (tooltip != null)
+                            tooltip.Hide();
+                    });
+                    trigger.triggers.Add(entryExit);
                 }
             }
         }

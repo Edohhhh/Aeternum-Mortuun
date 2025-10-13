@@ -168,9 +168,30 @@ public class WheelSelector : MonoBehaviour
     {
         if (wheel != null && !wheel.IsSpinning && wheel.UsosRestantes > 0)
         {
+            // 🚫 Desactivar Confirm mientras gira
+            foreach (var set in ruletaUISets)
+            {
+                if (set.linkedWheel == wheel && set.confirmButton != null)
+                    set.confirmButton.interactable = false;
+            }
+
+            // 🎡 Iniciar el giro
             wheel.Spin();
 
-            // Cuando le queda 1 spin, preparar para bloquear el spin y dejar Confirmar
+            // 🔔 Cuando termina de girar, volver a habilitar Confirm
+            wheel.AddSpinEndListener((_) =>
+            {
+                foreach (var set in ruletaUISets)
+                {
+                    if (set.linkedWheel == wheel && set.confirmButton != null)
+                    {
+                        set.confirmButton.interactable = true; // ✅ Habilitar Confirmar al terminar
+                        Debug.Log($"✅ {wheel.name} terminó de girar → Confirmar habilitado");
+                    }
+                }
+            });
+
+            // ⚙️ Si solo queda 1 spin, preparar el bloqueo de spin y habilitar Confirm al finalizar
             if (wheel.UsosRestantes == 1)
             {
                 wheel.AddSpinEndListener((_) =>
@@ -199,6 +220,7 @@ public class WheelSelector : MonoBehaviour
     }
 
 
+
     public void ConfirmarRuleta(PickerWheel wheel)
     {
         if (wheel == null)
@@ -207,10 +229,12 @@ public class WheelSelector : MonoBehaviour
             return;
         }
 
-        // Aplicar premio de la ruleta
+        // ✅ APLICA el power-up (efecto real del premio)
         wheel.AplicarUltimoPremio();
 
-        // 🎉 Efecto de confetti
+        wheel.MostrarPopupUltimoPremio();
+
+        // 🎉 Efecto visual de confetti
         if (confettiPrefab != null)
         {
             confettiPrefab.SetActive(true);

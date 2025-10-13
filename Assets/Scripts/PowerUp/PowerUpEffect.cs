@@ -6,10 +6,11 @@ public class PowerUpEffect : ScriptableObject
 {
     [Header("Visual")]
     public string label;
+    [TextArea(2, 4)] public string description;
     public Sprite icon;
 
     [Header("Efecto")]
-    public PowerUp powerUp; // Referencia al ScriptableObject funcional
+    public PowerUp powerUp; 
 
     public void Apply(GameObject playerObj)
     {
@@ -32,10 +33,10 @@ public class PowerUpEffect : ScriptableObject
             return;
         }
 
-        // Aplicar el efecto
+       
         powerUp.Apply(controller);
 
-        // Añadir el PowerUp a la lista si no estaba
+        
         if (controller.initialPowerUps == null)
             controller.initialPowerUps = new PowerUp[0];
 
@@ -51,11 +52,11 @@ public class PowerUpEffect : ScriptableObject
             Debug.Log($"ℹ️ PowerUp '{powerUp.name}' ya estaba asignado.");
         }
 
-        // Asociar este PowerUpEffect al PowerUp para la UI
+   
         if (powerUp.effect == null)
             powerUp.effect = this;
 
-        // Refrescar la UI si existe
+
         var ui = Object.FindObjectOfType<PowerUpUI>();
         if (ui != null)
         {

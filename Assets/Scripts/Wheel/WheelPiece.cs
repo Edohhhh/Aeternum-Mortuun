@@ -7,6 +7,7 @@ namespace EasyUI.PickerWheelUI
     {
         public Sprite Icon;
         public string Label;
+        public PowerUpEffect Effect; // ✅ referencia al ScriptableObject
 
         [Tooltip("Reward amount")]
         public int Amount = 1;
@@ -17,8 +18,5 @@ namespace EasyUI.PickerWheelUI
 
         [HideInInspector] public int Index;
         [HideInInspector] public double _weight = 0f;
-
-        // 🔁 Nuevo: Referencia directa al efecto funcional
-        [HideInInspector] public PowerUpEffect Effect;
     }
 }
