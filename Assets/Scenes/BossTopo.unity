@@ -9349,7 +9349,13 @@ MonoBehaviour:
   animator: {fileID: 0}
   rb: {fileID: 0}
   hitbox: {fileID: 1715398195}
-  initialPowerUps: []
+  initialPowerUps:
+  - {fileID: 11400000, guid: 324480661807d1d46aa367ce5a502969, type: 2}
+  - {fileID: 11400000, guid: 324480661807d1d46aa367ce5a502969, type: 2}
+  - {fileID: 11400000, guid: 324480661807d1d46aa367ce5a502969, type: 2}
+  - {fileID: 11400000, guid: 324480661807d1d46aa367ce5a502969, type: 2}
+  - {fileID: 11400000, guid: 324480661807d1d46aa367ce5a502969, type: 2}
+  - {fileID: 11400000, guid: 324480661807d1d46aa367ce5a502969, type: 2}
   lastNonZeroMoveInput: {x: 1, y: 0}
   dashCooldownTimer: 0
   knockbackDecay: 18
@@ -12688,6 +12694,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   powerUpPools: []
   powerUpPool: {fileID: 0}
+  rewardPopup: {fileID: 0}
   linePrefab: {fileID: 1258666099951334, guid: 052d5aa0d2632e04c90d4d5027f9dd37, type: 3}
   linesParent: {fileID: 5396449332336509900}
   selector: {fileID: 0}
@@ -12704,39 +12711,39 @@ MonoBehaviour:
   wheelPieces:
   - Icon: {fileID: 1753655533966520807, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
     Label: 
+    Effect: {fileID: 0}
     Amount: 10
     Chance: 73.3
     Index: 0
     _weight: 0
-    Effect: {fileID: 0}
   - Icon: {fileID: -6379153957335788890, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
     Label: 
+    Effect: {fileID: 0}
     Amount: 20
     Chance: 56.6
     Index: 0
     _weight: 0
-    Effect: {fileID: 0}
   - Icon: {fileID: 3622378070614508730, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
     Label: 
+    Effect: {fileID: 0}
     Amount: 30
     Chance: 60
     Index: 0
     _weight: 0
-    Effect: {fileID: 0}
   - Icon: {fileID: -3436129635470280944, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
     Label: 
+    Effect: {fileID: 0}
     Amount: 40
     Chance: 25
     Index: 0
     _weight: 0
-    Effect: {fileID: 0}
   - Icon: {fileID: 7005750741070879577, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
     Label: 
+    Effect: {fileID: 0}
     Amount: 60
     Chance: 10
     Index: 0
     _weight: 0
-    Effect: {fileID: 0}
   usosMaximos: 3
 --- !u!222 &5066738421732428209
 CanvasRenderer:

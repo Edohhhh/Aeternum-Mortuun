@@ -1,6 +1,4 @@
 using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
 
 public class PlayerOrbital : MonoBehaviour
 {
@@ -8,7 +6,6 @@ public class PlayerOrbital : MonoBehaviour
     private float orbitRadius;
     private float rotationSpeed;
     private int damagePerSecond;
-
     private float angle;
     private float damageTimer;
 
@@ -18,6 +15,11 @@ public class PlayerOrbital : MonoBehaviour
         orbitRadius = radius;
         rotationSpeed = speed;
         damagePerSecond = dps;
+    }
+
+    public void SetInitialAngle(float startAngle)
+    {
+        angle = startAngle;
     }
 
     void Update()
@@ -49,9 +51,7 @@ public class PlayerOrbital : MonoBehaviour
                 if (enemy != null)
                 {
                     Vector2 knockbackDir = (enemy.transform.position - transform.position).normalized;
-                    float knockbackForce = 0f; // o podés poner un valor si querés empujar un poquito
-                    enemy.TakeDamage(damagePerSecond, knockbackDir, knockbackForce);
-
+                    enemy.TakeDamage(damagePerSecond, knockbackDir, 0f);
                 }
             }
         }

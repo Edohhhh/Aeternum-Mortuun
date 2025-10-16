@@ -1,57 +1,83 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections.Generic;
 
 public class OrbitalManager : MonoBehaviour
 {
-    private GameObject orbitalInstance;
+    private List<GameObject> orbitals = new List<GameObject>();
     private OrbitalPowerUp config;
     private PlayerController player;
+    private int stackCount = 0;
 
-    public void SpawnOrbital(OrbitalPowerUp config, PlayerController player)
+    private void Awake()
+    {
+        DontDestroyOnLoad(gameObject);
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    public void AddStack(OrbitalPowerUp config, PlayerController player)
     {
         this.config = config;
         this.player = player;
 
-        if (orbitalInstance != null) return;
-
-        orbitalInstance = Instantiate(config.orbitalPrefab);
-        var orbital = orbitalInstance.AddComponent<PlayerOrbital>();
-        orbital.Initialize(player.transform, config.orbitRadius, config.rotationSpeed, config.damagePerSecond);
-
-        // Escuchar cambios de escena
-        SceneManager.sceneLoaded += OnSceneLoaded;
+        stackCount++;
+        RebuildOrbitals();
     }
 
-    public void DestroyOrbital()
+    private void RebuildOrbitals()
     {
-        if (orbitalInstance != null)
-        {
-            Destroy(orbitalInstance);
-            orbitalInstance = null;
-        }
+        // Limpiar los anteriores
+        foreach (var orb in orbitals)
+            if (orb != null) Destroy(orb);
 
-        SceneManager.sceneLoaded -= OnSceneLoaded;
+        orbitals.Clear();
+
+        // Crear todos los orbitales según el stack
+        for (int i = 0; i < stackCount; i++)
+        {
+            var go = Instantiate(config.orbitalPrefab);
+            var orbital = go.AddComponent<PlayerOrbital>();
+
+            float angleOffset = (360f / stackCount) * i;
+            float adjustedSpeed = config.rotationSpeed * Mathf.Sign((i % 2 == 0) ? 1 : -1);
+
+            orbital.Initialize(player.transform, config.orbitRadius, adjustedSpeed, config.damagePerSecond);
+            orbital.SetInitialAngle(angleOffset);
+
+            orbitals.Add(go);
+        }
+    }
+
+    public void ClearOrbitals()
+    {
+        foreach (var orb in orbitals)
+            if (orb != null) Destroy(orb);
+
+        orbitals.Clear();
+        stackCount = 0;
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        // chequea si la perk todavía está en los datos guardados
-        var data = GameDataManager.Instance.playerData;
-        bool perkActiva = data.initialPowerUps.Exists(p => p is OrbitalPowerUp);
+        // Al cambiar de escena, volver a asignar al jugador
+        StartCoroutine(ReassignPlayer());
+    }
 
-        if (!perkActiva)
+    private System.Collections.IEnumerator ReassignPlayer()
+    {
+        PlayerController found = null;
+        while (found == null)
         {
-            // si no está en la lista, destruye el orbital
-            DestroyOrbital();
+            found = Object.FindFirstObjectByType<PlayerController>();
+            yield return null;
         }
-        else
-        {
-            // si está, re-spawnea al entrar en la nueva escena
-            var player = UnityEngine.Object.FindFirstObjectByType<PlayerController>();
-            if (player != null && orbitalInstance == null)
-            {
-                SpawnOrbital(config, player);
-            }
-        }
+
+        player = found;
+        RebuildOrbitals();
     }
 }

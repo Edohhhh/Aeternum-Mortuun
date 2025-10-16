@@ -5,7 +5,7 @@ public class OrbitalPowerUp : PowerUp
 {
     public GameObject orbitalPrefab;
     public float orbitRadius = 1.2f;
-    public float rotationSpeed = 90f; // grados por segundo
+    public float rotationSpeed = 90f;
     public int damagePerSecond = 1;
 
     public override void Apply(PlayerController player)
@@ -18,7 +18,8 @@ public class OrbitalPowerUp : PowerUp
             Object.DontDestroyOnLoad(go);
         }
 
-        manager.SpawnOrbital(this, player);
+        // En lugar de reemplazar, acumulamos
+        manager.AddStack(this, player);
     }
 
     public override void Remove(PlayerController player)
@@ -26,7 +27,7 @@ public class OrbitalPowerUp : PowerUp
         var manager = Object.FindFirstObjectByType<OrbitalManager>();
         if (manager != null)
         {
-            manager.DestroyOrbital();
+            manager.ClearOrbitals();
         }
     }
 }

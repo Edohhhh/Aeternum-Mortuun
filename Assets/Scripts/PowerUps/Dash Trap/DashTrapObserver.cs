@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class DashTrapObserver : MonoBehaviour
 {
@@ -14,6 +15,7 @@ public class DashTrapObserver : MonoBehaviour
     private void Awake()
     {
         SceneManager.sceneLoaded += OnSceneLoaded;
+        DontDestroyOnLoad(gameObject);
     }
 
     private void OnDestroy()
@@ -23,8 +25,21 @@ public class DashTrapObserver : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        // Buscar al nuevo Player en la nueva escena
-        player = FindFirstObjectByType<PlayerController>();
+        // Evita error por timing
+        StartCoroutine(ReassignPlayer());
+    }
+
+    private IEnumerator ReassignPlayer()
+    {
+        // Esperar hasta que el nuevo Player exista
+        PlayerController found = null;
+        while (found == null)
+        {
+            found = FindFirstObjectByType<PlayerController>();
+            yield return null; // esperar un frame
+        }
+
+        player = found;
     }
 
     private void Update()

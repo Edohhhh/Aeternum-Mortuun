@@ -48,6 +48,9 @@ public class MinionController : MonoBehaviour, IEnemyDataProvider, IMeleeHost
     }
     public void MarkMeleeUsed() => nextMeleeAllowedTime = Time.time + meleeCooldown;
 
+    private EnemyDeathState _deathRef;
+    public void RegisterDeathState(EnemyDeathState s) => _deathRef = s;
+    public void OnDeathAnimFinished() => _deathRef?.OnDeathAnimFinished();
     private void Start()
     {
         EnemyManager.Instance.RegisterEnemy();

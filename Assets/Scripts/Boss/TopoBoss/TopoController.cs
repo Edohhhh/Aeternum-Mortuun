@@ -130,6 +130,12 @@ public class TopoController : MonoBehaviour, IEnemyDataProvider
         if (rb) rb.gravityScale = 0f; // blindaje por si un clip lo pisa
     }
 
+
+    private EnemyDeathState _deathRef;
+    public void RegisterDeathState(EnemyDeathState s) => _deathRef = s;
+    public void OnDeathAnimFinished() => _deathRef?.OnDeathAnimFinished();
+
+
     private void Start()
     {
         EnemyManager.Instance.RegisterEnemy();

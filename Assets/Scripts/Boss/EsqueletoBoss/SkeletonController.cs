@@ -96,6 +96,10 @@ public class SkeletonController : MonoBehaviour, IEnemyDataProvider, IMeleeHost
     public bool IsSpawningMinions() =>
         fsm.GetCurrentState() is SpawnMinionState;
 
+    private EnemyDeathState _deathRef;
+    public void RegisterDeathState(EnemyDeathState s) => _deathRef = s;
+    public void OnDeathAnimFinished() => _deathRef?.OnDeathAnimFinished();
+
     private void Start()
     {
         EnemyManager.Instance.RegisterEnemy();

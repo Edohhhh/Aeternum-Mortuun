@@ -151,6 +151,10 @@ public class GolemController : MonoBehaviour, IEnemyDataProvider, IMeleeHost
     private EnemyHealth health;
     private Rigidbody2D rb;
 
+    private EnemyDeathState _deathRef;
+    public void RegisterDeathState(EnemyDeathState s) => _deathRef = s;
+    public void OnDeathAnimFinished() => _deathRef?.OnDeathAnimFinished();
+
     private void Start()
     {
         EnemyManager.Instance.RegisterEnemy();
