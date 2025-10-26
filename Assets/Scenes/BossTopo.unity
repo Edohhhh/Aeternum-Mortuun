@@ -2558,7 +2558,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &620707450
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11081,7 +11081,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4821700984448308204, guid: 3a1e1246dff2d4e0f88642abb6882685, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -11241,8 +11241,16 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1715398198}
     - target: {fileID: -6279594110209237281, guid: 8406d285745239c4393afb76f8cedf6f, type: 3}
+      propertyPath: fleeSpeed
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -6279594110209237281, guid: 8406d285745239c4393afb76f8cedf6f, type: 3}
       propertyPath: homingSpeed
       value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: -6279594110209237281, guid: 8406d285745239c4393afb76f8cedf6f, type: 3}
+      propertyPath: fleeDuration
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -6279594110209237281, guid: 8406d285745239c4393afb76f8cedf6f, type: 3}
       propertyPath: straightSpeed

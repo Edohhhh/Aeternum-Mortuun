@@ -60,6 +60,30 @@ public class TopoController : MonoBehaviour, IEnemyDataProvider
     [SerializeField] private float projectileSpeedMultPhase2 = 1.25f;
     [SerializeField] private float projectileSpeedMultPhase3 = 1.50f;
 
+    [Header("Flee (huir)")]
+    [SerializeField, Tooltip("Velocidad al huir (más lenta que la del player).")]
+    private float fleeSpeed = 2.8f;
+    [SerializeField, Tooltip("Segundos que huye antes de enterrarse.")]
+    private float fleeDuration = 1.25f;
+
+    // flags para hacerlo una sola vez por fase
+    private bool fleeUsedPhase1 = false;
+    private bool fleeUsedPhase2 = false;
+    private bool fleeUsedPhase3 = false;
+
+    private TopoFleeState _fleeRef;
+    public void RegisterFleeState(TopoFleeState s) => _fleeRef = s;
+
+    // Animation Event desde el clip Flee (último frame)
+    public void AE_OnFleeEnd() => _fleeRef?.OnFleeAnimEnd();
+
+    // acceso desde el estado
+    public float FleeSpeed => fleeSpeed;
+    public float FleeDuration => fleeDuration;
+
+    private float _lastHealth;
+    private bool _fleeArmed = true;
+
     private int currentPhase = -1;
     private float currentProjMult = 1f;
     public float GetProjectileSpeedMult() => currentProjMult;
@@ -148,12 +172,16 @@ public class TopoController : MonoBehaviour, IEnemyDataProvider
         {
             health.OnDeath += () => Transition(EnemyInputs.Die);
             maxHealthAtSpawn = Mathf.Max(health.GetCurrentHealth(), 1f);
+            _lastHealth = GetCurrentHealth();
         }
+
+       
 
         // FSM
         var idle = new TopoIdleState(this);   // Idle "pasivo" (no dispara nada solo)
         var attack = new TopoAttackState(this); // event-driven
         var death = new EnemyDeathState(this);
+        var flee = new TopoFleeState(this);
 
         fsm = new FSM<EnemyInputs>(idle);
 
@@ -161,6 +189,11 @@ public class TopoController : MonoBehaviour, IEnemyDataProvider
         idle.AddTransition(EnemyInputs.SpecialAttack, attack);
         idle.AddTransition(EnemyInputs.Die, death);
         attack.AddTransition(EnemyInputs.SeePlayer, idle); // la usamos como "volver a Idle" desde AE_OnAttackEnd
+
+        // FLEE desde donde te interese (Idle/Attack/…)
+        attack.AddTransition(EnemyInputs.Flee, flee);
+        idle.AddTransition(EnemyInputs.Flee, flee);
+        flee.AddTransition(EnemyInputs.SeePlayer, idle);
 
         // Arrancar el ciclo un frame después (evita doble Emerge)
         currentPhase = GetPhase();
@@ -188,7 +221,17 @@ public class TopoController : MonoBehaviour, IEnemyDataProvider
         {
             currentPhase = p;
             ApplyPhaseTuning(p);
+            // rearmamos el debounce al cambiar de fase para no perder el próximo hit
+            _fleeArmed = true;
         }
+
+        
+        float hpNow = GetCurrentHealth();
+        TryTriggerFleeOnDamage(hpNow);
+        _lastHealth = hpNow;          // actualizar histórico
+        if (!_fleeArmed && !Mathf.Approximately(hpNow, _lastHealth))
+            _fleeArmed = true;
+
 
         // No empujar "ver jugador" – el ciclo lo llevan los Animation Events.
         // Solo flip visual si está visible
@@ -343,7 +386,7 @@ public class TopoController : MonoBehaviour, IEnemyDataProvider
     }
 
     // Aleatorio distinto al último (si hay 1)
-    private Transform GetRandomWaypointNotLast()
+    public Transform GetRandomWaypointNotLast()
     {
         if (waypoints == null || waypoints.Length == 0) return null;
 
@@ -389,6 +432,27 @@ public class TopoController : MonoBehaviour, IEnemyDataProvider
 
         // (Opcional) FX: flash, shake, sonido, etc.
         // Debug.Log($"[TOPO] Phase {phase} -> animSpeed={animator?.speed}, projMult={currentProjMult}");
+    }
+
+    private void TryTriggerFleeOnDamage(float hpNow)
+    {
+        // ¿recibió daño desde el último frame?
+        bool tookDamage = hpNow < _lastHealth - 0.001f;
+        if (!tookDamage || !_fleeArmed) return;
+
+        // 1 vez por fase
+        switch (currentPhase)
+        {
+            case 1:
+                if (!fleeUsedPhase1) { fleeUsedPhase1 = true; Transition(EnemyInputs.Flee); _fleeArmed = false; }
+                break;
+            case 2:
+                if (!fleeUsedPhase2) { fleeUsedPhase2 = true; Transition(EnemyInputs.Flee); _fleeArmed = false; }
+                break;
+            case 3:
+                if (!fleeUsedPhase3) { fleeUsedPhase3 = true; Transition(EnemyInputs.Flee); _fleeArmed = false; }
+                break;
+        }
     }
 
     // --------- IEnemyDataProvider ----------
