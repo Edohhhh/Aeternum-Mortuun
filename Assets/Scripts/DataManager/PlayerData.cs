@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -21,6 +21,8 @@ public class PlayerData
     // Attack
     public int baseDamage;
 
+    // ✅ --- AÑADIDO ---
+    public int extraSpins = 0;
 
     // Health
     public float maxHealth;

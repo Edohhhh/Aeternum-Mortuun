@@ -36,7 +36,7 @@ public class WheelSelector : MonoBehaviour
     private List<PickerWheel> ruletasInstanciadas = new List<PickerWheel>();
     private PickerWheel ruletaSeleccionada;
 
-    private void Start()
+    public void IniciarSelector()
     {
         InstanciarRuletasAleatorias();
     }
@@ -64,6 +64,14 @@ public class WheelSelector : MonoBehaviour
             return;
         }
 
+        PlayerController player = null;
+        GameObject playerObj = GameObject.FindWithTag("Player");
+        if (playerObj != null)
+            player = playerObj.GetComponent<PlayerController>();
+
+        if (player == null)
+            Debug.LogError("❌ WheelSelector no pudo encontrar al PlayerController.");
+
         // Elegir 3 distintas por ponderación (sin reemplazo)
         List<WeightedRuleta> seleccionadas = PickDistinctWeighted(candidatos, 3);
 
@@ -82,10 +90,15 @@ public class WheelSelector : MonoBehaviour
 
             ruletasInstanciadas.Add(wheel);
 
-            // ⚠️ Usa el método nuevo. Si no agregaste el alias, llamá a este:
+            // Sincroniza los spins ANTES de inicializar la UI
+            if (player != null)
+            {
+                // Aquí se aplica el Extra Spin
+                wheel.SincronizarSpinsConPlayer(player);
+            }
+
+            // Carga los premios
             wheel.CargarPremiosDesdePoolsPonderados();
-            // Si preferís no tocar PickerWheel, podés dejar el alias:
-            // wheel.CargarPremiosDesdePool();
 
             // Vincular UISet si existe
             if (i < ruletaUISets.Count && ruletaUISets[i] != null)
@@ -112,7 +125,6 @@ public class WheelSelector : MonoBehaviour
 
             if (total <= 0f)
             {
-                Debug.LogWarning("⚠️ Suma de pesos <= 0 durante la selección. Usando primer elemento como fallback.");
                 result.Add(pool[0]);
                 pool.RemoveAt(0);
                 continue;
@@ -132,7 +144,7 @@ public class WheelSelector : MonoBehaviour
                 }
             }
 
-            if (chosenIndex < 0) chosenIndex = pool.Count - 1; // Fallback por borde
+            if (chosenIndex < 0) chosenIndex = pool.Count - 1;
 
             result.Add(pool[chosenIndex]);
             pool.RemoveAt(chosenIndex);
@@ -168,49 +180,54 @@ public class WheelSelector : MonoBehaviour
     {
         if (wheel != null && !wheel.IsSpinning && wheel.UsosRestantes > 0)
         {
-            // 🚫 Desactivar Confirm mientras gira
+            // Desactivar Confirm mientras gira
             foreach (var set in ruletaUISets)
             {
                 if (set.linkedWheel == wheel && set.confirmButton != null)
                     set.confirmButton.interactable = false;
             }
 
-            // 🎡 Iniciar el giro
+            // Iniciar el giro
             wheel.Spin();
 
-            // 🔔 Cuando termina de girar, volver a habilitar Confirm
+            // Cuando termina de girar, volver a habilitar Confirm
             wheel.AddSpinEndListener((_) =>
             {
                 foreach (var set in ruletaUISets)
                 {
-                    if (set.linkedWheel == wheel && set.confirmButton != null)
+                    if (set.linkedWheel == wheel)
                     {
-                        set.confirmButton.interactable = true; // ✅ Habilitar Confirmar al terminar
-                        Debug.Log($"✅ {wheel.name} terminó de girar → Confirmar habilitado");
+                        set.ActualizarTextoSpin();
+
+                        if (set.confirmButton != null)
+                        {
+                            set.confirmButton.interactable = true;
+                        }
                     }
                 }
             });
 
-            // ⚙️ Si solo queda 1 spin, preparar el bloqueo de spin y habilitar Confirm al finalizar
+            // Si solo queda 1 spin, preparar el bloqueo de spin
             if (wheel.UsosRestantes == 1)
             {
                 wheel.AddSpinEndListener((_) =>
                 {
+                    foreach (var set in ruletaUISets)
+                    {
+                        if (set.linkedWheel == wheel)
+                            set.ActualizarTextoSpin();
+                    }
+
                     if (wheel.UsosRestantes <= 0)
                     {
                         foreach (var set in ruletaUISets)
                         {
                             if (set.linkedWheel == wheel)
                             {
-                                // 🚫 Deshabilitar solo Spin
                                 if (set.spinButton != null)
                                     set.spinButton.interactable = false;
-
-                                // ✅ Mantener Confirm activo
                                 if (set.confirmButton != null)
                                     set.confirmButton.interactable = true;
-
-                                Debug.Log($"ℹ️ {wheel.name} sin spins → Confirmar habilitado, Spin bloqueado");
                             }
                         }
                     }
@@ -220,35 +237,58 @@ public class WheelSelector : MonoBehaviour
     }
 
 
-
+    // ✅ --- MÉTODO MODIFICADO ---
     public void ConfirmarRuleta(PickerWheel wheel)
     {
+        // ✅ --- AÑADIDO: Limpiar "AcidPoollChico(Clone)" ---
+        // Esto se ejecuta ANTES que el resto de la lógica de confirmación.
+
+        string targetName = "AcidPoollChico(Clone)";
+        GameObject[] allObjects = GameObject.FindObjectsOfType<GameObject>();
+        int count = 0;
+
+        foreach (GameObject obj in allObjects)
+        {
+            // Comprueba si el nombre es exactamente el solicitado
+            if (obj.name == targetName)
+            {
+                GameObject.Destroy(obj);
+                count++;
+            }
+        }
+
+        if (count > 0)
+        {
+            Debug.Log($"🧹 Se eliminaron {count} objetos '{targetName}'.");
+        }
+        // ✅ --- FIN DEL CÓDIGO AÑADIDO ---
+
+
+        // --- Lógica de confirmación original ---
         if (wheel == null)
         {
             Debug.LogWarning("⚠️ No se asignó ruleta.");
             return;
         }
 
-        // ✅ APLICA el power-up (efecto real del premio)
+        // APLICA el power-up (efecto real del premio)
         wheel.AplicarUltimoPremio();
 
+        // Muestra el popup del premio
         wheel.MostrarPopupUltimoPremio();
 
-        // 🎉 Efecto visual de confetti
+        // Efecto visual de confetti
         if (confettiPrefab != null)
         {
             confettiPrefab.SetActive(true);
-
             ParticleSystem ps = confettiPrefab.GetComponent<ParticleSystem>();
             float duracion = 2f;
-
             if (ps != null)
                 duracion = ps.main.duration + ps.main.startLifetime.constantMax;
-
             StartCoroutine(DesactivarConfetti(confettiPrefab, duracion));
         }
 
-        // 📦 Guardar datos del jugador
+        // Guardar datos del jugador
         GameObject player = GameObject.FindWithTag("Player");
         if (player != null)
         {
@@ -268,17 +308,17 @@ public class WheelSelector : MonoBehaviour
             Debug.LogError("❌ No se encontró GameObject con tag 'Player'.");
         }
 
-        // 🚪 Cargar siguiente sala
+        // Cargar siguiente sala (descomentar si es necesario)
         //RoomManager.Instance.LoadNextRoomWithDelay();
 
-        // 🔒 Desactivar UI de todas las ruletas
+        // Desactivar UI de todas las ruletas
         foreach (var set in ruletaUISets)
         {
             if (set != null)
                 set.Activar(false);
         }
 
-        // ✅ Avisar al controlador de UI de ruletas que cierre HUD y reanude el juego
+        // Avisar al controlador de UI de ruletas que cierre HUD y reanude el juego
         if (wheelUIController != null)
         {
             wheelUIController.ConfirmarPremio();

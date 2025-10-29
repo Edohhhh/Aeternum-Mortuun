@@ -194,6 +194,7 @@ MonoBehaviour:
   - pool: {fileID: 11400000, guid: 45601f8f4591946c2bdc8b725a4e92e9, type: 2}
     weight: 25
   powerUpPool: {fileID: 11400000, guid: 990c36f0dfd896f468bd2e7e38db5f67, type: 2}
+  rewardPopup: {fileID: 0}
   linePrefab: {fileID: 1258666099951334, guid: ee8d4b94c42efd34eb323e0b8c83c810, type: 3}
   linesParent: {fileID: 2845754903725659257}
   selector: {fileID: 6718008529401278016}
@@ -203,53 +204,53 @@ MonoBehaviour:
   wheelPiecesParent: {fileID: 2091195014864347660}
   audioSource: {fileID: 7305758470852654209}
   tickAudioClip: {fileID: 8300000, guid: 43186eb953e63e546b2c31cb280f58d8, type: 3}
-  volume: 0.03
+  volume: 0.07
   pitch: 1
-  spinDuration: 5
+  spinDuration: 6
   wheelSize: 1
   wheelPieces:
   - Icon: {fileID: 1753655533966520807, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
     Label: 
+    Effect: {fileID: 0}
     Amount: 1
     Chance: 73.3
     Index: 0
     _weight: 0
-    Effect: {fileID: 0}
   - Icon: {fileID: -6379153957335788890, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
     Label: 
+    Effect: {fileID: 0}
     Amount: 2
     Chance: 56.6
     Index: 0
     _weight: 0
-    Effect: {fileID: 0}
   - Icon: {fileID: 3622378070614508730, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
     Label: 
+    Effect: {fileID: 0}
     Amount: 3
     Chance: 60
     Index: 0
     _weight: 0
-    Effect: {fileID: 0}
   - Icon: {fileID: -3436129635470280944, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
     Label: 
+    Effect: {fileID: 0}
     Amount: 4
     Chance: 25
     Index: 0
     _weight: 0
-    Effect: {fileID: 0}
   - Icon: {fileID: 7005750741070879577, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
     Label: 
+    Effect: {fileID: 0}
     Amount: 5
     Chance: 10
     Index: 0
     _weight: 0
-    Effect: {fileID: 0}
   - Icon: {fileID: 7005750741070879577, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
     Label: 
+    Effect: {fileID: 0}
     Amount: 5
     Chance: 10
     Index: 0
     _weight: 0
-    Effect: {fileID: 0}
   usosMaximos: 3
 --- !u!225 &-8141851463392014543
 CanvasGroup:

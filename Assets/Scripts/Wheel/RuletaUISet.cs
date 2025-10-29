@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using EasyUI.PickerWheelUI;
+using TMPro; // ✅ 1. AÑADIR: Importar TextMeshPro
 
 public class RuletaUISet : MonoBehaviour
 {
@@ -12,7 +13,9 @@ public class RuletaUISet : MonoBehaviour
     public Button selectButton;
     public Button spinButton;
     public Button confirmButton;
-    public Text spinButtonText;
+
+    // ✅ 2. MODIFICADO: Cambiar 'Text' por 'TextMeshProUGUI'
+    public TextMeshProUGUI spinButtonText;
 
     private CanvasGroup ruletaCanvasGroup;
 
@@ -40,7 +43,9 @@ public class RuletaUISet : MonoBehaviour
             {
                 var obj = Instantiate(theme.spinButtonPrefab, buttonsContainer);
                 spinButton = obj.GetComponent<Button>();
-                spinButtonText = spinButton.GetComponentInChildren<Text>();
+
+                // ✅ 3. MODIFICADO: Buscar 'TextMeshProUGUI' en lugar de 'Text'
+                spinButtonText = spinButton.GetComponentInChildren<TextMeshProUGUI>();
             }
 
             if (theme.confirmButtonPrefab != null)
@@ -75,14 +80,26 @@ public class RuletaUISet : MonoBehaviour
 
     public void Activar(bool estado)
     {
-        if (spinButton != null) spinButton.interactable = estado;
-        if (confirmButton != null) confirmButton.interactable = estado;
-
         if (ruletaCanvasGroup != null)
         {
             ruletaCanvasGroup.alpha = estado ? 1f : 0.2f;
             ruletaCanvasGroup.interactable = estado;
             ruletaCanvasGroup.blocksRaycasts = estado;
+        }
+
+        // Habilitar 'Spin' solo si quedan usos
+        if (spinButton != null)
+        {
+            bool quedanUsos = linkedWheel != null && linkedWheel.UsosRestantes > 0;
+            spinButton.interactable = estado && quedanUsos;
+        }
+
+        // Habilitar 'Confirm' solo si ya se giró
+        if (confirmButton != null)
+        {
+            bool yaGiro = linkedWheel != null && linkedWheel.UsosRestantes < linkedWheel.UsosMaximos;
+            // Solo se puede confirmar si está activo, ya giró, y NO está girando
+            confirmButton.interactable = estado && yaGiro && !linkedWheel.IsSpinning;
         }
     }
 
@@ -90,7 +107,12 @@ public class RuletaUISet : MonoBehaviour
     {
         if (linkedWheel != null && spinButtonText != null)
         {
-            spinButtonText.text = $"Spin ({linkedWheel.UsosRestantes}/3)";
+            // ✅ 4. MODIFICADO: Usar UsosMaximos (requiere el Paso 2)
+            spinButtonText.text = $"Spin ({linkedWheel.UsosRestantes}/{linkedWheel.UsosMaximos})";
+        }
+        else if (spinButtonText == null && spinButton != null)
+        {
+            Debug.LogError($"❌ No se encontró el componente 'TextMeshProUGUI' dentro del prefab '{spinButton.name}'. Verifica el prefab.");
         }
     }
 }

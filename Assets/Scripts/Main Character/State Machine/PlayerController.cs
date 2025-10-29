@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections.Generic; // Necesario para la lógica de PowerUpEffect
 
 public class PlayerController : MonoBehaviour
 {
@@ -8,6 +9,12 @@ public class PlayerController : MonoBehaviour
 
     [Header("Combate")]
     public int baseDamage = 1;
+
+    // ✅ --- AÑADIDO ---
+    [Header("Stats de Ruleta")]
+    [Tooltip("Cuántas tiradas extra tiene el jugador (stackeable)")]
+    public int extraSpins = 0;
+    // ✅ --- FIN ---
 
     [Header("Dash")]
     public float dashSpeed = 300f;
@@ -70,6 +77,9 @@ public class PlayerController : MonoBehaviour
     {
         stateMachine.Initialize(IdleState);
 
+        // Este Start() se ejecuta ANTES de LoadPlayerData,
+        // así que los 'initialPowerUps' aquí son solo los de "debug"
+        // o los de una partida nueva. LoadPlayerData los sobreescribirá.
         foreach (var powerUp in initialPowerUps)
             if (powerUp != null) powerUp.Apply(this);
     }
@@ -120,7 +130,7 @@ public class PlayerController : MonoBehaviour
         stateMachine.CurrentState.HandleInput();
         stateMachine.CurrentState.LogicUpdate();
 
-       
+
         // Animator: NO marcar isMoving durante Dash/Knockback/Recoil/Attack
         if (animator != null)
         {
@@ -191,6 +201,9 @@ public class PlayerController : MonoBehaviour
         GameDataManager.Instance.SavePlayerData(this);
     }
 
+    // ✅ --- MÉTODO 'LoadPlayerData' COMPLETAMENTE REEMPLAZADO ---
+    // (Esto es VITAL para que los power-ups stackeables funcionen
+    // y no se acumulen infinitamente en cada carga de escena)
     public void LoadPlayerData()
     {
         var data = GameDataManager.Instance.playerData;
@@ -212,6 +225,13 @@ public class PlayerController : MonoBehaviour
             }
         }
 
+        // ✅ --- RESETEAR STATS BASE ---
+        // ¡VITAL! Resetea stats a su valor por defecto ANTES de
+        // reaplicar los power-ups, para evitar que se stackeen.
+        this.baseDamage = 1; // (O tu valor base por defecto)
+        this.extraSpins = 0;
+        // (Añade aquí cualquier otra stat que tus power-ups modifiquen)
+
         // --- Restaurar perks guardadas ---
         if (data.initialPowerUps != null && data.initialPowerUps.Count > 0)
         {
@@ -226,4 +246,5 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
+   
 }

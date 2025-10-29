@@ -53,7 +53,14 @@ namespace EasyUI.PickerWheelUI
         [Header("Usos disponibles")]
         [SerializeField] private int usosMaximos = 3;
         private int usosRestantes;
+
+        // Propiedades públicas (tu "viejo" script solo tenía UsosRestantes)
         public int UsosRestantes => usosRestantes;
+
+        // ✅ --- AÑADIDO: Lógica del Extra Spin ---
+        // (Esto es necesario para que RuletaUISet.cs muestre "4/4")
+        public int UsosMaximos => usosMaximos;
+        // ✅ --- FIN ---
 
         private bool _isSpinning = false;
         public bool IsSpinning => _isSpinning;
@@ -83,6 +90,27 @@ namespace EasyUI.PickerWheelUI
         {
             usosRestantes = usosMaximos;
         }
+
+        // ✅ --- AÑADIDO: Lógica del Extra Spin ---
+        /// <summary>
+        /// Lee los spins extra del jugador y los aplica a esta ruleta.
+        /// Debe llamarse DESPUÉS de instanciar la ruleta y ANTES de inicializar la UI.
+        /// </summary>
+        public void SincronizarSpinsConPlayer(PlayerController player)
+        {
+            if (player == null) return;
+
+            int spinsExtra = player.extraSpins;
+            if (spinsExtra > 0)
+            {
+                // Suma los extras al máximo y a los restantes
+                usosMaximos += spinsExtra; // ej: 3 (base) + 1 (extra) = 4
+                usosRestantes = usosMaximos; // Resetea los usos al nuevo máximo (4)
+
+                Debug.Log($"Ruleta {gameObject.name} cargada con +{spinsExtra} tiradas extra. Total: {usosRestantes}");
+            }
+        }
+        // ✅ --- FIN ---
 
         private void Start()
         {
@@ -132,7 +160,7 @@ namespace EasyUI.PickerWheelUI
         }
 
         // ----------------------------------------------------
-        // 🌀 Lógica principal de la ruleta
+        // 🌀 Lógica principal de la ruleta (TU VERSIÓN ORIGINAL)
         // ----------------------------------------------------
         public void Spin()
         {
@@ -158,11 +186,13 @@ namespace EasyUI.PickerWheelUI
             float currentAngle = prevAngle;
             bool isIndicatorOnLine = false;
 
+            // --- ESTA ES TU LÓGICA DE GIRO "VIEJA" (VELOCIDAD, DIRECCIÓN Y EASE) ---
             wheelCircle
                 .DORotate(targetRotation, spinDuration, RotateMode.FastBeyond360)
                 .SetEase(Ease.OutQuad)
                 .SetUpdate(true)
                 .OnUpdate(() =>
+                // --- FIN DE LA LÓGICA DE GIRO "VIEJA" ---
                 {
                     float diff = Mathf.Abs(prevAngle - currentAngle);
                     if (diff >= halfPieceAngle)
