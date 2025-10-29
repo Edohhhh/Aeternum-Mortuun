@@ -32,4 +32,14 @@ public class Buttons : MonoBehaviour
     {
         Application.Quit();
     }
+
+    public void LoadMenu()
+    {
+        SceneManager.LoadScene("Options");
+    }
+
+    public void Back()
+    {
+        SceneManager.LoadScene("Menu");
+    }
 }

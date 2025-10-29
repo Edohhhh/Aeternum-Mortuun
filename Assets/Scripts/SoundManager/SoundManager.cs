@@ -7,6 +7,12 @@ public enum SoundType
     Hurt,
     Rodar,
     Walk,
+    EnemieWalk,
+    EnemieAtack,
+    EnemieAtackEspecial,
+    EnemieDie,
+    enemieHurt,
+    proyectilShoot,
 }
 
 [RequireComponent(typeof(AudioSource)), ExecuteInEditMode]
