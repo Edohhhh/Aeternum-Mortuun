@@ -1914,7 +1914,7 @@ AudioSource:
   m_audioClip: {fileID: 8300000, guid: b8136a7ae38baee4ca474abb73725d52, type: 3}
   m_Resource: {fileID: 8300000, guid: b8136a7ae38baee4ca474abb73725d52, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.02
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -11620,6 +11620,7 @@ MonoBehaviour:
   startActive: 0
   wheelSelector: {fileID: 1184180805}
   floatingText: {fileID: 0}
+  textoInstruccion: {fileID: 0}
 --- !u!4 &1941828957
 Transform:
   m_ObjectHideFlags: 0
@@ -11808,6 +11809,9 @@ MonoBehaviour:
   panelRectTransform: {fileID: 1513357770}
   slideDuration: 0.3
   slideOffset: {x: 0, y: -1080}
+  perksContainer: {fileID: 0}
+  perkIconPrefab: {fileID: 0}
+  tooltipUI: {fileID: 0}
   speedTxt: {fileID: 108518177}
   dashSpeedTxt: {fileID: 607027602}
   dashIframesTxt: {fileID: 0}
@@ -11818,89 +11822,10 @@ MonoBehaviour:
   currentHealthTxt: {fileID: 0}
   regenRateTxt: {fileID: 1878994279}
   regenDelayTxt: {fileID: 0}
-  invulnTimeTxt: {fileID: 0}
-  posTxt: {fileID: 0}
-  powerupsTxt: {fileID: 0}
+  baseDamageTxt: {fileID: 2140620339}
   attackCooldownTxt: {fileID: 999505154}
   attackCooldownRemainingTxt: {fileID: 0}
-  baseDamageTxt: {fileID: 2140620339}
-  knockbackForceTxt: {fileID: 615862581}
-  perkAssetNames:
-  - DarkBell
-  - CursedEye
-  - ThornsPath
-  - ChargedLaser
-  - BloodRitual
-  - HealthDown
-  - Burn
-  - Ghost
-  - HitSlow
-  - DamagedSlow
-  - Bleed
-  - LifeUp
-  - Orbital
-  - Effect Dash
-  - SpeedUp
-  - DamageUp
-  - NormalBook
-  - DashDuration
-  - CriticalHit
-  - BOMB!
-  - PestTrail
-  - SacrificioOscuro
-  - DashTrap
-  - Last Thrust
-  perkIcons:
-  - {fileID: -2833207525403889250, guid: 8f66222187e68cc42bb5cb49fcbc6096, type: 3}
-  - {fileID: 5762035117728753134, guid: 8f66222187e68cc42bb5cb49fcbc6096, type: 3}
-  - {fileID: -7896028604689211231, guid: 8f66222187e68cc42bb5cb49fcbc6096, type: 3}
-  - {fileID: 7511617788268671622, guid: 8f66222187e68cc42bb5cb49fcbc6096, type: 3}
-  - {fileID: 6433230767143609284, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
-  - {fileID: 1966231425076472312, guid: 8e3e4a35293864f728c02d2b46d9fc88, type: 3}
-  - {fileID: -5864153785757311042, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
-  - {fileID: 1801802143419725553, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
-  - {fileID: 7910451321189131583, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
-  - {fileID: -5874140283895155960, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
-  - {fileID: -6379153957335788890, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
-  - {fileID: 2930215628994803016, guid: 59316c844e51e024cb7ae170c91050fa, type: 3}
-  - {fileID: 3622378070614508730, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
-  - {fileID: -3436129635470280944, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
-  - {fileID: -1678816627508897502, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
-  - {fileID: 7152588514996068638, guid: 59316c844e51e024cb7ae170c91050fa, type: 3}
-  - {fileID: 846023402984881443, guid: 0eca78bbfd84e4b839ccca7bb0f2a3ec, type: 3}
-  - {fileID: -4970557309839544929, guid: 59316c844e51e024cb7ae170c91050fa, type: 3}
-  - {fileID: 3253419203303204372, guid: 63aba4ffe629649458ab8216c5e4ac7b, type: 3}
-  - {fileID: 3253419203303204372, guid: 63aba4ffe629649458ab8216c5e4ac7b, type: 3}
-  - {fileID: 3622378070614508730, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
-  - {fileID: 2462328836089513958, guid: 8f66222187e68cc42bb5cb49fcbc6096, type: 3}
-  - {fileID: -4481463232305192947, guid: 92bddc848084c421d840f30c689b0965, type: 3}
-  - {fileID: 2646508460080752575, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
-  perkSpawnPoints:
-  - {fileID: 1598123819}
-  - {fileID: 1545804918}
-  - {fileID: 783203067}
-  - {fileID: 358472269}
-  - {fileID: 1529551187}
-  - {fileID: 756804743}
-  - {fileID: 1935213096}
-  - {fileID: 805058716}
-  - {fileID: 1463041602}
-  - {fileID: 880626743}
-  - {fileID: 327810582}
-  - {fileID: 2043689985}
-  - {fileID: 945520183}
-  - {fileID: 1946843938}
-  - {fileID: 1694627410}
-  - {fileID: 2033655731}
-  - {fileID: 78190209}
-  - {fileID: 923063260}
-  - {fileID: 1284117530}
-  - {fileID: 1433731790}
-  - {fileID: 418741623}
-  - {fileID: 749403113}
-  - {fileID: 238221953}
-  - {fileID: 1699025173}
-  refreshInterval: 0.25
+  recoilDistanceTxt: {fileID: 0}
 --- !u!114 &1944641653
 MonoBehaviour:
   m_ObjectHideFlags: 0

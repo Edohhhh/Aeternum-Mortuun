@@ -19,11 +19,12 @@ public class RoomRandomizer : MonoBehaviour
     [Header("Sala inicial fija")]
     [Tooltip("Sala que siempre aparecerá al inicio de la run")]
     public RoomData startRoom;
-
+    public RoomData winRoom;
     [Header("Listas de escenas por dificultad")]
     public List<RoomData> easyRooms = new List<RoomData>();
     public List<RoomData> mediumRooms = new List<RoomData>();
     public List<RoomData> hardRooms = new List<RoomData>();
+  
 
     [Header("Configuración de la run")]
     public int easyCount = 2;
@@ -66,6 +67,11 @@ public class RoomRandomizer : MonoBehaviour
         AddRandomRooms(easyRooms, easyCount);
         AddRandomRooms(mediumRooms, mediumCount);
         AddRandomRooms(hardRooms, hardCount);
+
+        if (winRoom != null)
+        {
+            generatedRun.Add(winRoom);
+        }
 
         // Evitar IDs duplicados (mantiene el orden)
         HashSet<int> usedIDs = new HashSet<int>();

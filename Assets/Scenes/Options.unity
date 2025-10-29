@@ -2222,7 +2222,7 @@ GameObject:
   - component: {fileID: 547454614}
   - component: {fileID: 547454613}
   m_Layer: 5
-  m_Name: Salir
+  m_Name: volver
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2262,7 +2262,7 @@ MonoBehaviour:
   audioSource: {fileID: 0}
   hoverClip: {fileID: 8300000, guid: 27cef8486ea541e43ab90a4f2fc0e450, type: 3}
   clickClip: {fileID: 0}
-  volume: 1
+  volume: 0.02
 --- !u!114 &547454614
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3235,10 +3235,10 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: -6735070044237822930, guid: 2589dda68bd2be64cbfc6d2537e9369f, type: 2}
-  m_audioClip: {fileID: 8300000, guid: a78a1e64b4fbcb9429f87f4fb2cd5538, type: 3}
-  m_Resource: {fileID: 8300000, guid: a78a1e64b4fbcb9429f87f4fb2cd5538, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 5da4d9880584622428419a650c97079f, type: 3}
+  m_Resource: {fileID: 8300000, guid: 5da4d9880584622428419a650c97079f, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.015
   m_Pitch: 1
   Loop: 1
   Mute: 0

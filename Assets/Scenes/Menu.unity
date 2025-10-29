@@ -923,6 +923,9 @@ MonoBehaviour:
   startRoom:
     id: 0
     roomName: Tutorial
+  winRoom:
+    id: 28
+    roomName: Victory
   easyRooms:
   - id: 1
     roomName: LoopSlime1
@@ -935,16 +938,20 @@ MonoBehaviour:
     roomName: LoopMiniSlimes
   - id: 5
     roomName: LoopMiniEsqueletos
-  hardRooms:
   - id: 6
-    roomName: BossGolem
+    roomName: bar
+  hardRooms:
   - id: 7
-    roomName: BossTopo
+    roomName: BossGolem
   - id: 8
+    roomName: BossTopo
+  - id: 9
     roomName: LoopMiniEsqueletosYSlimes
+  - id: 10
+    roomName: BossMimico
   easyCount: 2
-  mediumCount: 3
-  hardCount: 3
+  mediumCount: 4
+  hardCount: 4
   generatedRun: []
 --- !u!4 &195921830
 Transform:
@@ -1578,7 +1585,7 @@ MonoBehaviour:
   audioSource: {fileID: 0}
   hoverClip: {fileID: 8300000, guid: 27cef8486ea541e43ab90a4f2fc0e450, type: 3}
   clickClip: {fileID: 0}
-  volume: 1
+  volume: 0.02
 --- !u!1001 &375032338
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2075,7 +2082,7 @@ MonoBehaviour:
   audioSource: {fileID: 0}
   hoverClip: {fileID: 8300000, guid: 27cef8486ea541e43ab90a4f2fc0e450, type: 3}
   clickClip: {fileID: 0}
-  volume: 1
+  volume: 0.02
 --- !u!1001 &504654517
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3273,10 +3280,10 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: a78a1e64b4fbcb9429f87f4fb2cd5538, type: 3}
-  m_Resource: {fileID: 8300000, guid: a78a1e64b4fbcb9429f87f4fb2cd5538, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 5da4d9880584622428419a650c97079f, type: 3}
+  m_Resource: {fileID: 8300000, guid: 5da4d9880584622428419a650c97079f, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.015
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -3837,7 +3844,7 @@ MonoBehaviour:
   audioSource: {fileID: 0}
   hoverClip: {fileID: 8300000, guid: 27cef8486ea541e43ab90a4f2fc0e450, type: 3}
   clickClip: {fileID: 0}
-  volume: 1
+  volume: 0.02
 --- !u!1001 &1093425592
 PrefabInstance:
   m_ObjectHideFlags: 0

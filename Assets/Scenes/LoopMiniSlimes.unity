@@ -156,6 +156,8 @@ MonoBehaviour:
   - {fileID: 941485764}
   startActive: 0
   wheelSelector: {fileID: 1255194625}
+  floatingText: {fileID: 0}
+  textoInstruccion: {fileID: 0}
 --- !u!4 &1391430
 Transform:
   m_ObjectHideFlags: 0
@@ -6435,8 +6437,8 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: cd5557a40f5b6744abed91cc8e910870, type: 3}
+  m_Resource: {fileID: 8300000, guid: cd5557a40f5b6744abed91cc8e910870, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -6547,6 +6549,18 @@ MonoBehaviour:
   - name: Walk
     sounds:
     - {fileID: 8300000, guid: b725c874360c4e442a7ddc8d7bf9d42f, type: 3}
+  - name: EnemieWalk
+    sounds: []
+  - name: EnemieAtack
+    sounds: []
+  - name: EnemieAtackEspecial
+    sounds: []
+  - name: EnemieDie
+    sounds: []
+  - name: enemieHurt
+    sounds: []
+  - name: proyectilShoot
+    sounds: []
 --- !u!4 &896767273
 Transform:
   m_ObjectHideFlags: 0
@@ -8891,6 +8905,9 @@ MonoBehaviour:
   panelRectTransform: {fileID: 242727890}
   slideDuration: 0.3
   slideOffset: {x: 0, y: -1080}
+  perksContainer: {fileID: 0}
+  perkIconPrefab: {fileID: 0}
+  tooltipUI: {fileID: 0}
   speedTxt: {fileID: 887295933}
   dashSpeedTxt: {fileID: 1322954315}
   dashIframesTxt: {fileID: 0}
@@ -8901,89 +8918,10 @@ MonoBehaviour:
   currentHealthTxt: {fileID: 0}
   regenRateTxt: {fileID: 1543161596}
   regenDelayTxt: {fileID: 0}
-  invulnTimeTxt: {fileID: 0}
-  posTxt: {fileID: 0}
-  powerupsTxt: {fileID: 0}
+  baseDamageTxt: {fileID: 98422089}
   attackCooldownTxt: {fileID: 345889735}
   attackCooldownRemainingTxt: {fileID: 0}
-  baseDamageTxt: {fileID: 98422089}
-  knockbackForceTxt: {fileID: 368934885}
-  perkAssetNames:
-  - DarkBell
-  - CursedEye
-  - ThornsPath
-  - ChargedLaser
-  - BloodRitual
-  - HealthDown
-  - Burn
-  - Ghost
-  - HitSlow
-  - DamagedSlow
-  - Bleed
-  - LifeUp
-  - Orbital
-  - Effect Dash
-  - SpeedUp
-  - DamageUp
-  - NormalBook
-  - DashDuration
-  - CriticalHit
-  - BOMB!
-  - PestTrail
-  - SacrificioOscuro
-  - DashTrap
-  - Last Thrust
-  perkIcons:
-  - {fileID: -2833207525403889250, guid: 8f66222187e68cc42bb5cb49fcbc6096, type: 3}
-  - {fileID: 5762035117728753134, guid: 8f66222187e68cc42bb5cb49fcbc6096, type: 3}
-  - {fileID: -7896028604689211231, guid: 8f66222187e68cc42bb5cb49fcbc6096, type: 3}
-  - {fileID: 7511617788268671622, guid: 8f66222187e68cc42bb5cb49fcbc6096, type: 3}
-  - {fileID: 6433230767143609284, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
-  - {fileID: 1966231425076472312, guid: 8e3e4a35293864f728c02d2b46d9fc88, type: 3}
-  - {fileID: -5864153785757311042, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
-  - {fileID: 1801802143419725553, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
-  - {fileID: 7910451321189131583, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
-  - {fileID: -5874140283895155960, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
-  - {fileID: -6379153957335788890, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
-  - {fileID: 2930215628994803016, guid: 59316c844e51e024cb7ae170c91050fa, type: 3}
-  - {fileID: 3622378070614508730, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
-  - {fileID: -3436129635470280944, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
-  - {fileID: -1678816627508897502, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
-  - {fileID: 7152588514996068638, guid: 59316c844e51e024cb7ae170c91050fa, type: 3}
-  - {fileID: 846023402984881443, guid: 0eca78bbfd84e4b839ccca7bb0f2a3ec, type: 3}
-  - {fileID: -4970557309839544929, guid: 59316c844e51e024cb7ae170c91050fa, type: 3}
-  - {fileID: 3253419203303204372, guid: 63aba4ffe629649458ab8216c5e4ac7b, type: 3}
-  - {fileID: 3253419203303204372, guid: 63aba4ffe629649458ab8216c5e4ac7b, type: 3}
-  - {fileID: 3622378070614508730, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
-  - {fileID: 2462328836089513958, guid: 8f66222187e68cc42bb5cb49fcbc6096, type: 3}
-  - {fileID: -4481463232305192947, guid: 92bddc848084c421d840f30c689b0965, type: 3}
-  - {fileID: 2646508460080752575, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
-  perkSpawnPoints:
-  - {fileID: 1817472906}
-  - {fileID: 1668175859}
-  - {fileID: 284166148}
-  - {fileID: 834211131}
-  - {fileID: 1719478536}
-  - {fileID: 757844192}
-  - {fileID: 460805110}
-  - {fileID: 478765914}
-  - {fileID: 1095846293}
-  - {fileID: 1761329719}
-  - {fileID: 1953395448}
-  - {fileID: 12302289}
-  - {fileID: 2066367801}
-  - {fileID: 200470396}
-  - {fileID: 1787020373}
-  - {fileID: 1842534155}
-  - {fileID: 2075222831}
-  - {fileID: 1449590474}
-  - {fileID: 504572077}
-  - {fileID: 1057308173}
-  - {fileID: 730910039}
-  - {fileID: 809435232}
-  - {fileID: 84182647}
-  - {fileID: 1283137360}
-  refreshInterval: 0.25
+  recoilDistanceTxt: {fileID: 0}
 --- !u!114 &1620010851
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9484,6 +9422,7 @@ MonoBehaviour:
   canMove: 1
   moveSpeed: 4
   baseDamage: 1
+  extraSpins: 0
   dashSpeed: 10
   dashIframes: 10
   dashSlideDuration: 0.4
@@ -10913,6 +10852,135 @@ RectTransform:
   m_AnchoredPosition: {x: 214, y: -3.1403}
   m_SizeDelta: {x: 100, y: 78.7965}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &1990550956
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1990550958}
+  - component: {fileID: 1990550957}
+  m_Layer: 0
+  m_Name: music
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!82 &1990550957
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1990550956}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: cd5557a40f5b6744abed91cc8e910870, type: 3}
+  m_Resource: {fileID: 8300000, guid: cd5557a40f5b6744abed91cc8e910870, type: 3}
+  m_PlayOnAwake: 1
+  m_Volume: 0.015
+  m_Pitch: 1
+  Loop: 1
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!4 &1990550958
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1990550956}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.4147553, y: 2.4035227, z: 0.023650255}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1997230288
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -28452,3 +28520,4 @@ SceneRoots:
   - {fileID: 1009883816}
   - {fileID: 741661426}
   - {fileID: 896767273}
+  - {fileID: 1990550958}

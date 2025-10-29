@@ -2579,6 +2579,9 @@ MonoBehaviour:
   panelRectTransform: {fileID: 369330185}
   slideDuration: 0.3
   slideOffset: {x: 0, y: -1080}
+  perksContainer: {fileID: 0}
+  perkIconPrefab: {fileID: 0}
+  tooltipUI: {fileID: 0}
   speedTxt: {fileID: 867052589}
   dashSpeedTxt: {fileID: 1704353087}
   dashIframesTxt: {fileID: 0}
@@ -2589,89 +2592,10 @@ MonoBehaviour:
   currentHealthTxt: {fileID: 0}
   regenRateTxt: {fileID: 168082984}
   regenDelayTxt: {fileID: 0}
-  invulnTimeTxt: {fileID: 0}
-  posTxt: {fileID: 0}
-  powerupsTxt: {fileID: 0}
+  baseDamageTxt: {fileID: 920293891}
   attackCooldownTxt: {fileID: 1244892084}
   attackCooldownRemainingTxt: {fileID: 0}
-  baseDamageTxt: {fileID: 920293891}
-  knockbackForceTxt: {fileID: 1570375092}
-  perkAssetNames:
-  - DarkBell
-  - CursedEye
-  - ThornsPath
-  - ChargedLaser
-  - BloodRitual
-  - HealthDown
-  - Burn
-  - Ghost
-  - HitSlow
-  - DamagedSlow
-  - Bleed
-  - LifeUp
-  - Orbital
-  - Effect Dash
-  - SpeedUp
-  - DamageUp
-  - NormalBook
-  - DashDuration
-  - CriticalHit
-  - BOMB!
-  - PestTrail
-  - SacrificioOscuro
-  - DashTrap
-  - Last Thrust
-  perkIcons:
-  - {fileID: -2833207525403889250, guid: 8f66222187e68cc42bb5cb49fcbc6096, type: 3}
-  - {fileID: 5762035117728753134, guid: 8f66222187e68cc42bb5cb49fcbc6096, type: 3}
-  - {fileID: -7896028604689211231, guid: 8f66222187e68cc42bb5cb49fcbc6096, type: 3}
-  - {fileID: 7511617788268671622, guid: 8f66222187e68cc42bb5cb49fcbc6096, type: 3}
-  - {fileID: 6433230767143609284, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
-  - {fileID: 1966231425076472312, guid: 8e3e4a35293864f728c02d2b46d9fc88, type: 3}
-  - {fileID: -5864153785757311042, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
-  - {fileID: 1801802143419725553, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
-  - {fileID: 7910451321189131583, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
-  - {fileID: -5874140283895155960, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
-  - {fileID: -6379153957335788890, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
-  - {fileID: 2930215628994803016, guid: 59316c844e51e024cb7ae170c91050fa, type: 3}
-  - {fileID: 3622378070614508730, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
-  - {fileID: -3436129635470280944, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
-  - {fileID: -1678816627508897502, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
-  - {fileID: 7152588514996068638, guid: 59316c844e51e024cb7ae170c91050fa, type: 3}
-  - {fileID: 846023402984881443, guid: 0eca78bbfd84e4b839ccca7bb0f2a3ec, type: 3}
-  - {fileID: -4970557309839544929, guid: 59316c844e51e024cb7ae170c91050fa, type: 3}
-  - {fileID: 3253419203303204372, guid: 63aba4ffe629649458ab8216c5e4ac7b, type: 3}
-  - {fileID: 3253419203303204372, guid: 63aba4ffe629649458ab8216c5e4ac7b, type: 3}
-  - {fileID: 3622378070614508730, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
-  - {fileID: 2462328836089513958, guid: 8f66222187e68cc42bb5cb49fcbc6096, type: 3}
-  - {fileID: -4481463232305192947, guid: 92bddc848084c421d840f30c689b0965, type: 3}
-  - {fileID: 2646508460080752575, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
-  perkSpawnPoints:
-  - {fileID: 1013945098}
-  - {fileID: 1816271601}
-  - {fileID: 1599508390}
-  - {fileID: 163382563}
-  - {fileID: 2033531145}
-  - {fileID: 1869322647}
-  - {fileID: 436835991}
-  - {fileID: 1675785032}
-  - {fileID: 350242055}
-  - {fileID: 1070156763}
-  - {fileID: 1070127943}
-  - {fileID: 1056518541}
-  - {fileID: 1952181055}
-  - {fileID: 888577764}
-  - {fileID: 1901989337}
-  - {fileID: 248022038}
-  - {fileID: 534505166}
-  - {fileID: 854515825}
-  - {fileID: 1294354934}
-  - {fileID: 1914467281}
-  - {fileID: 2002475129}
-  - {fileID: 713734055}
-  - {fileID: 1741359576}
-  - {fileID: 1601914661}
-  refreshInterval: 0.25
+  recoilDistanceTxt: {fileID: 0}
 --- !u!114 &620707451
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2824,6 +2748,7 @@ MonoBehaviour:
   startActive: 0
   wheelSelector: {fileID: 1783118434}
   floatingText: {fileID: 0}
+  textoInstruccion: {fileID: 0}
 --- !u!4 &627725548
 Transform:
   m_ObjectHideFlags: 0
@@ -9143,7 +9068,7 @@ AudioSource:
   m_audioClip: {fileID: 8300000, guid: b8136a7ae38baee4ca474abb73725d52, type: 3}
   m_Resource: {fileID: 8300000, guid: b8136a7ae38baee4ca474abb73725d52, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.02
   m_Pitch: 1
   Loop: 1
   Mute: 0
