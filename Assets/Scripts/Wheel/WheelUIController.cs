@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-using TMPro; // ✅ AÑADIDO
-using DG.Tweening; // ✅ AÑADIDO
-using System.Collections; // ✅ AÑADIDO
+using TMPro;
+using DG.Tweening; // ¡DOTween es necesario!
+using System.Collections;
+using System.Linq; // Necesario para 'TrueForAll'
 
 namespace EasyUI.PickerWheelUI
 {
@@ -17,13 +18,18 @@ namespace EasyUI.PickerWheelUI
         [Header("Referencia al selector de ruletas")]
         [SerializeField] private WheelSelector wheelSelector;
 
-        // ✅ --- AÑADIDO ---
-        [Header("Feedback Visual")]
+        [Header("Feedback Visual (Popups)")]
         [SerializeField] private TextMeshProUGUI floatingText;
+
+        // --- Texto de Instrucción "Seleccione..." ---
+        [Header("Feedback Visual (Instrucción)")]
+        [SerializeField] private TextMeshProUGUI textoInstruccion; // 👈 Asegúrate de que tu texto esté arrastrado aquí
+        private CanvasGroup instruccionCanvasGroup;
+        private Sequence instruccionBreathingAnim;
+        // --- Fin ---
 
         private Vector3 floatingTextOriginalPos;
         private Coroutine floatingTextCoroutine;
-        // ✅ --- FIN ---
 
         private void Start()
         {
@@ -33,88 +39,72 @@ namespace EasyUI.PickerWheelUI
                     canvas.SetActive(startActive);
             }
 
-            // ✅ --- AÑADIDO ---
             if (floatingText != null)
             {
-                // Guardamos la posición inicial para resetear la animación
                 if (floatingText.rectTransform != null)
                     floatingTextOriginalPos = floatingText.rectTransform.anchoredPosition;
                 else
-                    Debug.LogWarning("floatingText no tiene RectTransform. Asegúrate de que sea un objeto UI.");
-
-                floatingText.gameObject.SetActive(false);
+                    Debug.LogWarning("floatingText no tiene RectTransform.");
             }
-            // ✅ --- FIN ---
 
-            Time.timeScale = startActive ? 0f : 1f;
+            // --- Lógica para el texto de instrucción ---
+            if (textoInstruccion != null)
+            {
+                // 1. Obtener o añadir el CanvasGroup
+                instruccionCanvasGroup = textoInstruccion.GetComponent<CanvasGroup>();
+                if (instruccionCanvasGroup == null)
+                {
+                    Debug.LogWarning("Texto de Instrucción no tenía CanvasGroup. Añadiendo uno...");
+                    instruccionCanvasGroup = textoInstruccion.gameObject.AddComponent<CanvasGroup>();
+                }
+
+                instruccionCanvasGroup.alpha = 1f;
+                textoInstruccion.gameObject.SetActive(true);
+
+                // 2. Crear la animación de respiración
+                instruccionBreathingAnim = DOTween.Sequence();
+                instruccionBreathingAnim.Append(instruccionCanvasGroup.DOFade(0.7f, 1.5f).SetEase(Ease.InOutSine));
+                instruccionBreathingAnim.Append(instruccionCanvasGroup.DOFade(1.0f, 1.5f).SetEase(Ease.InOutSine));
+                instruccionBreathingAnim.SetLoops(-1); // Repetir por siempre
+
+                // ✅ --- ¡ARREGLO 1! ---
+                // Le decimos a TODA la secuencia que ignore la pausa del juego
+                instruccionBreathingAnim.SetUpdate(true);
+                // ✅ --- FIN ---
+            }
+            else
+            {
+                Debug.LogWarning("WheelUIController: 'Texto Instruccion' no está asignado en el Inspector.");
+            }
+            // --- Fin ---
         }
 
-        public void MostrarRuleta()
+        /// <summary>
+        /// Oculta el texto de instrucción con un fade-out.
+        /// </summary>
+        public void OcultarTextoInstruccion()
         {
-            foreach (var canvas in wheelCanvases)
-            {
-                if (canvas != null)
-                    canvas.SetActive(true);
-            }
+            if (instruccionCanvasGroup == null) return;
 
-            Time.timeScale = 0f;
+            if (instruccionBreathingAnim != null && instruccionBreathingAnim.IsActive())
+                instruccionBreathingAnim.Kill();
 
-            // ✅ --- AÑADIDO ---
-            if (floatingText != null)
-            {
-                // Si había una animación anterior, la detenemos
-                if (floatingTextCoroutine != null)
-                    StopCoroutine(floatingTextCoroutine);
+            instruccionCanvasGroup.DOFade(0f, 0.5f) // Fade rápido de 0.5 seg
+                .SetEase(Ease.OutQuad)
 
-                // Iniciamos la nueva animación
-                floatingTextCoroutine = StartCoroutine(AnimateFloatingText());
-            }
-            // ✅ --- FIN ---
+                // ✅ --- ¡ARREGLO 2! ---
+                // Le decimos a ESTA animación que ignore la pausa
+                .SetUpdate(true)
+                // ✅ --- FIN ---
+
+                .OnComplete(() => {
+                    if (textoInstruccion != null)
+                        textoInstruccion.gameObject.SetActive(false);
+                });
         }
 
-        // ✅ --- MÉTODO NUEVO AÑADIDO ---
-        private IEnumerator AnimateFloatingText()
-        {
-            // Referencia al CanvasGroup (requerido en el objeto)
-            CanvasGroup cg = floatingText.GetComponent<CanvasGroup>();
-            if (cg == null)
-            {
-                Debug.LogWarning("FloatingText no tiene CanvasGroup. Añádelo para el efecto de fade.");
-                yield break;
-            }
 
-            // --- Resetear estado ---
-            floatingText.gameObject.SetActive(true);
-            cg.alpha = 0f;
-            floatingText.rectTransform.anchoredPosition = floatingTextOriginalPos;
-            floatingText.transform.localScale = Vector3.one * 0.9f; // Empezar un poco pequeño
-
-            Vector3 endPos = floatingTextOriginalPos + new Vector3(0, 60, 0); // Hacia dónde se moverá
-
-            // --- Crear secuencia de DOTween ---
-            // Usamos SetUpdate(true) para que funcione con Time.timeScale = 0
-            Sequence seq = DOTween.Sequence();
-            seq.SetUpdate(true); // ¡IMPORTANTE!
-
-            // 1. Aparecer (Fade In) y Escalar
-            seq.Append(cg.DOFade(1f, 0.4f).SetEase(Ease.OutQuad));
-            seq.Join(floatingText.transform.DOScale(1f, 0.4f).SetEase(Ease.OutBack)); // Efecto "pop"
-
-            // 2. Pausa (se mantiene visible)
-            yield return new WaitForSecondsRealtime(1.5f);
-
-            // 3. Desaparecer (Fade Out) y Moverse hacia arriba
-            seq.Append(cg.DOFade(0f, 0.6f).SetEase(Ease.InQuad));
-            seq.Join(floatingText.rectTransform.DOAnchorPos(endPos, 0.6f).SetEase(Ease.InQuad));
-
-            // 4. Esperar a que termine la secuencia
-            yield return seq.WaitForCompletion(true);
-
-            // 5. Ocultar al finalizar
-            floatingText.gameObject.SetActive(false);
-            floatingTextCoroutine = null;
-        }
-        // ✅ --- FIN DEL MÉTODO NUEVO ---
+        // (Aquí iría tu Coroutine ShowFloatingText si la tienes)
 
 
         public void ConfirmarPremio()
@@ -125,23 +115,53 @@ namespace EasyUI.PickerWheelUI
                     canvas.SetActive(false);
             }
 
-            // ✅ --- AÑADIDO ---
+            OcultarTextoInstruccion();
+
             if (floatingTextCoroutine != null)
             {
                 StopCoroutine(floatingTextCoroutine);
                 floatingText.gameObject.SetActive(false);
             }
-            // ✅ --- FIN ---
 
+            // Reanudamos el juego
             Time.timeScale = 1f;
         }
 
+        /// <summary>
+        /// Muestra forzadamente la UI de la ruleta, inicializa el selector y pausa el juego.
+        /// </summary>
+        public void MostrarRuleta()
+        {
+            foreach (var canvas in wheelCanvases)
+            {
+                if (canvas != null)
+                    canvas.SetActive(true);
+            }
+
+            if (wheelSelector != null)
+                wheelSelector.IniciarSelector();
+
+            // Pausamos el juego
+            Time.timeScale = 0f;
+
+            // Reactivar el texto de instrucción
+            if (textoInstruccion != null && instruccionCanvasGroup != null)
+            {
+                instruccionCanvasGroup.alpha = 1f;
+                textoInstruccion.gameObject.SetActive(true);
+                if (instruccionBreathingAnim != null)
+                    instruccionBreathingAnim.Play(); // Reanuda la animación de respiración
+            }
+        }
+
+        /// <summary>
+        /// Comprueba si no hay enemigos y si la ruleta no está ya mostrada.
+        /// </summary>
         public void VerificarYMostrarSiNoHayEnemigos()
         {
             GameObject[] enemigos = GameObject.FindGameObjectsWithTag("Enemy");
 
-            // Solo muestra si TODOS los canvas están desactivados
-            bool todosDesactivados = wheelCanvases.TrueForAll(c => !c.activeSelf);
+            bool todosDesactivados = wheelCanvases.TrueForAll(c => c == null || !c.activeSelf);
 
             if (enemigos.Length == 0 && todosDesactivados)
             {

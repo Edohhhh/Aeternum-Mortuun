@@ -7200,7 +7200,7 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 22
-      m_TileSpriteIndex: 30
+      m_TileSpriteIndex: 33
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
@@ -10450,7 +10450,7 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 37
-      m_TileSpriteIndex: 25
+      m_TileSpriteIndex: 32
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
@@ -15787,24 +15787,24 @@ Tilemap:
     m_Data: {fileID: 0}
   - m_RefCount: 0
     m_Data: {fileID: 0}
+  - m_RefCount: 0
+    m_Data: {fileID: 0}
+  - m_RefCount: 0
+    m_Data: {fileID: 0}
+  - m_RefCount: 0
+    m_Data: {fileID: 0}
+  - m_RefCount: 0
+    m_Data: {fileID: 0}
+  - m_RefCount: 0
+    m_Data: {fileID: 0}
+  - m_RefCount: 0
+    m_Data: {fileID: 0}
+  - m_RefCount: 0
+    m_Data: {fileID: 0}
   - m_RefCount: 1
     m_Data: {fileID: 7867600, guid: 6ea8abf7d0349fc4a9448b4d2b72d358, type: 3}
-  - m_RefCount: 0
-    m_Data: {fileID: 0}
-  - m_RefCount: 0
-    m_Data: {fileID: 0}
-  - m_RefCount: 0
-    m_Data: {fileID: 0}
-  - m_RefCount: 0
-    m_Data: {fileID: 0}
   - m_RefCount: 1
     m_Data: {fileID: -149484696, guid: 6ea8abf7d0349fc4a9448b4d2b72d358, type: 3}
-  - m_RefCount: 0
-    m_Data: {fileID: 0}
-  - m_RefCount: 0
-    m_Data: {fileID: 0}
-  - m_RefCount: 0
-    m_Data: {fileID: 0}
   - m_RefCount: 1
     m_Data: {fileID: 281111311, guid: 6ea8abf7d0349fc4a9448b4d2b72d358, type: 3}
   - m_RefCount: 5
@@ -17690,6 +17690,7 @@ GameObject:
   - component: {fileID: 396520000}
   - component: {fileID: 396520002}
   - component: {fileID: 396520001}
+  - component: {fileID: 396520003}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -17815,6 +17816,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 396519999}
   m_CullTransparentMesh: 1
+--- !u!225 &396520003
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 396519999}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &402130076
 GameObject:
   m_ObjectHideFlags: 0
@@ -26332,6 +26345,7 @@ GameObject:
   - component: {fileID: 1729880627}
   - component: {fileID: 1729880626}
   - component: {fileID: 1729880625}
+  - component: {fileID: 1729880629}
   m_Layer: 5
   m_Name: Texto Ruleta
   m_TagString: Untagged
@@ -26422,6 +26436,18 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!225 &1729880629
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1729880624}
+  m_Enabled: 0
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &1736311342
 GameObject:
   m_ObjectHideFlags: 0
@@ -26697,6 +26723,7 @@ MonoBehaviour:
   startActive: 0
   wheelSelector: {fileID: 86721581}
   floatingText: {fileID: 0}
+  textoInstruccion: {fileID: 396520001}
 --- !u!4 &1749465131
 Transform:
   m_ObjectHideFlags: 0
