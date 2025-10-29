@@ -150,7 +150,7 @@ namespace EasyUI.PickerWheelUI
         private void OnRewardSelected(WheelPiece selectedPiece)
         {
             Sprite sprite = selectedPiece.Icon;
-            string name = selectedPiece.Label;
+            string name = (selectedPiece.Effect != null) ? selectedPiece.Effect.label : "Recompensa";
             string desc = selectedPiece.Effect != null ? selectedPiece.Effect.description : "Sin descripción";
 
             if (rewardPopup != null)
@@ -480,7 +480,7 @@ namespace EasyUI.PickerWheelUI
             }
 
             Sprite sprite = ultimoPremio.Icon;
-            string name = ultimoPremio.Label;
+            string name = (ultimoPremio.Effect != null) ? ultimoPremio.Effect.label : "Recompensa";
             string desc = ultimoPremio.Effect != null ? ultimoPremio.Effect.description : "Sin descripción";
 
             rewardPopup.ShowReward(sprite, name, desc);
