@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using System.Reflection;
+using System.Reflection; // Para leer stats privadas
 using System.Collections.Generic;
 using DG.Tweening;
 
@@ -16,13 +16,21 @@ public class PlayerStatsHUD : MonoBehaviour
     [Header("Panel contenedor")]
     [SerializeField] private GameObject panel;
     [SerializeField] private CanvasGroup canvasGroup;
-    [SerializeField] private RectTransform panelRectTransform; // Nuevo: para la animación
+    [SerializeField] private RectTransform panelRectTransform;
 
     [Header("Animación")]
     [SerializeField] private float slideDuration = 0.3f;
-    [SerializeField] private Vector2 slideOffset = new Vector2(0, -50); // Desplazamiento inicial
+    [SerializeField] private Vector2 slideOffset = new Vector2(0, -50);
 
-    [Header("Filas (Texto)")]
+    // ✅ --- Referencias para Perks (Tu nueva lógica de inventario) ---
+    [Header("Perks (Inventario)")]
+    [SerializeField] private Transform perksContainer; // El objeto con el Horizontal Layout Group
+    [SerializeField] private GameObject perkIconPrefab; // El prefab del icono
+    [SerializeField] private InventoryTooltipUI tooltipUI; // El tooltip de la escena
+    // ✅ --- FIN ---
+
+    [Header("Filas (Texto de Stats)")]
+    // (Tu lista de stats de texto)
     [SerializeField] private TMP_Text speedTxt;
     [SerializeField] private TMP_Text dashSpeedTxt;
     [SerializeField] private TMP_Text dashIframesTxt;
@@ -34,282 +42,256 @@ public class PlayerStatsHUD : MonoBehaviour
     [SerializeField] private TMP_Text currentHealthTxt;
     [SerializeField] private TMP_Text regenRateTxt;
     [SerializeField] private TMP_Text regenDelayTxt;
-    [SerializeField] private TMP_Text invulnTimeTxt;
 
-    [SerializeField] private TMP_Text posTxt;
-    [SerializeField] private TMP_Text powerupsTxt;
-
-    // --- Ataque (de CombatSystem) ---
-    [Header("Ataque (Cooldown)")]
+    [SerializeField] private TMP_Text baseDamageTxt;
     [SerializeField] private TMP_Text attackCooldownTxt;
     [SerializeField] private TMP_Text attackCooldownRemainingTxt;
+    [SerializeField] private TMP_Text recoilDistanceTxt; // Cambiado de knockbackForceTxt
+    // ...y todas las demás que tengas...
 
-    // --- NUEVO: stats de daño/knockback del PlayerController ---
-    [Header("Daño / Knockback (PlayerController)")]
-    [SerializeField] private TMP_Text baseDamageTxt;
-    [SerializeField] private TMP_Text knockbackForceTxt;
 
-    [Header("Perks (Imágenes)")]
-    public List<string> perkAssetNames = new List<string>();   // Nombres de los assets PowerUpEffect
-    public List<Sprite> perkIcons = new List<Sprite>();       // Imágenes correspondientes
-    public List<Transform> perkSpawnPoints = new List<Transform>(); // Lugares donde aparecerán
+    // --- Variables de Estado y Referencias ---
+    private bool isPanelVisible = false;
+    private bool isTransitioning = false;
 
-    [SerializeField, Min(0.05f)] private float refreshInterval = 0.25f;
-    private float refreshTimer;
-
-    private bool _visible;
-    private Vector2 originalAnchoredPosition; // Guardar la posición original
-    private GameDataManager DM => GameDataManager.Instance;
-
-    // refs cache
+    // ✅ --- Referencias Corregidas ---
     private PlayerController player;
-    private CombatSystem combat;
+    private PlayerHealth health;
+    private CombatSystem combat; // Corregido de PlayerCombat
 
-    // reflection cache
-    private FieldInfo attackTimerField;
-    private FieldInfo knockbackForceField;
+    // Reflection (para leer stats privadas)
+    private FieldInfo attackCooldownTimerField;
 
-    // Cache de iconos instanciados
-    private List<GameObject> instantiatedIcons = new List<GameObject>();
-
-    private void Awake()
+    private void Start()
     {
-        if (panel == null) panel = gameObject;
-        if (panelRectTransform == null) panelRectTransform = GetComponent<RectTransform>();
-
-        // Guardar la posición original
-        originalAnchoredPosition = panelRectTransform.anchoredPosition;
-
-        ApplyVisible(false, true);
-
-        player = Object.FindFirstObjectByType<PlayerController>();
-        if (player != null)
+        // Encontrar al jugador
+        GameObject playerObj = GameObject.FindWithTag("Player");
+        if (playerObj != null)
         {
-            combat = player.GetComponent<CombatSystem>();
-            if (combat != null)
-            {
-                attackTimerField = typeof(CombatSystem)
-                    .GetField("attackTimer", BindingFlags.Instance | BindingFlags.NonPublic);
-            }
-
-            knockbackForceField = typeof(PlayerController)
-                .GetField("knockbackForce", BindingFlags.Instance | BindingFlags.NonPublic);
+            // ✅ Obtenemos los componentes correctos
+            player = playerObj.GetComponent<PlayerController>();
+            health = playerObj.GetComponent<PlayerHealth>();
+            combat = playerObj.GetComponent<CombatSystem>();
         }
+        else
+        {
+            Debug.LogError("PlayerStatsHUD: No se encontró el GameObject 'Player'.");
+        }
+
+        // Reflection (para leer el timer privado 'attackTimer' de CombatSystem)
+        if (combat != null)
+        {
+            // ✅ Corregido a 'attackTimer' (minúscula)
+            attackCooldownTimerField = combat.GetType().GetField("attackTimer", BindingFlags.NonPublic | BindingFlags.Instance);
+            if (attackCooldownTimerField == null)
+            {
+                Debug.LogWarning("PlayerStatsHUD: No se pudo encontrar el Field 'attackTimer' en CombatSystem.cs");
+            }
+        }
+
+        // Ocultar panel al inicio
+        if (panel != null) panel.SetActive(false);
+        if (canvasGroup != null) canvasGroup.alpha = 0f;
     }
 
     private void Update()
     {
         HandleInput();
 
-        if (_visible)
+        // Si el panel es visible, actualiza las stats
+        if (isPanelVisible)
         {
-            refreshTimer -= Time.unscaledDeltaTime;
-            if (refreshTimer <= 0f)
-            {
-                refreshTimer = refreshInterval;
-                RefreshHUD();
-            }
+            UpdateStatsText();
         }
     }
 
     private void HandleInput()
     {
-        if (holdToShow && !toggleMode)
+        if (toggleMode)
         {
-            bool shouldShow = Input.GetKey(key);
-            if (shouldShow != _visible) ApplyVisible(shouldShow);
+            if (Input.GetKeyDown(key))
+            {
+                TogglePanel();
+            }
+        }
+        else if (holdToShow)
+        {
+            if (Input.GetKeyDown(key))
+            {
+                ShowPanel();
+            }
+            else if (Input.GetKeyUp(key))
+            {
+                HidePanel();
+            }
+        }
+    }
+
+    public void TogglePanel()
+    {
+        if (isPanelVisible)
+            HidePanel();
+        else
+            ShowPanel();
+    }
+
+    public void ShowPanel()
+    {
+        if (isTransitioning || isPanelVisible) return;
+        isTransitioning = true;
+        isPanelVisible = true;
+
+        if (panel != null) panel.SetActive(true);
+
+        // --- Lógica del Inventario de Perks ---
+        UpdatePerksUI();
+        // --- Fin ---
+
+        // Actualiza las stats de texto
+        UpdateStatsText();
+
+        // Animación de Fade In y Deslizamiento
+        if (canvasGroup != null)
+        {
+            canvasGroup.DOFade(1f, slideDuration)
+                .From(0f)
+                .SetEase(Ease.OutQuad)
+                .SetUpdate(true); // Ignora la pausa
+        }
+        if (panelRectTransform != null)
+        {
+            panelRectTransform.DOAnchorPos(Vector2.zero, slideDuration)
+                .From(slideOffset)
+                .SetEase(Ease.OutQuad)
+                .SetUpdate(true) // Ignora la pausa
+                .OnComplete(() => isTransitioning = false);
+        }
+    }
+
+    public void HidePanel()
+    {
+        if (isTransitioning || !isPanelVisible) return;
+        isTransitioning = true;
+        isPanelVisible = false;
+
+        // Oculta el tooltip por si acaso
+        if (tooltipUI != null)
+            tooltipUI.Hide();
+
+        // Animación de Fade Out y Deslizamiento
+        if (canvasGroup != null)
+        {
+            canvasGroup.DOFade(0f, slideDuration)
+                .From(1f)
+                .SetEase(Ease.InQuad)
+                .SetUpdate(true); // Ignora la pausa
+        }
+        if (panelRectTransform != null)
+        {
+            panelRectTransform.DOAnchorPos(slideOffset, slideDuration)
+                .From(Vector2.zero)
+                .SetEase(Ease.InQuad)
+                .SetUpdate(true) // Ignora la pausa
+                .OnComplete(() =>
+                {
+                    isTransitioning = false;
+                    if (panel != null) panel.SetActive(false);
+                });
+        }
+    }
+
+    // --- MÉTODO PARA ACTUALIZAR LOS ICONOS DE PERKS (Tu nueva lógica) ---
+    private void UpdatePerksUI()
+    {
+        if (perksContainer == null || perkIconPrefab == null)
+        {
+            Debug.LogError("PlayerStatsHUD: Faltan referencias de Perks Container o Prefab del Icono.");
             return;
         }
 
-        if (Input.GetKeyDown(key))
+        // 1. Limpiar iconos de perks anteriores
+        foreach (Transform child in perksContainer)
         {
-            _visible = !_visible;
-            ApplyVisible(_visible);
-        }
-    }
-
-    private void ApplyVisible(bool show, bool force = false)
-    {
-        if (!force && _visible == show) return;
-        _visible = show;
-        refreshTimer = 0f;
-
-        if (canvasGroup != null)
-        {
-            canvasGroup.alpha = show ? 1f : 0f;
-            canvasGroup.blocksRaycasts = show;
-            canvasGroup.interactable = show;
+            Destroy(child.gameObject);
         }
 
-        // Animar el panel
-        AnimatePanel(show);
-
-        // Mostrar/Ocultar iconos de perks
-        if (show)
+        if (tooltipUI == null)
         {
-            ShowPerkIcons();
+            Debug.LogError("PlayerStatsHUD: Tooltip UI no está asignado.");
+            return;
         }
-        else
+
+        // 2. Cargar perks actuales del jugador (desde PlayerController.initialPowerUps)
+        if (player != null && player.initialPowerUps != null)
         {
-            HidePerkIcons();
-        }
-    }
-
-    private void AnimatePanel(bool show)
-    {
-        Vector2 targetPosition = show ? originalAnchoredPosition : originalAnchoredPosition + slideOffset;
-
-        panelRectTransform.anchoredPosition = show ? originalAnchoredPosition + slideOffset : originalAnchoredPosition;
-
-        panelRectTransform
-            .DOAnchorPos(targetPosition, slideDuration)
-            .SetEase(Ease.OutBack);
-    }
-
-    private void ShowPerkIcons()
-    {
-        HidePerkIcons(); // Limpiar iconos anteriores
-
-        var perks = DM.playerData.initialPowerUps;
-        var tooltip = FindObjectOfType<InventoryTooltipUI>(true); // 🧠 Buscar el tooltip en la escena
-
-        foreach (var powerUp in perks)
-        {
-            if (powerUp != null && powerUp.effect != null)
+            // Iteramos sobre el array de PowerUp[]
+            foreach (PowerUp powerUp in player.initialPowerUps)
             {
-                string assetName = powerUp.effect.name;
-
-                int index = perkAssetNames.IndexOf(assetName);
-                if (index != -1 && index < perkIcons.Count && index < perkSpawnPoints.Count)
+                // El PowerUp debe tener su 'PowerUpEffect' asignado
+                if (powerUp != null && powerUp.effect != null)
                 {
-                    var spawnPoint = perkSpawnPoints[index];
-                    var iconGO = new GameObject("PerkIcon");
-                    iconGO.transform.SetParent(spawnPoint.parent);
-                    iconGO.transform.position = spawnPoint.position;
+                    // 3. Instanciar un icono para esta perk
+                    GameObject iconObj = Instantiate(perkIconPrefab, perksContainer);
+                    PerkIconUI iconScript = iconObj.GetComponent<PerkIconUI>();
 
-                    var image = iconGO.AddComponent<Image>();
-                    image.sprite = perkIcons[index];
-                    instantiatedIcons.Add(iconGO);
-
-                    // 🧩 Agregar EventTrigger para tooltip
-                    var trigger = iconGO.AddComponent<UnityEngine.EventSystems.EventTrigger>();
-
-                    // Mouse entra → mostrar tooltip
-                    var entryEnter = new UnityEngine.EventSystems.EventTrigger.Entry
+                    if (iconScript != null)
                     {
-                        eventID = UnityEngine.EventSystems.EventTriggerType.PointerEnter
-                    };
-                    entryEnter.callback.AddListener((_) =>
-                    {
-                        if (tooltip != null && powerUp.effect != null)
-                        {
-                            tooltip.Show(powerUp.effect.label, powerUp.effect.description);
-                        }
-                    });
-                    trigger.triggers.Add(entryEnter);
-
-                    // Mouse sale → ocultar tooltip
-                    var entryExit = new UnityEngine.EventSystems.EventTrigger.Entry
-                    {
-                        eventID = UnityEngine.EventSystems.EventTriggerType.PointerExit
-                    };
-                    entryExit.callback.AddListener((_) =>
-                    {
-                        if (tooltip != null)
-                            tooltip.Hide();
-                    });
-                    trigger.triggers.Add(entryExit);
+                        // 4. Inicializar el icono con los datos del SO y la ref al tooltip
+                        iconScript.Initialize(powerUp.effect, tooltipUI);
+                    }
                 }
             }
         }
     }
 
-    private void HidePerkIcons()
+
+    // ✅ --- MÉTODO DE STATS CORREGIDO ---
+    private void UpdateStatsText()
     {
-        foreach (var icon in instantiatedIcons)
+        // --- Stats de PlayerHealth ---
+        if (health != null)
         {
-            if (icon != null) Destroy(icon);
+            SetText(maxHealthTxt, health.maxHealth);
+            SetText(currentHealthTxt, health.currentHealth);
+            SetText(regenRateTxt, health.regenerationRate);
+            SetText(regenDelayTxt, health.regenDelay);
         }
-        instantiatedIcons.Clear();
-    }
 
-    private void RefreshHUD()
-    {
-        if (DM == null || DM.playerData == null) return;
-        var d = DM.playerData;
+        // --- Stats de PlayerController (Movimiento y Daño) ---
+        if (player != null)
+        {
+            // Movimiento
+            SetText(speedTxt, player.moveSpeed);
+            SetText(dashSpeedTxt, player.dashSpeed);
+            SetText(dashIframesTxt, player.dashIframes);
+            SetText(dashSlideDurTxt, player.dashSlideDuration);
+            SetText(dashDurTxt, player.dashDuration);
+            SetText(dashCooldownTxt, player.dashCooldown);
 
-        // Movimiento / Dash
-        SetText(speedTxt, d.moveSpeed, "Velocidad");
-        SetText(dashSpeedTxt, d.dashSpeed, "Dash Vel.");
-        SetText(dashIframesTxt, d.dashIframes, "Dash iFrames");
-        SetText(dashSlideDurTxt, d.dashSlideDuration, "Dash Slide");
-        SetText(dashDurTxt, d.dashDuration, "Dash Duración");
-        SetText(dashCooldownTxt, d.dashCooldown, "Dash CD");
+            // Combate
+            SetText(baseDamageTxt, player.baseDamage);
+        }
 
-        // Salud
-        SetText(maxHealthTxt, d.maxHealth, "Vida Máx");
-        SetText(currentHealthTxt, d.currentHealth, "Vida");
-        SetText(regenRateTxt, d.regenerationRate, "Regen/s");
-        SetText(regenDelayTxt, d.regenDelay, "Delay Regen");
-        SetText(invulnTimeTxt, d.invulnerableTime, "Invulnerable");
-
-        // Pos y PowerUps
-        if (posTxt != null)
-            posTxt.text = $"Pos: X {d.position.x:0.##}  Y {d.position.y:0.##}";
-        if (powerupsTxt != null)
-            powerupsTxt.text = $"PowerUps: {d.initialPowerUps?.Count ?? 0}";
-
-        // --- Ataque (cooldown) desde CombatSystem ---
+        // --- Stats de CombatSystem ---
         if (combat != null)
         {
-            if (attackCooldownTxt != null)
-                attackCooldownTxt.text = $"{combat.attackCooldown:0.00}";
-            if (attackCooldownRemainingTxt != null && attackTimerField != null)
+            SetText(attackCooldownTxt, combat.attackCooldown);
+            SetText(recoilDistanceTxt, combat.recoilDistance); // Mapeado aquí
+
+            // Leer timer privado con Reflection
+            if (attackCooldownRemainingTxt != null && attackCooldownTimerField != null)
             {
-                var val = attackTimerField.GetValue(combat);
+                var val = attackCooldownTimerField.GetValue(combat);
                 float remaining = (val is float f) ? Mathf.Max(0f, f) : 0f;
                 attackCooldownRemainingTxt.text = $"{remaining:0.00}";
             }
         }
-        else
-        {
-            if (attackCooldownTxt != null) attackCooldownTxt.text = "-";
-            if (attackCooldownRemainingTxt != null) attackCooldownRemainingTxt.text = "-";
-        }
-
-        // --- NUEVO: Base Damage y Knockback Force desde PlayerController ---
-        if (player != null)
-        {
-            if (baseDamageTxt != null)
-                baseDamageTxt.text = $"{player.baseDamage}";
-
-            if (knockbackForceTxt != null)
-            {
-                float kf = 0f;
-                if (knockbackForceField != null)
-                {
-                    var val = knockbackForceField.GetValue(player);
-                    if (val is float f) kf = f;
-                }
-                knockbackForceTxt.text = $"{kf:0.##}";
-            }
-        }
-        else
-        {
-            if (baseDamageTxt != null) baseDamageTxt.text = "-";
-            if (knockbackForceTxt != null) knockbackForceTxt.text = "-";
-        }
     }
 
-    private static void SetText(TMP_Text t, float value, string label)
+    // Helper para asignar texto (simplificado)
+    private static void SetText(TMP_Text t, float value)
     {
         if (t == null) return;
         t.text = $"{value:0.##}";
-    }
-
-    private static void SetText(TMP_Text t, int value, string label)
-    {
-        if (t == null) return;
-        t.text = $"{value}";
     }
 }

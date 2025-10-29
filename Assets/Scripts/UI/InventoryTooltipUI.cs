@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using TMPro;
 using DG.Tweening;
 
@@ -28,6 +28,7 @@ public class InventoryTooltipUI : MonoBehaviour
                 Input.mousePosition,
                 mainCamera,
                 out pos);
+            // Ajuste para que el tooltip no tape el ratón
             rectTransform.anchoredPosition = pos + new Vector2(40, -40);
         }
     }
@@ -39,7 +40,11 @@ public class InventoryTooltipUI : MonoBehaviour
 
         gameObject.SetActive(true);
         canvasGroup.blocksRaycasts = false;
-        canvasGroup.DOFade(1f, 0.2f).From(0f);
+
+        // ✅ --- MODIFICADO ---
+        // Añadimos SetUpdate(true) para que el fade funcione si el juego está pausado
+        canvasGroup.DOFade(1f, 0.2f).From(0f).SetUpdate(true);
+        // ✅ --- FIN ---
     }
 
     public void Hide()
