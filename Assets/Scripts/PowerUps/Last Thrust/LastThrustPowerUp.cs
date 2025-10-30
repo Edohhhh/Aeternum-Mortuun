@@ -7,19 +7,27 @@ public class LastThrustPowerUp : PowerUp
 
     public override void Apply(PlayerController player)
     {
-        if (GameObject.Find("LastThrustObserver") != null) return;
+        var existing = GameObject.Find("LastThrustObserver");
+        LastThrustObserver observer;
 
-        var go = new GameObject("LastThrustObserver");
-        var observer = go.AddComponent<LastThrustObserver>();
-        observer.player = player;
+        if (existing == null)
+        {
+            var go = new GameObject("LastThrustObserver");
+            observer = go.AddComponent<LastThrustObserver>();
+            Object.DontDestroyOnLoad(go);
+        }
+        else
+        {
+            observer = existing.GetComponent<LastThrustObserver>();
+        }
+
         observer.shockwavePrefab = shockwavePrefab;
-
-        Object.DontDestroyOnLoad(go);
+        observer.player = player; // se reasigna igual en sceneLoaded, pero esto lo habilita ya
     }
 
     public override void Remove(PlayerController player)
     {
         var go = GameObject.Find("LastThrustObserver");
-        if (go != null) Destroy(go);
+        if (go != null) Object.Destroy(go);
     }
 }

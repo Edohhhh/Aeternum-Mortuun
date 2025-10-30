@@ -25,7 +25,7 @@ public class PlayerDamageHook : MonoBehaviour
         }
         else if (playerHealth.currentHealth > lastHealth)
         {
-            // También actualizamos si curó, para evitar errores
+
             lastHealth = playerHealth.currentHealth;
         }
     }

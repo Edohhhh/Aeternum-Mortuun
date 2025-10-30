@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -9,18 +9,20 @@ public class LifeUpPowerUp : PowerUp
 
     public override void Apply(PlayerController player)
     {
+        // Evitar doble aplicaciï¿½n en el mismo frame/escena
         if (GameObject.Find("LifeUpMarker") != null) return;
 
-        // Crear marcador persistente
+        // Crear marcador persistente SOLO como guard temporal
         GameObject marker = new GameObject("LifeUpMarker");
         Object.DontDestroyOnLoad(marker);
 
-        // Aplicar el efecto luego de que PlayerHealth terminó su Start()
+        // Aplicar el efecto luego de que PlayerHealth termine su Start()
         player.StartCoroutine(ApplyDelayed(player, marker));
     }
 
     private IEnumerator ApplyDelayed(PlayerController player, GameObject marker)
     {
+        // Espera un frame para asegurar que PlayerHealth y su UI estï¿½n inicializados
         yield return new WaitForEndOfFrame();
 
         var health = player.GetComponent<PlayerHealth>();
@@ -34,14 +36,14 @@ public class LifeUpPowerUp : PowerUp
         health.maxHealth += extraMaxHealth;
         health.currentHealth = Mathf.Min(health.currentHealth + extraMaxHealth, health.maxHealth);
 
-        // Actualizar la UI correctamente
+        // Actualizar la UI correctamente (si la tenï¿½s)
         if (health.healthUI != null)
         {
             health.healthUI.Initialize(health.maxHealth);
             health.healthUI.UpdateHearts(health.currentHealth);
         }
 
-        // PowerUp se borra de la lista
+        // Remover la perk de initialPowerUps (si es de un solo uso al inicio)
         var list = new List<PowerUp>(player.initialPowerUps);
         if (list.Contains(this))
         {
@@ -49,9 +51,14 @@ public class LifeUpPowerUp : PowerUp
             player.initialPowerUps = list.ToArray();
         }
 
-
-        marker.hideFlags = HideFlags.HideInHierarchy;
+        // Importante: destruir el marker para permitir futuras aplicaciones
+        Object.Destroy(marker);
     }
 
-    public override void Remove(PlayerController player) { }
+    // Implementaciï¿½n requerida por la clase base
+    public override void Remove(PlayerController player)
+    {
+        // Intencionalmente vacï¿½o: este power-up es de efecto permanente (one-shot).
+        // Si quisieras revertirlo al quitar la perk, podrï¿½as restar extraMaxHealth aquï¿½ y actualizar la UI.
+    }
 }

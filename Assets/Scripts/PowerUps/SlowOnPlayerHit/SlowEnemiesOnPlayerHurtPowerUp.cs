@@ -13,12 +13,12 @@ public class SlowEnemiesOnPlayerHurtPowerUp : PowerUp
     {
         if (observerInstance != null) return;
 
-        // Crear el observador como GameObject aparte
+        // Crear el observador como GameObject aparte 
         observerInstance = new GameObject("PlayerHurtSlowObserver");
         var observer = observerInstance.AddComponent<PlayerHurtSlowObserver>();
         observer.slowPercent = slowPercent;
         observer.duration = Powerduration;
-        observer.AttachTo(player); // conecta el listener al player
+        observer.AttachTo(player); // conecta el listener al player 
         Object.DontDestroyOnLoad(observerInstance);
     }
 
