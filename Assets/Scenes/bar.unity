@@ -5961,6 +5961,8 @@ GameObject:
   - component: {fileID: 1286885518}
   - component: {fileID: 1286885517}
   - component: {fileID: 1286885516}
+  - component: {fileID: 1286885521}
+  - component: {fileID: 1286885520}
   m_Layer: 5
   m_Name: DialoguesUI
   m_TagString: Untagged
@@ -6051,6 +6053,40 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &1286885520
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1286885515}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c00548e8003f40de85fc2b82c5e4b47, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveDistance: 200
+  moveDuration: 0.6
+  fadeDuration: 0.6
+  moveEase: 9
+  fadeEase: 6
+  exitMoveDistance: 200
+  exitDuration: 0.5
+  fadeOutDuration: 0.4
+  exitEase: 8
+  fadeOutEase: 5
+--- !u!225 &1286885521
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1286885515}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &1289988879
 GameObject:
   m_ObjectHideFlags: 0

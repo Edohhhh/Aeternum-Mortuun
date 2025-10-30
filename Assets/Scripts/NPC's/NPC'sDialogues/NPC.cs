@@ -22,7 +22,7 @@ public class NPC : MonoBehaviour
     public string iconSortingLayer = "UI";
     public int iconSortingOrder = 50;
 
-    // ===== Candado global de diálogo =====
+    // ===== Candado global de diálogo (uno a la vez) =====
     private static NPC currentActiveNPC = null; // null => nadie hablando
 
     private int dialogueIndex;
@@ -32,11 +32,19 @@ public class NPC : MonoBehaviour
     // Renderer creado en runtime si no hay uno en escena
     private SpriteRenderer runtimeIconRenderer;
 
+    // Cache del animador del panel (UI)
+    private UIDialogueAnimator dialogueAnimator;
+
     void Start()
     {
-        if (dialoguePanel) dialoguePanel.SetActive(false);
+        if (dialoguePanel)
+        {
+            // Asegurar que arranca oculto
+            dialoguePanel.SetActive(false);
+            dialogueAnimator = dialoguePanel.GetComponent<UIDialogueAnimator>();
+        }
 
-        // Preparar icono
+        // Preparar icono de interacción
         SpriteRenderer target = interactRendererInScene;
         if (target == null)
         {
@@ -55,7 +63,7 @@ public class NPC : MonoBehaviour
 
     void Update()
     {
-        // Mantener posición del icono runtime
+        // Mantener posición del icono runtime sobre el NPC
         if (runtimeIconRenderer != null)
         {
             var pos = transform.position;
@@ -91,10 +99,17 @@ public class NPC : MonoBehaviour
         isDialogueActive = true;
         dialogueIndex = 0;
 
-        nameText.SetText(dialogueData.npcName);
-        portraitImage.sprite = dialogueData.npcPortrait;
+        if (nameText != null) nameText.SetText(dialogueData.npcName);
+        if (portraitImage != null) portraitImage.sprite = dialogueData.npcPortrait;
 
-        dialoguePanel.SetActive(true);
+        if (dialoguePanel != null)
+        {
+            dialoguePanel.SetActive(true);
+            // Animación de aparición (si existe el componente)
+            dialogueAnimator ??= dialoguePanel.GetComponent<UIDialogueAnimator>();
+            dialogueAnimator?.AnimateIn();
+        }
+
         SetIconVisible(false);       // ocultar icono mientras se habla
 
         StartCoroutine(TypeLine());
@@ -105,7 +120,8 @@ public class NPC : MonoBehaviour
         if (isTyping)
         {
             StopAllCoroutines();
-            dialogueText.SetText(dialogueData.dialogueLines[dialogueIndex]);
+            if (dialogueText != null)
+                dialogueText.SetText(dialogueData.dialogueLines[dialogueIndex]);
             isTyping = false;
         }
         else if (++dialogueIndex < dialogueData.dialogueLines.Length)
@@ -121,11 +137,11 @@ public class NPC : MonoBehaviour
     IEnumerator TypeLine()
     {
         isTyping = true;
-        dialogueText.SetText("");
+        if (dialogueText != null) dialogueText.SetText("");
 
         foreach (char letter in dialogueData.dialogueLines[dialogueIndex])
         {
-            dialogueText.text += letter;
+            if (dialogueText != null) dialogueText.text += letter;
             yield return new WaitForSeconds(dialogueData.typingSpeed);
         }
 
@@ -143,14 +159,37 @@ public class NPC : MonoBehaviour
     {
         StopAllCoroutines();
         isDialogueActive = false;
-        dialogueText.SetText("");
-        dialoguePanel.SetActive(false);
+        if (dialogueText != null) dialogueText.SetText("");
 
-        // Liberar el candado global SOLO si este NPC era el activo
+        // Animación de salida: bajar + fade out, y al terminar se oculta
+        if (dialoguePanel != null)
+        {
+            dialogueAnimator ??= dialoguePanel.GetComponent<UIDialogueAnimator>();
+            if (dialogueAnimator != null)
+            {
+                dialogueAnimator.AnimateOut(() =>
+                {
+                    // Al terminar de salir, se desactiva el panel
+                    dialoguePanel.SetActive(false);
+
+                    // Liberar el candado global SOLO si este NPC era el activo
+                    if (currentActiveNPC == this)
+                        currentActiveNPC = null;
+
+                    // Si el jugador sigue cerca y no hay otro diálogo activo, mostrar icono
+                    UpdateIconVisibility();
+                });
+
+                return; // Importante: salimos aquí para que no se ejecute dos veces la lógica
+            }
+        }
+
+        // Fallback si no hay animador
+        if (dialoguePanel != null) dialoguePanel.SetActive(false);
+
         if (currentActiveNPC == this)
             currentActiveNPC = null;
 
-        // Si el jugador sigue cerca y no hay otro diálogo activo, mostrar icono
         UpdateIconVisibility();
     }
 
@@ -170,6 +209,9 @@ public class NPC : MonoBehaviour
         {
             playerInRange = false;
             UpdateIconVisibility();
+
+            // (Opcional) Si querés cerrar el diálogo al salir del rango:
+            // if (isDialogueActive) EndDialogue();
         }
     }
 
