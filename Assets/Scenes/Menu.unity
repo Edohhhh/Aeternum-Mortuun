@@ -929,8 +929,6 @@ MonoBehaviour:
   easyRooms:
   - id: 1
     roomName: LoopSlime1
-  - id: 2
-    roomName: LoopSlime1
   mediumRooms:
   - id: 3
     roomName: LoopEsqueleto1
@@ -949,9 +947,11 @@ MonoBehaviour:
     roomName: LoopMiniEsqueletosYSlimes
   - id: 10
     roomName: BossMimico
-  easyCount: 2
+  - id: 11
+    roomName: bar
+  easyCount: 1
   mediumCount: 4
-  hardCount: 4
+  hardCount: 5
   generatedRun: []
 --- !u!4 &195921830
 Transform:

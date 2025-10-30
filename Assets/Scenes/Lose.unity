@@ -741,10 +741,10 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 1844cdfc76eadbb43958bee76747b603, type: 3}
-  m_Resource: {fileID: 8300000, guid: 1844cdfc76eadbb43958bee76747b603, type: 3}
+  m_audioClip: {fileID: 8300000, guid: eaa2833d2dee4834ca0f9f3a7e36834d, type: 3}
+  m_Resource: {fileID: 8300000, guid: eaa2833d2dee4834ca0f9f3a7e36834d, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.02
+  m_Volume: 0.124
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -1486,6 +1486,9 @@ MonoBehaviour:
   startRoom:
     id: 0
     roomName: LoopSlime1
+  winRoom:
+    id: 0
+    roomName: 
   easyRooms:
   - id: 1
     roomName: LoopSlime1
