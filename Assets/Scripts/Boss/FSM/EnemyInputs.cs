@@ -17,5 +17,6 @@ public enum EnemyInputs
     Spawn,
     MeleeAttack,
     HeavyAttack,
-    Flee
+    Flee,
+    RangeAttack
 }

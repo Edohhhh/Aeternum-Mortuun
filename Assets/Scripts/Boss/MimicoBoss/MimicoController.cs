@@ -29,6 +29,15 @@ public class MimicoController : MonoBehaviour, IEnemyDataProvider, IMeleeHost
     [SerializeField] private bool toggleAllColliders = true;
     [SerializeField] private Collider2D[] collidersToToggle;   // si toggleAllColliders = false, asigná acá
 
+    [Header("Ranged")]
+    [SerializeField] private Transform shootPoint;                   // lugar desde donde sale el proyectil
+    [SerializeField] private GameObject rangeBulletPrefab;           // prefab con MimicBulletStraight
+    [SerializeField] private float rangeBulletSpeed = 8f;
+    [SerializeField] private float rangeBulletDamage = 1f;
+    [SerializeField] private LayerMask playerMaskForBullets;
+    [SerializeField] private float rangeCooldown = 5f;
+    private float nextRangeReadyTime = 0f;
+
     [Header("Special")]
     [SerializeField] private Transform rightSpawn;
     [SerializeField] private Transform leftEdge;
@@ -79,6 +88,33 @@ public class MimicoController : MonoBehaviour, IEnemyDataProvider, IMeleeHost
     }
 
 
+    public bool IsRanging() => fsm.GetCurrentState() is RangeAttackState;
+    public bool CanRangeAttack() => Time.time >= nextRangeReadyTime;
+    public void MarkRangeUsed() => nextRangeReadyTime = Time.time + rangeCooldown;
+
+    // Referencia al estado (para reenviar AE)
+    private RangeAttackState _rangeRef;
+    public void RegisterRangeState(RangeAttackState s) => _rangeRef = s;
+
+    // Llamadas hechas desde los Animation Events del clip "Range"
+    public void OnRangeFire() => _rangeRef?.OnRangeFire();
+    public void OnRangeEnd() => _rangeRef?.OnRangeFinished();
+
+    // Spawner del proyectil
+    public void SpawnRangeProjectile()
+    {
+        Transform p = GetPlayer();
+        if (!p || !rangeBulletPrefab) return;
+
+        Vector2 origin = shootPoint ? (Vector2)shootPoint.position : (Vector2)transform.position;
+        Vector2 dir = (p.position - (Vector3)origin).normalized;
+
+        var go = Instantiate(rangeBulletPrefab, origin, Quaternion.identity);
+        var b = go.GetComponent<MimicBulletStraight>();
+        if (b) b.Init(dir, rangeBulletSpeed, rangeBulletDamage, playerMaskForBullets);
+    }
+
+
     [Header("Attack script (del prefab)")]
     [SerializeField] private EnemyAttack attack; // asignalé el EnemyAttack del Mimico
 
@@ -116,6 +152,7 @@ public class MimicoController : MonoBehaviour, IEnemyDataProvider, IMeleeHost
         var follow = new EnemyFollowState(transform, player, maxSpeed);
         var melee = new MeleeAttackState(this);
         var special = new MimicoSpecialState(this);
+        var range = new RangeAttackState(this);
         var death = new EnemyDeathState(this);
 
         fsm = new FSM<EnemyInputs>(dormant);
@@ -145,6 +182,10 @@ public class MimicoController : MonoBehaviour, IEnemyDataProvider, IMeleeHost
         special.AddTransition(EnemyInputs.SeePlayer, follow);
         special.AddTransition(EnemyInputs.Die, death);
 
+        follow.AddTransition(EnemyInputs.RangeAttack, range);
+        range.AddTransition(EnemyInputs.SeePlayer, follow);
+        range.AddTransition(EnemyInputs.Die, death);
+
         // Registrar refs de estados (para Animation Events)
         RegisterMeleeState(melee);
         RegisterDeathState(death);
@@ -166,7 +207,7 @@ public class MimicoController : MonoBehaviour, IEnemyDataProvider, IMeleeHost
     private void Update()
     {
         // Mientras golpea, no metemos inputs externos
-        if (IsDormant() || IsAwakening() || IsMeleeing() || IsSpecialing())
+        if (IsDormant() || IsAwakening() || IsMeleeing() || IsSpecialing() || IsRanging())
         {
             fsm.Update();
             return;
@@ -184,7 +225,7 @@ public class MimicoController : MonoBehaviour, IEnemyDataProvider, IMeleeHost
         // Anim caminar
         if (animator) animator.SetBool("isWalking", fsm.GetCurrentState() is EnemyFollowState);
 
-        bool blocked = IsDormant() || IsAwakening() || IsMeleeing() || IsSpecialing();
+        bool blocked = IsDormant() || IsAwakening() || IsMeleeing() || IsSpecialing() || IsRanging();
         if (!blocked && IsFollowing())
             specialCharge += Time.deltaTime;
 
