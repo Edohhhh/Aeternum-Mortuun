@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 98845fb8652284d9caf1c1de16fafd3f, type: 3}
-  m_Name: Bartender
+  m_Name: King
   m_EditorClassIdentifier: 
-  npcName: Bartender
-  npcPortrait: {fileID: 7481529506853502804, guid: 4b8aa57e80bbc4c688b9314355fe3fca, type: 3}
+  npcName: King
+  npcPortrait: {fileID: 0}
   dialogueLines:
-  - Buenas... noches?
-  - "Dentro de estas paredes puede perderse la noci\xF3n del tiempo con facilidad..."
-  - Sientase libre por quedarse en el bar el tiempo que necesite.
+  - Si... Aun puedo quedarme...
+  - Buenas tardes, no me distraigas estoy en racha.
+  - En cualquier momento... se que...
   autoProgressLines: 010101
   autoProgressDelay: 1.5
   typingSpeed: 0.05
