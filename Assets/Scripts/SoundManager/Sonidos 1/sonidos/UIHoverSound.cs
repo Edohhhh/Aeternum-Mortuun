@@ -1,4 +1,5 @@
-using UnityEngine;
+Ôªøusing UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -6,11 +7,13 @@ using UnityEngine.UI;
 public class UIHoverSound : MonoBehaviour, IPointerEnterHandler, ISelectHandler
 {
     [Header("Audio")]
-    [SerializeField] private AudioSource audioSource;   // Asign· el AudioSource del botÛn
-    [SerializeField] private AudioClip hoverClip;       // Sonido al pasar el mouse
-    [SerializeField] private AudioClip clickClip;       // (Opcional) Sonido al hacer click
-    [Range(0f, 1f)]
-    [SerializeField] private float volume = 1f;
+    [SerializeField] private AudioSource audioSource;        // Asign√° el AudioSource del bot√≥n
+    [SerializeField] private AudioClip hoverClip;            // Sonido al pasar el mouse
+    [SerializeField] private AudioClip clickClip;            // Sonido al hacer click
+    [Range(0f, 1f)][SerializeField] private float volume = 1f;
+
+    [Header("Opcional: Grupo del Mixer")]
+    [SerializeField] private AudioMixerGroup mixerGroup;     // ‚Üê Pod√©s asignar el grupo aqu√≠
 
     private Button button;
 
@@ -26,12 +29,16 @@ public class UIHoverSound : MonoBehaviour, IPointerEnterHandler, ISelectHandler
         if (button != null)
             button.onClick.AddListener(PlayClick);
 
-        // Seguridad: si no hay AudioSource en el objeto, lo creamos
+        // Si no hay AudioSource, creamos uno
         if (audioSource == null)
         {
             audioSource = gameObject.AddComponent<AudioSource>();
             audioSource.playOnAwake = false;
         }
+
+        // Si hay un grupo asignado, lo aplicamos
+        if (mixerGroup != null)
+            audioSource.outputAudioMixerGroup = mixerGroup;
     }
 
     public void OnPointerEnter(PointerEventData eventData)
@@ -39,18 +46,17 @@ public class UIHoverSound : MonoBehaviour, IPointerEnterHandler, ISelectHandler
         PlayHover();
     }
 
-    // Para navegaciÛn con teclado/gamepad (cuando el botÛn se selecciona)
     public void ISelectHandler_OnSelect()
     {
         PlayHover();
     }
+
     void ISelectHandler.OnSelect(BaseEventData eventData) => ISelectHandler_OnSelect();
 
     private void PlayHover()
     {
         if (hoverClip == null || audioSource == null) return;
 
-        // Evita acumular capas si te movÈs r·pido entre botones
         audioSource.Stop();
         audioSource.PlayOneShot(hoverClip, volume);
     }

@@ -33,8 +33,8 @@ public class DashState : IPlayerState
             true
         );
 
-        if (AudioManager.Instance != null)
-            AudioManager.Instance.Play("dash");
+       // if (AudioManager.Instance != null)
+         //   AudioManager.Instance.Play("dash");
     }
 
     public void HandleInput() { }

@@ -247,8 +247,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b0965933ee8592b4db2de36dc218ab85, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sound: 3
+  clip: {fileID: 0}
+  mixerGroup: {fileID: 0}
   volume: 0.072
+  spatial3D: 0
 --- !u!1102 &-2026268558443396672
 AnimatorState:
   serializedVersion: 6
@@ -291,8 +293,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b0965933ee8592b4db2de36dc218ab85, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sound: 0
+  clip: {fileID: 8300000, guid: baa4f31b7485e614cbbc023cc6771cb0, type: 3}
+  mixerGroup: {fileID: -948031095554008997, guid: 2589dda68bd2be64cbfc6d2537e9369f, type: 2}
   volume: 0.57
+  spatial3D: 0
 --- !u!1101 &-179218607530194111
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
@@ -426,8 +430,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b0965933ee8592b4db2de36dc218ab85, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sound: 2
+  clip: {fileID: 8300000, guid: 89d11aac875f23f4591cd82154e632f9, type: 3}
+  mixerGroup: {fileID: -948031095554008997, guid: 2589dda68bd2be64cbfc6d2537e9369f, type: 2}
   volume: 0.258
+  spatial3D: 0
 --- !u!1102 &5037780331659426723
 AnimatorState:
   serializedVersion: 6
