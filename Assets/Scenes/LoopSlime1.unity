@@ -17376,6 +17376,8 @@ GameObject:
   - component: {fileID: 328972263}
   - component: {fileID: 328972262}
   - component: {fileID: 328972266}
+  - component: {fileID: 328972268}
+  - component: {fileID: 328972267}
   m_Layer: 5
   m_Name: RuletaUIset1
   m_TagString: Untagged
@@ -17486,6 +17488,30 @@ MonoBehaviour:
   spinButton: {fileID: 0}
   confirmButton: {fileID: 0}
   spinButtonText: {fileID: 0}
+--- !u!114 &328972267
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 328972261}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96cc056cba19f4edca1b60a42eb652a6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!225 &328972268
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 328972261}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &389826487
 GameObject:
   m_ObjectHideFlags: 0
@@ -18495,6 +18521,8 @@ GameObject:
   - component: {fileID: 576635358}
   - component: {fileID: 576635357}
   - component: {fileID: 576635356}
+  - component: {fileID: 576635362}
+  - component: {fileID: 576635361}
   m_Layer: 5
   m_Name: RuletaUIset3
   m_TagString: Untagged
@@ -18605,6 +18633,30 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &576635361
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 576635355}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96cc056cba19f4edca1b60a42eb652a6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!225 &576635362
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 576635355}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &581154482
 GameObject:
   m_ObjectHideFlags: 0
@@ -24281,6 +24333,8 @@ GameObject:
   - component: {fileID: 1174474509}
   - component: {fileID: 1174474508}
   - component: {fileID: 1174474507}
+  - component: {fileID: 1174474513}
+  - component: {fileID: 1174474512}
   m_Layer: 5
   m_Name: RuletaUIset2
   m_TagString: Untagged
@@ -24391,6 +24445,30 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &1174474512
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1174474506}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96cc056cba19f4edca1b60a42eb652a6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!225 &1174474513
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1174474506}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &1209306224
 GameObject:
   m_ObjectHideFlags: 0
