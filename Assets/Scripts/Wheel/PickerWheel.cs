@@ -54,13 +54,9 @@ namespace EasyUI.PickerWheelUI
         [SerializeField] private int usosMaximos = 3;
         private int usosRestantes;
 
-        // Propiedades públicas (tu "viejo" script solo tenía UsosRestantes)
+        // Propiedades públicas
         public int UsosRestantes => usosRestantes;
-
-        // ✅ --- AÑADIDO: Lógica del Extra Spin ---
-        // (Esto es necesario para que RuletaUISet.cs muestre "4/4")
         public int UsosMaximos => usosMaximos;
-        // ✅ --- FIN ---
 
         private bool _isSpinning = false;
         public bool IsSpinning => _isSpinning;
@@ -91,11 +87,6 @@ namespace EasyUI.PickerWheelUI
             usosRestantes = usosMaximos;
         }
 
-        // ✅ --- AÑADIDO: Lógica del Extra Spin ---
-        /// <summary>
-        /// Lee los spins extra del jugador y los aplica a esta ruleta.
-        /// Debe llamarse DESPUÉS de instanciar la ruleta y ANTES de inicializar la UI.
-        /// </summary>
         public void SincronizarSpinsConPlayer(PlayerController player)
         {
             if (player == null) return;
@@ -103,18 +94,14 @@ namespace EasyUI.PickerWheelUI
             int spinsExtra = player.extraSpins;
             if (spinsExtra > 0)
             {
-                // Suma los extras al máximo y a los restantes
-                usosMaximos += spinsExtra; // ej: 3 (base) + 1 (extra) = 4
-                usosRestantes = usosMaximos; // Resetea los usos al nuevo máximo (4)
-
+                usosMaximos += spinsExtra;
+                usosRestantes = usosMaximos;
                 Debug.Log($"Ruleta {gameObject.name} cargada con +{spinsExtra} tiradas extra. Total: {usosRestantes}");
             }
         }
-        // ✅ --- FIN ---
 
         private void Start()
         {
-            // ✅ Buscar automáticamente el popup si no está asignado
             if (rewardPopup == null)
             {
                 rewardPopup = FindObjectOfType<RewardPopupUI>(true);
@@ -124,7 +111,6 @@ namespace EasyUI.PickerWheelUI
                     Debug.LogWarning("⚠️ No se encontró ningún RewardPopupUI en la escena.");
             }
 
-            // Carga inicial de premios
             CargarPremiosDesdePoolsPonderados();
 
             pieceAngle = 360f / wheelPieces.Length;
@@ -159,9 +145,6 @@ namespace EasyUI.PickerWheelUI
                 Debug.LogWarning("⚠️ No se encontró RewardPopupUI para mostrar la descripción.");
         }
 
-        // ----------------------------------------------------
-        // 🌀 Lógica principal de la ruleta (TU VERSIÓN ORIGINAL)
-        // ----------------------------------------------------
         public void Spin()
         {
             if (_isSpinning) return;
@@ -186,13 +169,12 @@ namespace EasyUI.PickerWheelUI
             float currentAngle = prevAngle;
             bool isIndicatorOnLine = false;
 
-            // --- ESTA ES TU LÓGICA DE GIRO "VIEJA" (VELOCIDAD, DIRECCIÓN Y EASE) ---
+            // (Si 'FastBeyond360' da error, cámbialo a 'Fast')
             wheelCircle
                 .DORotate(targetRotation, spinDuration, RotateMode.FastBeyond360)
                 .SetEase(Ease.OutQuad)
                 .SetUpdate(true)
                 .OnUpdate(() =>
-                // --- FIN DE LA LÓGICA DE GIRO "VIEJA" ---
                 {
                     float diff = Mathf.Abs(prevAngle - currentAngle);
                     if (diff >= halfPieceAngle)
@@ -231,16 +213,12 @@ namespace EasyUI.PickerWheelUI
                     ultimoPremio = wheelPieces[landedIndex];
                     Debug.Log($"🎯 Selector está sobre la pieza {landedIndex}: {ultimoPremio.Label}");
 
-                    // Llamar evento y popup
                     OnRewardSelected(ultimoPremio);
                     OnSpinEnd?.Invoke(ultimoPremio);
                     onSpinEndEvent?.Invoke(ultimoPremio);
                 });
         }
 
-        // ----------------------------------------------------
-        // ⚙️ Métodos utilitarios
-        // ----------------------------------------------------
         private int GetRandomPieceIndex()
         {
             double r = rand.NextDouble() * accumulatedWeight;
@@ -269,13 +247,11 @@ namespace EasyUI.PickerWheelUI
 
         private void Generate()
         {
-            // Limpieza inicial para evitar acumulación de piezas duplicadas
             foreach (Transform child in wheelPiecesParent)
                 Destroy(child.gameObject);
             foreach (Transform child in linesParent)
                 Destroy(child.gameObject);
 
-            // Calcular tamaño base según cantidad de piezas
             float t = Mathf.InverseLerp(piecesMin, piecesMax, Mathf.Clamp(wheelPieces.Length, piecesMin, piecesMax));
             float pieceWidth = Mathf.Lerp(pieceMaxSize.x, pieceMinSize.x, t);
             float pieceHeight = Mathf.Lerp(pieceMaxSize.y, pieceMinSize.y, t);
@@ -284,60 +260,129 @@ namespace EasyUI.PickerWheelUI
             {
                 WheelPiece piece = wheelPieces[i];
 
-                // Instanciar pieza
                 GameObject pieceObj = Instantiate(wheelPiecePrefab, wheelPiecesParent);
-                Transform pieceTrns = pieceObj.transform.GetChild(0);
+                Transform pieceTrns = pieceObj.transform.GetChild(0); // Panel con VerticalLayoutGroup ('Fondo')
 
-                // Asignar sprite, label y cantidad
-                pieceTrns.GetChild(0).GetComponent<Image>().sprite = piece.Icon;
-                pieceTrns.GetChild(1).GetComponent<Text>().text = piece.Label;
-                pieceTrns.GetChild(2).GetComponent<Text>().text = piece.Amount.ToString();
+                // --- MODIFICACIÓN DE JERARQUÍA ---
 
-                // Ajustar tamaño del RectTransform sin deformar
+                Transform iconContainer = pieceTrns.Find("IconContainer");
+                if (iconContainer == null)
+                {
+                    Debug.LogError($"PickerWheel: No se encontró 'IconContainer' en el prefab '{wheelPiecePrefab.name}'");
+                    continue;
+                }
+
+                Transform iconTransform = iconContainer.Find("Icon");
+                if (iconTransform == null)
+                {
+                    Debug.LogError($"PickerWheel: No se encontró 'Icon' en '{iconContainer.name}'");
+                    continue;
+                }
+
+                Transform vfxIconObject = iconContainer.Find("Icon_VFX");
+                iconTransform.GetComponent<Image>().sprite = piece.Icon;
+                pieceTrns.Find("Label").GetComponent<Text>().text = piece.Label;
+                pieceTrns.Find("Amount").GetComponent<Text>().text = piece.Amount.ToString();
+
+                // --- FIN DE LA MODIFICACIÓN ---
+
                 RectTransform rt = pieceTrns.GetComponent<RectTransform>();
                 rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, pieceWidth);
                 rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, pieceHeight);
-                rt.localScale = Vector3.one; // 🔧 evita escalado acumulativo
+                rt.localScale = Vector3.one;
 
-                // Calcular rotación de la pieza
+                // --- CÓDIGO DE PARTÍCULAS (para Material Y Color) ---
+
+                if (vfxIconObject != null)
+                {
+                    if (piece.Effect != null)
+                    {
+                        bool vfxActive = false;
+
+                        ParticleSystem pSystem = vfxIconObject.GetComponent<ParticleSystem>();
+                        ParticleSystemRenderer vfxRenderer = vfxIconObject.GetComponent<ParticleSystemRenderer>();
+
+                        if (piece.Effect.vfxMaterial != null)
+                        {
+                            if (vfxRenderer != null)
+                            {
+                                vfxRenderer.material = piece.Effect.vfxMaterial;
+                                vfxActive = true;
+                            }
+                            else
+                            {
+                                Debug.LogError($"PickerWheel: El objeto 'VFX Icon' no tiene un componente ParticleSystemRenderer.");
+                            }
+                        }
+
+                        if (pSystem != null)
+                        {
+                            var mainModule = pSystem.main;
+                            mainModule.startColor = piece.Effect.vfxStartColor;
+                            vfxActive = true;
+                        }
+                        else
+                        {
+                            Debug.LogError($"PickerWheel: El objeto 'VFX Icon' no tiene un componente ParticleSystem.");
+                        }
+
+                        vfxIconObject.gameObject.SetActive(vfxActive);
+                    }
+                    else
+                    {
+                        vfxIconObject.gameObject.SetActive(false);
+                    }
+                }
+                // --- FIN DE LA MODIFICACIÓN ---
+
                 pieceTrns.RotateAround(wheelPiecesParent.position, Vector3.back, pieceAngle * i);
 
-                // Crear la línea divisoria
                 Transform lineTrns = Instantiate(linePrefab, linesParent.position, Quaternion.identity, linesParent).transform;
                 lineTrns.RotateAround(wheelPiecesParent.position, Vector3.back, (pieceAngle * i) + halfPieceAngle);
             }
         }
+
+        // ✅ --- MÉTODO CORREGIDO ---
         private void DrawPiece(int index)
         {
             WheelPiece piece = wheelPieces[index];
             Transform pieceTrns = InstantiatePiece().transform.GetChild(0);
 
-            // Solo mostrar el ícono
-            Image iconImage = pieceTrns.GetChild(0).GetComponent<Image>();
-            iconImage.sprite = piece.Icon;
+            Transform iconContainer = pieceTrns.Find("IconContainer");
+            if (iconContainer != null)
+            {
+                Transform iconTransform = iconContainer.Find("Icon");
+                if (iconTransform != null)
+                    iconTransform.GetComponent<Image>().sprite = piece.Icon;
+            }
 
-            // Ocultar el texto del label y cantidad si existen
-            Transform labelText = pieceTrns.childCount > 1 ? pieceTrns.GetChild(1) : null;
-            Transform amountText = pieceTrns.childCount > 2 ? pieceTrns.GetChild(2) : null;
+            Transform labelText = pieceTrns.Find("Label");
+            Transform amountText = pieceTrns.Find("Amount");
 
             if (labelText != null)
                 labelText.gameObject.SetActive(false);
             if (amountText != null)
                 amountText.gameObject.SetActive(false);
 
-            // Posicionar el icono
+            if (iconContainer != null)
+            {
+                Transform vfxIconObject = iconContainer.Find("VFX Icon");
+                if (vfxIconObject != null)
+                    vfxIconObject.gameObject.SetActive(false);
+            }
+
+            // ✅ LÍNEA CORREGIDA: 'i' reemplazado por 'index'
             pieceTrns.RotateAround(wheelPiecesParent.position, Vector3.back, pieceAngle * index);
 
-            // Crear la línea divisoria
             Transform lineTrns = Instantiate(linePrefab, linesParent.position, Quaternion.identity, linesParent).transform;
+
+            // ✅ LÍNEA CORREGIDA: 'i' reemplazado por 'index'
             lineTrns.RotateAround(wheelPiecesParent.position, Vector3.back, (pieceAngle * index) + halfPieceAngle);
         }
+        // ✅ --- FIN DE LA CORRECCIÓN ---
 
         private GameObject InstantiatePiece() => Instantiate(wheelPiecePrefab, wheelPiecesParent);
 
-        // ----------------------------------------------------
-        // 🧩 Aplicar premio al jugador
-        // ----------------------------------------------------
         public void AplicarUltimoPremio()
         {
             if (ultimoPremio == null)
@@ -345,28 +390,23 @@ namespace EasyUI.PickerWheelUI
                 Debug.LogWarning("⚠️ No hay premio para aplicar.");
                 return;
             }
-
             if (ultimoPremio.Effect == null)
             {
                 Debug.LogError($"❌ El WheelPiece '{ultimoPremio.Label}' no tiene asignado un PowerUpEffect.");
                 return;
             }
-
             GameObject player = GameObject.FindWithTag("Player");
             if (player == null)
             {
                 Debug.LogError("❌ No se encontró el Player en la escena.");
                 return;
             }
-
             ultimoPremio.Effect.Apply(player);
             Debug.Log($"✅ PowerUp aplicado: {ultimoPremio.Effect.label}");
         }
         public void CargarPremiosDesdePoolsPonderados()
         {
             PowerUpPool elegido = null;
-
-            // Buscar el pool ponderado elegido
             if (powerUpPools != null && powerUpPools.Count > 0)
             {
                 float total = 0f;
@@ -375,16 +415,13 @@ namespace EasyUI.PickerWheelUI
                     if (w != null && w.pool != null && w.weight > 0f)
                         total += w.weight;
                 }
-
                 if (total <= 0f)
                 {
                     Debug.LogError("❌ Todos los pesos de los pools están en 0. Asigná weights > 0.");
                     return;
                 }
-
                 float r = UnityEngine.Random.Range(0f, total);
                 float acc = 0f;
-
                 foreach (var w in powerUpPools)
                 {
                     if (w == null || w.pool == null || w.weight <= 0f) continue;
@@ -395,10 +432,8 @@ namespace EasyUI.PickerWheelUI
                         break;
                     }
                 }
-
                 if (elegido == null)
                 {
-                    // Fallback si algo sale mal
                     foreach (var w in powerUpPools)
                     {
                         if (w != null && w.pool != null && w.weight > 0f)
@@ -408,55 +443,42 @@ namespace EasyUI.PickerWheelUI
                         }
                     }
                 }
-
                 if (elegido != null)
                     Debug.Log($"🎲 Pool elegido por porcentaje: {elegido.name}");
             }
             else
             {
-                // Legacy: usa el pool único
                 elegido = powerUpPool;
                 if (elegido != null)
                     Debug.Log($"(LEGACY) Usando PowerUpPool: {elegido.name}");
             }
-
-            // Validaciones
             if (elegido == null || elegido.entries == null || elegido.entries.Length == 0)
             {
                 Debug.LogError("❌ No hay PowerUpPool válido o está vacío.");
                 return;
             }
-
-            // Construir las piezas de la ruleta
             wheelPieces = new WheelPiece[elegido.entries.Length];
-
             for (int i = 0; i < elegido.entries.Length; i++)
             {
                 PowerUpEntry entry = elegido.entries[i];
-
                 if (entry == null || entry.effect == null)
                 {
                     Debug.LogError($"❌ Entrada nula o sin efecto en índice {i}");
                     continue;
                 }
-
                 wheelPieces[i] = new WheelPiece
                 {
                     Icon = entry.effect.icon,
-                    Label = "", // ❌ no mostrar texto en la ruleta
+                    Label = "",
                     Amount = 1,
                     Chance = entry.chance,
                     Effect = entry.effect
                 };
-
             }
-
-            // Redibujar la ruleta
             foreach (Transform child in wheelPiecesParent)
                 Destroy(child.gameObject);
             foreach (Transform child in linesParent)
                 Destroy(child.gameObject);
-
             Generate();
             CalculateWeightsAndIndices();
         }
@@ -467,8 +489,6 @@ namespace EasyUI.PickerWheelUI
                 Debug.LogWarning("⚠️ No hay premio disponible para mostrar en el popup.");
                 return;
             }
-
-            // Si el popup no fue asignado manualmente, intenta encontrarlo automáticamente
             if (rewardPopup == null)
             {
                 rewardPopup = FindObjectOfType<RewardPopupUI>(true);
@@ -478,11 +498,9 @@ namespace EasyUI.PickerWheelUI
                     return;
                 }
             }
-
             Sprite sprite = ultimoPremio.Icon;
             string name = (ultimoPremio.Effect != null) ? ultimoPremio.Effect.label : "Recompensa";
             string desc = ultimoPremio.Effect != null ? ultimoPremio.Effect.description : "Sin descripción";
-
             rewardPopup.ShowReward(sprite, name, desc);
         }
         public void AddSpinStartListener(UnityAction callback) => onSpinStartEvent += callback;

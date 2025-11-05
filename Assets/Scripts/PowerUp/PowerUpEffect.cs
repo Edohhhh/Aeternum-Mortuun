@@ -9,8 +9,17 @@ public class PowerUpEffect : ScriptableObject
     [TextArea(2, 4)] public string description;
     public Sprite icon;
 
+    [Header("VFX")]
+    [Tooltip("Arrastra aquí el MATERIAL de partículas (ej: UIParticle_Blue)")]
+    public Material vfxMaterial;
+
+    // ✅ --- LÍNEA AÑADIDA ---
+    [Tooltip("El color de inicio que tendrán las partículas")]
+    public Color vfxStartColor = Color.white; // Default a blanco
+    // ✅ --- FIN ---
+
     [Header("Efecto")]
-    public PowerUp powerUp; 
+    public PowerUp powerUp;
 
     public void Apply(GameObject playerObj)
     {
@@ -33,10 +42,10 @@ public class PowerUpEffect : ScriptableObject
             return;
         }
 
-       
+
         powerUp.Apply(controller);
 
-        
+
         if (controller.initialPowerUps == null)
             controller.initialPowerUps = new PowerUp[0];
 
@@ -52,15 +61,8 @@ public class PowerUpEffect : ScriptableObject
             Debug.Log($"ℹ️ PowerUp '{powerUp.name}' ya estaba asignado.");
         }
 
-   
+
         if (powerUp.effect == null)
             powerUp.effect = this;
-
-
-        var ui = Object.FindObjectOfType<PowerUpUI>();
-        if (ui != null)
-        {
-            ui.RefreshUI();
-        }
     }
 }
