@@ -10837,8 +10837,7 @@ MonoBehaviour:
   animator: {fileID: 0}
   rb: {fileID: 0}
   hitbox: {fileID: 1715398195}
-  initialPowerUps:
-  - {fileID: 11400000, guid: eca52cc6fcef64cc5b24c52170419da3, type: 2}
+  initialPowerUps: []
   lastNonZeroMoveInput: {x: 1, y: 0}
   dashCooldownTimer: 0
   knockbackDecay: 18
@@ -13298,6 +13297,14 @@ PrefabInstance:
       propertyPath: m_Size.y
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 4169325431073955929, guid: 4e223373eb5c48949bae3911acd4a5ab, type: 3}
+      propertyPath: m_SpriteTilingProperty.newSize.x
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4169325431073955929, guid: 4e223373eb5c48949bae3911acd4a5ab, type: 3}
+      propertyPath: m_SpriteTilingProperty.newSize.y
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 7268702320847530874, guid: 4e223373eb5c48949bae3911acd4a5ab, type: 3}
       propertyPath: m_LocalPosition.x
       value: 4.8880215
@@ -13338,6 +13345,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7594743268992949050, guid: 4e223373eb5c48949bae3911acd4a5ab, type: 3}
+      propertyPath: maxHealth
+      value: 325
+      objectReference: {fileID: 0}
+    - target: {fileID: 7594743268992949050, guid: 4e223373eb5c48949bae3911acd4a5ab, type: 3}
+      propertyPath: currentHealth
+      value: 325
+      objectReference: {fileID: 0}
+    - target: {fileID: 7594743268992949050, guid: 4e223373eb5c48949bae3911acd4a5ab, type: 3}
+      propertyPath: hitParticlePrefab
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7594743268992949050, guid: 4e223373eb5c48949bae3911acd4a5ab, type: 3}
+      propertyPath: damageNumberPrefab
+      value: 
+      objectReference: {fileID: 784950756064908022, guid: cb52f7cb821b7499cbf468b37d6727fa, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:

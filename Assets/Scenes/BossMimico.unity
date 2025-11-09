@@ -9981,6 +9981,18 @@ PrefabInstance:
       propertyPath: playerMaskForBullets.m_Bits
       value: 64
       objectReference: {fileID: 0}
+    - target: {fileID: 6766060275267724997, guid: eb7455f0ee67e9f41974dc9c1a2a4398, type: 3}
+      propertyPath: maxHealth
+      value: 225
+      objectReference: {fileID: 0}
+    - target: {fileID: 6766060275267724997, guid: eb7455f0ee67e9f41974dc9c1a2a4398, type: 3}
+      propertyPath: currentHealth
+      value: 225
+      objectReference: {fileID: 0}
+    - target: {fileID: 6766060275267724997, guid: eb7455f0ee67e9f41974dc9c1a2a4398, type: 3}
+      propertyPath: damageNumberPrefab
+      value: 
+      objectReference: {fileID: 784950756064908022, guid: cb52f7cb821b7499cbf468b37d6727fa, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -14014,8 +14026,7 @@ MonoBehaviour:
   animator: {fileID: 0}
   rb: {fileID: 0}
   hitbox: {fileID: 1715398195}
-  initialPowerUps:
-  - {fileID: 11400000, guid: eca52cc6fcef64cc5b24c52170419da3, type: 2}
+  initialPowerUps: []
   lastNonZeroMoveInput: {x: 1, y: 0}
   dashCooldownTimer: 0
   knockbackDecay: 18

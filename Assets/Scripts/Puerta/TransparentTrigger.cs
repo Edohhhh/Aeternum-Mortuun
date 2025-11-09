@@ -5,9 +5,6 @@ public class TransparentTrigger : MonoBehaviour
     [Header("Sprite a hacer transparente")]
     [SerializeField] private SpriteRenderer targetSprite;
 
-    [Header("Objeto a eliminar al entrar")]
-    [SerializeField] private GameObject objectToDestroy;
-
     [Header("Transparencia deseada (0 = invisible, 1 = opaco)")]
     [Range(0f, 1f)]
     [SerializeField] private float transparentAlpha = 0.3f;
@@ -30,12 +27,6 @@ public class TransparentTrigger : MonoBehaviour
                 Color c = targetSprite.color;
                 c.a = transparentAlpha;
                 targetSprite.color = c;
-            }
-
-            // Destruir el objeto asignado
-            if (objectToDestroy != null)
-            {
-                Destroy(objectToDestroy);
             }
         }
     }

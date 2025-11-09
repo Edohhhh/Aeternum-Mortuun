@@ -23,6 +23,12 @@ public class EnemyHealth : MonoBehaviour
     private readonly Color damageColor = Color.red;
     private float flashDuration = 0.1f;
 
+    [Header("Partículas al recibir daño")]
+    [SerializeField] private GameObject hitParticlePrefab;
+
+    [Header("FX Daño (números)")]
+    [SerializeField] private DamageNumberFX damageNumberPrefab;
+
 
     private void Awake()
     {
@@ -94,6 +100,22 @@ public class EnemyHealth : MonoBehaviour
             }
             OnDeath?.Invoke();
         }
+
+        if (hitParticlePrefab != null)
+        {
+            var fx = Instantiate(hitParticlePrefab, transform.position, Quaternion.identity);
+            var bones = fx.GetComponent<BoneBurstFX>();
+            if (bones != null) bones.Init(knockbackDir);
+        }
+
+        if (damageNumberPrefab != null)
+        {
+            // Un pequeño offset arriba del enemigo para que no se tape con el sprite
+            Vector3 spawnPos = transform.position + new Vector3(0f, 0.4f, 0f);
+            var num = Instantiate(damageNumberPrefab, spawnPos, Quaternion.identity);
+            num.Init(damage, knockbackDir); // usamos la dirección del golpe que ya recibís aquí
+        }
+
     }
 
     private IEnumerator FlashRed()
