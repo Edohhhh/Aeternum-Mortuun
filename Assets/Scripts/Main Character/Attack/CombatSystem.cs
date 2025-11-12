@@ -98,8 +98,8 @@ public class CombatSystem : MonoBehaviour
         }
 
         // SFX
-      //  if (AudioManager.Instance != null)
-        //    AudioManager.Instance.PlayWithRandomPitch("swing", 0.95f, 1.05f);
+        //  if (AudioManager.Instance != null)
+        //  AudioManager.Instance.PlayWithRandomPitch("swing", 0.95f, 1.05f);
 
         // VFX
         Vector2 spawnPos = (Vector2)transform.position + LastAttackDir * hitboxOffset;

@@ -8,7 +8,8 @@ public class PlayerController : MonoBehaviour
     public float moveSpeed = 90f;
 
     [Header("Combate")]
-    public int baseDamage = 1;
+    // ✅ --- VALOR CAMBIADO ---
+    public int baseDamage = 3;
 
     // ✅ --- AÑADIDO ---
     [Header("Stats de Ruleta")]
@@ -136,9 +137,9 @@ public class PlayerController : MonoBehaviour
         {
             bool enAtaque = animator.GetBool("isAttacking");
             bool bloqueado = stateMachine.CurrentState == RecoilState ||
-                             stateMachine.CurrentState == KnockbackState ||
-                             stateMachine.CurrentState == DashState ||
-                             enAtaque;
+                                stateMachine.CurrentState == KnockbackState ||
+                                stateMachine.CurrentState == DashState ||
+                                enAtaque;
 
             animator.SetBool("isMoving", !bloqueado && canMove && moveInput.sqrMagnitude > 0.0001f);
         }
@@ -228,7 +229,9 @@ public class PlayerController : MonoBehaviour
         // ✅ --- RESETEAR STATS BASE ---
         // ¡VITAL! Resetea stats a su valor por defecto ANTES de
         // reaplicar los power-ups, para evitar que se stackeen.
-        this.baseDamage = 1; // (O tu valor base por defecto)
+
+        // ✅ --- VALOR CAMBIADO ---
+        this.baseDamage = 3; // (O tu valor base por defecto)
         this.extraSpins = 0;
         // (Añade aquí cualquier otra stat que tus power-ups modifiquen)
 
@@ -246,5 +249,5 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
-   
+
 }
