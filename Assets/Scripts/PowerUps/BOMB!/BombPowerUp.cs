@@ -12,15 +12,25 @@ public class BombPowerUp : PowerUp
 
     public override void Apply(PlayerController player)
     {
-        if (GameObject.Find("BombObserver") != null) return;
+        var existing = GameObject.Find("BombObserver");
+        BombComboObserver obs;
 
-        GameObject observer = new GameObject("BombObserver");
-        var bombTrigger = observer.AddComponent<BombComboObserver>();
-        bombTrigger.player = player;
-        bombTrigger.bombPrefab = bombPrefab;
-        bombTrigger.spawnChance = spawnChance;
+        if (existing == null)
+        {
+            var go = new GameObject("BombObserver");
+            go.name = "BombObserver";
+            obs = go.AddComponent<BombComboObserver>();
+            Object.DontDestroyOnLoad(go);
+        }
+        else
+        {
+            obs = existing.GetComponent<BombComboObserver>();
+        }
 
-        Object.DontDestroyOnLoad(observer);
+        // Configurar/actualizar bindings
+        obs.player = player;               // se reasigna también al cambiar de escena
+        obs.bombPrefab = bombPrefab;
+        obs.spawnChance = spawnChance;
     }
 
     public override void Remove(PlayerController player)

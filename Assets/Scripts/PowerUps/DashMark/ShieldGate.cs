@@ -1,105 +1,74 @@
 ﻿using UnityEngine;
-using System;
-using System.Reflection;
+
 
 public class ShieldGate : MonoBehaviour
 {
-    [Header("Escudo visual (opcional)")]
-    [Tooltip("Prefab del c�rculo o aura que aparece mientras el escudo est� activo")]
-    public GameObject shieldVisualPrefab;
+    [Header("Icono sobre la cabeza")]
+    public Sprite shieldIconSprite;          // Seteado por DashMark (viene del SO)
+    public Vector3 iconOffset = new Vector3(0f, 1.2f, 0f);
+    public float iconBobAmplitude = 0.08f;
+    public float iconBobSpeed = 3f;
 
-    private GameObject visualInstance;
+    [Tooltip("Opcional: Sorting Layer para el icono (vacío = ignorar)")]
+    public string iconSortingLayer = "";
+    public int iconSortingOrder = 9999;
 
-    [Header("Opcional: capa invulnerable")]
-    public string invulnLayerName = "PlayerInvulnerable"; // si no existe, se ignora
-
+    private GameObject iconInstance;
     private PlayerHealth ph;
-    private float timer;
+
     private bool active;
-
-    // Snapshot
     private float lastHealth;
-
-    // Reflection hooks
-    private FieldInfo invFlagField;
-    private PropertyInfo invFlagProp;
-    private MethodInfo setInvMethod;
-    private EventInfo onDamagedEvent;
-    private Delegate onDamagedHandler;
-
-    private int originalLayer = -1;
-    private int invulnLayer = -1;
 
     private void Awake()
     {
         ph = GetComponent<PlayerHealth>();
         if (ph != null) lastHealth = ph.currentHealth;
-
-        int layerId = LayerMask.NameToLayer(invulnLayerName);
-        if (layerId >= 0) invulnLayer = layerId;
-
-        if (ph != null)
-        {
-            var t = ph.GetType();
-            invFlagField = t.GetField("invincible", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                         ?? t.GetField("isInvincible", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                         ?? t.GetField("invulnerable", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                         ?? t.GetField("iFrames", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-
-            invFlagProp = t.GetProperty("Invincible", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                       ?? t.GetProperty("IsInvincible", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-
-            setInvMethod = t.GetMethod("SetInvincible", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-
-            onDamagedEvent = t.GetEvent("OnDamaged", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                          ?? t.GetEvent("DamageTaken", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-        }
     }
 
-    public void Activate(float duration)
+    public void ActivateOneHit()
     {
-        timer = Mathf.Max(timer, duration);
         if (active) return;
-
         active = true;
-
-        TrySetInvincible(true);
-        TrySubscribeDamageEvent();
-
-        if (invulnLayer >= 0)
-        {
-            originalLayer = gameObject.layer;
-            gameObject.layer = invulnLayer;
-        }
 
         if (ph != null) lastHealth = ph.currentHealth;
 
-        // ?? Instanciar el prefab visual (c�rculo)
-        if (shieldVisualPrefab != null)
+        if (shieldIconSprite != null && iconInstance == null)
         {
-            visualInstance = Instantiate(shieldVisualPrefab, transform.position, Quaternion.identity, transform);
+            iconInstance = new GameObject("ShieldIcon");
+            var sr = iconInstance.AddComponent<SpriteRenderer>();
+            sr.sprite = shieldIconSprite;
+
+            if (!string.IsNullOrEmpty(iconSortingLayer))
+                sr.sortingLayerName = iconSortingLayer;
+            sr.sortingOrder = iconSortingOrder;
+
+            var follow = iconInstance.AddComponent<ShieldIconFollow>();
+            follow.target = transform;
+            follow.offset = iconOffset;
+            follow.bobAmplitude = iconBobAmplitude;
+            follow.bobSpeed = iconBobSpeed;
         }
     }
 
     private void Update()
     {
-        if (!active) return;
+        if (!active || ph == null) return;
 
-        timer -= Time.deltaTime;
-
-        if (ph != null && ph.currentHealth < lastHealth)
+        if (ph.currentHealth < lastHealth)
         {
             ph.currentHealth = lastHealth;
-        }
-        else if (ph != null)
-        {
-            lastHealth = ph.currentHealth;
+
+            if (ph.healthUI != null)
+            {
+                ph.healthUI.Initialize(ph.maxHealth);
+                ph.healthUI.UpdateHearts(ph.currentHealth);
+            }
+
+            Deactivate();
+            return;
         }
 
-        if (timer <= 0f)
-        {
-            Deactivate();
-        }
+        lastHealth = ph.currentHealth;
     }
 
     private void Deactivate()
@@ -107,69 +76,9 @@ public class ShieldGate : MonoBehaviour
         if (!active) return;
         active = false;
 
-        TrySetInvincible(false);
-        TryUnsubscribeDamageEvent();
-
-        if (originalLayer >= 0)
-        {
-            gameObject.layer = originalLayer;
-            originalLayer = -1;
-        }
-
-        // ? Destruir el prefab visual
-        if (visualInstance != null)
-        {
-            Destroy(visualInstance);
-        }
+        if (iconInstance != null) Destroy(iconInstance);
+        iconInstance = null;
 
         Destroy(this);
-    }
-
-    private void TrySetInvincible(bool val)
-    {
-        try
-        {
-            if (ph == null) return;
-
-            if (invFlagField != null && invFlagField.FieldType == typeof(bool))
-                invFlagField.SetValue(ph, val);
-
-            if (invFlagProp != null && invFlagProp.PropertyType == typeof(bool) && invFlagProp.CanWrite)
-                invFlagProp.SetValue(ph, val);
-
-            if (setInvMethod != null)
-                setInvMethod.Invoke(ph, new object[] { val });
-        }
-        catch { }
-    }
-
-    private void TrySubscribeDamageEvent()
-    {
-        try
-        {
-            if (ph == null || onDamagedEvent == null) return;
-            onDamagedHandler = Delegate.CreateDelegate(
-                onDamagedEvent.EventHandlerType,
-                this,
-                typeof(ShieldGate).GetMethod(nameof(OnPreDamageRelay), BindingFlags.NonPublic | BindingFlags.Instance));
-            onDamagedEvent.AddEventHandler(ph, onDamagedHandler);
-        }
-        catch { }
-    }
-
-    private void TryUnsubscribeDamageEvent()
-    {
-        try
-        {
-            if (ph == null || onDamagedEvent == null || onDamagedHandler == null) return;
-            onDamagedEvent.RemoveEventHandler(ph, onDamagedHandler);
-            onDamagedHandler = null;
-        }
-        catch { }
-    }
-
-    private void OnPreDamageRelay(params object[] _)
-    {
-        if (ph != null) lastHealth = ph.currentHealth;
     }
 }

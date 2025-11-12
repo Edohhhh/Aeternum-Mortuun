@@ -8,13 +8,20 @@ public class DashMarkObserver : MonoBehaviour
     public PlayerController player;
     public GameObject markPrefab;
 
-    [Header("Tiempos")]
-    public float shieldDuration = 3f;
+    [Header("Marca")]
     public float markLifetime = 3f;
 
-    [Header("Spawn aleatorio")]
+    [Header("Spawn aleatorio ligero alrededor del origen del dash")]
     public float maxOffsetX = 0.6f;
     public float maxOffsetY = 0.4f;
+
+    [Header("Icono (inyectado desde la perk)")]
+    public Sprite iconSprite;
+    public Vector3 iconOffset = new Vector3(0f, 1.2f, 0f);
+    public string iconSortingLayer = "";
+    public int iconSortingOrder = 9999;
+    public float iconBobAmplitude = 0.08f;
+    public float iconBobSpeed = 3f;
 
     private bool wasDashing;
     private Vector3 dashStartPos;
@@ -47,13 +54,9 @@ public class DashMarkObserver : MonoBehaviour
 
         bool isDashing = player.stateMachine != null && player.stateMachine.CurrentState == player.DashState;
 
-        // Flanco de subida (acaba de empezar el dash): guardo la posici�n
         if (isDashing && !wasDashing)
-        {
             dashStartPos = player.transform.position;
-        }
 
-        // Flanco de bajada (acaba de terminar el dash): spawneo la marca atr�s
         if (!isDashing && wasDashing)
         {
             Vector2 off = new(Random.Range(-maxOffsetX, maxOffsetX),
@@ -66,9 +69,14 @@ public class DashMarkObserver : MonoBehaviour
 
     private void SpawnMarkAt(Vector3 pos)
     {
-        var mark = Instantiate(markPrefab, pos, Quaternion.identity);
-        var comp = mark.GetComponent<DashMark>();
-        if (comp == null) comp = mark.AddComponent<DashMark>();
-        comp.Initialize(shieldDuration, markLifetime);
+        var go = Instantiate(markPrefab, pos, Quaternion.identity);
+        var comp = go.GetComponent<DashMark>();
+        if (comp == null) comp = go.AddComponent<DashMark>();
+
+        // Inicializar duración de la marca
+        comp.Initialize(markLifetime);
+
+        // ► Pasar al DashMark la config del icono (que vino del ScriptableObject)
+        comp.ConfigureIcon(iconSprite, iconOffset, iconSortingLayer, iconSortingOrder, iconBobAmplitude, iconBobSpeed);
     }
 }

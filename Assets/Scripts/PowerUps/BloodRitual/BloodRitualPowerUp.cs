@@ -1,4 +1,5 @@
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 [CreateAssetMenu(fileName = "BloodRitualPowerUp", menuName = "PowerUps/Blood Ritual")]
 public class BloodRitualPowerUp : PowerUp
@@ -6,28 +7,35 @@ public class BloodRitualPowerUp : PowerUp
     [Range(0f, 1f)] public float healChance = 0.1f;
     public float healAmount = 0.5f;
 
-    private GameObject observerInstance;
-
     public override void Apply(PlayerController player)
     {
-        if (observerInstance != null) return;
+        // Singleton del observer
+        var existing = GameObject.Find("BloodRitualObserver");
+        BloodRitualObserver obs;
 
-        observerInstance = new GameObject("BloodRitualObserver");
-        var observer = observerInstance.AddComponent<BloodRitualObserver>();
-        observer.healChance = healChance;
-        observer.healAmount = healAmount;
-        observer.player = player;
+        if (existing == null)
+        {
+            var go = new GameObject("BloodRitualObserver");
+            go.name = "BloodRitualObserver";
+            obs = go.AddComponent<BloodRitualObserver>();
+            Object.DontDestroyOnLoad(go);
+        }
+        else
+        {
+            obs = existing.GetComponent<BloodRitualObserver>();
+        }
 
-        Object.DontDestroyOnLoad(observerInstance);
+        // Config
+        obs.healChance = healChance;
+        obs.healAmount = healAmount;
+
+        // Player actual (se re-enlaza solo en cada escena)
+        obs.BindPlayer(player);
     }
 
     public override void Remove(PlayerController player)
     {
-        if (observerInstance != null)
-        {
-            GameObject.Destroy(observerInstance);
-            observerInstance = null;
-        }
+        var go = GameObject.Find("BloodRitualObserver");
+        if (go != null) Object.Destroy(go);
     }
 }
-

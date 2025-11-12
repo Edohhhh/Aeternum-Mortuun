@@ -9,10 +9,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b2342b665a2061b4ea3cef98f5ad1f2f, type: 3}
-  m_Name: PowerDashPowerUp
+  m_Script: {fileID: 11500000, guid: d07c9d44d56126846a0fb2bddea0aaa8, type: 3}
+  m_Name: DiceRNGPowerUp
   m_EditorClassIdentifier: 
   duration: 5
   isPermanent: 0
   effect: {fileID: 0}
-  dashMarkPrefab: {fileID: 4228098805220149113, guid: c51dce0c5ca9ef94abcb031bae4c3f6e, type: 3}
+  diceFaces: fdfffffffeffffffffffffff010000000200000003000000
+  rollAnimPerStat: 0.6
+  showFinalFor: 5

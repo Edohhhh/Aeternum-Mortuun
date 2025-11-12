@@ -1,22 +1,22 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
+using Object = UnityEngine.Object;
 
-[CreateAssetMenu(fileName = "DarkSacrificePowerUp", menuName = "PowerUps/Dark Sacrifice")] 
+[CreateAssetMenu(fileName = "DarkSacrificePowerUp", menuName = "PowerUps/Dark Sacrifice")]
 public class DarkSacrificePowerUp : PowerUp
 {
-    [Header("Configuraci�n de la marca")]
+    [Header("Prefab de la marca")]
     public GameObject markerPrefab;
 
-    [Tooltip("Capa que se considera obst�culo para evitar spawnear encima (ej: Walls, Ground)")] 
-    public LayerMask obstacleMask;
+    [Header("Spawn")]
+    [Tooltip("Cada cuántos segundos aparece una nueva marca bajo el jugador")]
+    public float spawnIntervalSeconds = 6f;
 
-    [Tooltip("Radio para verificar colisi�n con obst�culos")]
-    public float checkRadius = 0.3f;
+    [Tooltip("Cuánto dura la marca antes de desaparecer")]
+    public float markerLifetimeSeconds = 3f;
 
-    [Tooltip("Distancia m�xima horizontal desde el jugador (izquierda/derecha)")]
-    public float maxOffsetX = 5f;
-
-    [Tooltip("Distancia m�xima vertical desde el jugador (arriba/abajo)")]
-    public float maxOffsetY = 3f;
+    [Tooltip("Pequeño ajuste vertical (negativo = un poco más abajo)")]
+    public float yOffset = 0f;
 
     public override void Apply(PlayerController player)
     {
@@ -26,43 +26,34 @@ public class DarkSacrificePowerUp : PowerUp
             return;
         }
 
-        // evitar duplicar el marcador 
-        if (GameObject.Find("DarkSacrificeMarker") != null)
-            return;
-
-        // calcular una posici�n aleatoria cerca del jugador 
-        Vector2 basePos = player.transform.position;
-        Vector2 spawnPosition = GetValidRandomPosition(basePos);
-
-        // instanciar la marca 
-        GameObject marker = GameObject.Instantiate(markerPrefab, spawnPosition,
-Quaternion.identity);
-        marker.name = "DarkSacrificeMarker";
-        GameObject.DontDestroyOnLoad(marker);
-    }
-
-    private Vector2 GetValidRandomPosition(Vector2 basePos)
-    {
-        Vector2 spawnPos = basePos + new Vector2(Random.Range(-maxOffsetX,
-maxOffsetX),
-                                                 Random.Range(-maxOffsetY, maxOffsetY));
-
-        // hasta 8 intentos para encontrar un lugar libre 
-        const int maxTries = 8;
-        for (int i = 0; i < maxTries; i++)
+        // Singleton del observer
+        var existing = GameObject.Find("DarkSacrificeObserver");
+        DarkSacrificeObserver obs;
+        if (existing == null)
         {
-            if (!Physics2D.OverlapCircle(spawnPos, checkRadius, obstacleMask))
-                break;
-
-            spawnPos = basePos + new Vector2(Random.Range(-maxOffsetX, maxOffsetX),
-                                             Random.Range(-maxOffsetY, maxOffsetY));
+            var go = new GameObject("DarkSacrificeObserver");
+            obs = go.AddComponent<DarkSacrificeObserver>();
+            go.name = "DarkSacrificeObserver";
+            Object.DontDestroyOnLoad(go);
+        }
+        else
+        {
+            obs = existing.GetComponent<DarkSacrificeObserver>();
         }
 
-        return spawnPos;
+        obs.markerPrefab = markerPrefab;
+        obs.spawnInterval = Mathf.Max(0.5f, spawnIntervalSeconds);
+        obs.markerLifetime = Mathf.Max(0.2f, markerLifetimeSeconds);
+        obs.yOffset = yOffset;
+
+        // Vincular player actual (el observer se re-vincula solo en cada escena)
+        obs.BindPlayer(player);
+        obs.EnableSpawning(true);
     }
 
     public override void Remove(PlayerController player)
     {
-        // la marca se destruye sola o con el cambio de escena. 
+        var go = GameObject.Find("DarkSacrificeObserver");
+        if (go != null) Object.Destroy(go);
     }
 }
