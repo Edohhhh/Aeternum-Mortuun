@@ -16,6 +16,11 @@ public class MimicBulletStraight : MonoBehaviour
         speed = spd;
         damage = dmg;
         playerMask = mask;
+
+        // --- NUEVO: hace que la bala mire hacia la dirección del disparo ---
+        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.Euler(0, 0, angle);
+
         Destroy(gameObject, lifetime);
     }
 

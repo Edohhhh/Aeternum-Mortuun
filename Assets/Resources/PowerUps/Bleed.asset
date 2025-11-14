@@ -16,4 +16,6 @@ MonoBehaviour:
   isPermanent: 1
   effect: {fileID: 11400000, guid: 188473e58f2d0d045b07a7b5cebdb879, type: 2}
   bleedChance: 1
-  startingBleedDamage: 3
+  startingBleedDamage: 5
+  bleedCooldown: 10
+  bleedVfxPrefab: {fileID: 986296328853669327, guid: df28ae2de010d4a62a11846a4b25cf96, type: 3}

@@ -3,20 +3,28 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "SlowOnHitPowerUp", menuName = "PowerUps/Slow On Any Damage")]
 public class SlowOnHitPowerUp : PowerUp
 {
+    [Header("Slow Settings")]
     public float slowPercent = 0.05f;
     public float Slowduration = 2f;
 
+    [Header("VFX")]
+    public GameObject slowEffectPrefab; // <-- tu prefab de partícula
+
     public override void Apply(PlayerController player)
     {
-        // Crear el observer
-        if (Object.FindAnyObjectByType<GlobalEnemyDamageObserver>() == null)
+        // Buscar o crear el observer
+        var observer = Object.FindAnyObjectByType<GlobalEnemyDamageObserver>();
+        if (observer == null)
         {
             var go = new GameObject("GlobalEnemyDamageObserver");
-            var observer = go.AddComponent<GlobalEnemyDamageObserver>();
-            observer.slowPercent = slowPercent;
-            observer.duration = Slowduration;
+            observer = go.AddComponent<GlobalEnemyDamageObserver>();
             Object.DontDestroyOnLoad(go);
         }
+
+        // Configurar parámetros del slow y el prefab
+        observer.slowPercent = slowPercent;
+        observer.duration = Slowduration;
+        observer.slowEffectPrefab = slowEffectPrefab;
 
         // Agregar hook a todos los enemigos activos
         foreach (var enemy in GameObject.FindGameObjectsWithTag("Enemy"))
@@ -33,4 +41,3 @@ public class SlowOnHitPowerUp : PowerUp
         // Nada, efecto es temporal y autocontrolado
     }
 }
-

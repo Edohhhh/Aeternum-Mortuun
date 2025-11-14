@@ -3,29 +3,37 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "KeenEdgePowerUp", menuName = "PowerUps/Keen Edge (Bleed)")]
 public class KeenEdgePowerUp : PowerUp
 {
+    [Header("Bleed Settings")]
     [Range(0f, 1f)] public float bleedChance = 0.05f;
     public int startingBleedDamage = 3;
+    public float bleedCooldown = 2f;
 
-    private GameObject instance;
+    [Header("VFX")]
+    public GameObject bleedVfxPrefab;
+
+    private GameObject observerInstance;
 
     public override void Apply(PlayerController player)
     {
-        if (instance != null) return;
+        if (observerInstance != null) return;
 
-        instance = new GameObject("KeenEdgeObserver");
-        var observer = instance.AddComponent<KeenEdgeObserver>();
+        observerInstance = new GameObject("KeenEdgeObserver");
+        var observer = observerInstance.AddComponent<KeenEdgeObserver>();
+
         observer.bleedChance = bleedChance;
         observer.bleedStartDamage = startingBleedDamage;
+        observer.bleedCooldown = bleedCooldown;
+        observer.bleedVfxPrefab = bleedVfxPrefab;
 
-        Object.DontDestroyOnLoad(instance);
+        Object.DontDestroyOnLoad(observerInstance);
     }
 
     public override void Remove(PlayerController player)
     {
-        if (instance != null)
+        if (observerInstance != null)
         {
-            Destroy(instance);
-            instance = null;
+            Object.Destroy(observerInstance);
+            observerInstance = null;
         }
     }
 }

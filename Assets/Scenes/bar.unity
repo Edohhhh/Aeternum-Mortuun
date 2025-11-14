@@ -617,10 +617,11 @@ MonoBehaviour:
   interactKey: 102
   interactIcon: {fileID: 3586741604311950002, guid: e5c2a70ce542543008496729a857058b, type: 3}
   interactRendererInScene: {fileID: 0}
-  spriteOffsetY: 1.5
+  spriteOffsetY: 1
   playerTag: Player
   iconSortingLayer: UI
   iconSortingOrder: 50
+  maxDialogueDistance: 3.5
 --- !u!212 &83027759
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -3166,10 +3167,11 @@ MonoBehaviour:
   interactKey: 102
   interactIcon: {fileID: 3586741604311950002, guid: e5c2a70ce542543008496729a857058b, type: 3}
   interactRendererInScene: {fileID: 0}
-  spriteOffsetY: 1.5
+  spriteOffsetY: 1
   playerTag: Player
   iconSortingLayer: UI
   iconSortingOrder: 50
+  maxDialogueDistance: 3.5
 --- !u!212 &367767489
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -6865,7 +6867,7 @@ MonoBehaviour:
   interactKey: 102
   playerTag: Player
   interactIcon: {fileID: 3586741604311950002, guid: e5c2a70ce542543008496729a857058b, type: 3}
-  iconOffsetY: 1.5
+  iconOffsetY: 2.3
   perksACobrar: 2
   noPerksMessage: No tienes suficientes Perks para usar la ruleta.
   wheelUIController: {fileID: 0}
@@ -6903,7 +6905,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.062814474, y: -0.15075493}
+  m_Offset: {x: -0.116612196, y: -0.15075493}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -6913,7 +6915,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1.9547801, y: 1.3015099}
+  m_Size: {x: 2.3136334, y: 1.3015099}
   m_EdgeRadius: 0
 --- !u!4 &923966675
 Transform:
@@ -6924,7 +6926,7 @@ Transform:
   m_GameObject: {fileID: 923966672}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.45, y: 6.85, z: -0.01694411}
+  m_LocalPosition: {x: -5.37, y: 6.85, z: -0.01694411}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -17810,10 +17812,11 @@ MonoBehaviour:
   interactKey: 102
   interactIcon: {fileID: 3586741604311950002, guid: e5c2a70ce542543008496729a857058b, type: 3}
   interactRendererInScene: {fileID: 0}
-  spriteOffsetY: 1.5
+  spriteOffsetY: 1
   playerTag: Player
   iconSortingLayer: UI
   iconSortingOrder: 50
+  maxDialogueDistance: 3.5
 --- !u!212 &1747442134
 SpriteRenderer:
   m_ObjectHideFlags: 0

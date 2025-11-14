@@ -7,20 +7,24 @@ public class BurnOnHitPowerUp : PowerUp
     public float burnDuration = 5f;
     public float cooldownPerEnemy = 10f;
 
+    public GameObject burnVfxPrefab;
+
     private GameObject observerInstance;
 
     public override void Apply(PlayerController player)
     {
         if (observerInstance != null) return;
 
-        // Crear el observer global
+        // Crear observer
         observerInstance = new GameObject("BurnOnHitObserver");
         var observer = observerInstance.AddComponent<BurnOnHitObserver>();
+
         observer.damagePerSecond = damagePerSecond;
         observer.duration = burnDuration;
         observer.cooldownPerEnemy = cooldownPerEnemy;
 
-        // Agregar el auto-hook manager
+        observer.burnVfxPrefab = burnVfxPrefab;
+
         observerInstance.AddComponent<BurnHookManager>();
 
         Object.DontDestroyOnLoad(observerInstance);
@@ -35,9 +39,6 @@ public class BurnOnHitPowerUp : PowerUp
         }
 
         foreach (var extra in Object.FindObjectsByType<BurnOnHitObserver>(FindObjectsSortMode.None))
-        {
             Object.Destroy(extra.gameObject);
-        }
-
     }
 }
