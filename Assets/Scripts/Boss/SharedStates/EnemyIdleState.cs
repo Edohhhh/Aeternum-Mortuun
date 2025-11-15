@@ -7,6 +7,7 @@ public class EnemyIdleState : State<EnemyInputs>
     private float timer = 0f;
     private SpriteRenderer spriteRenderer;
 
+    // Este es el constructor que usan tus Slimes (1 o 2 argumentos)
     public EnemyIdleState(Transform enemy, float idleTime = 2f)
     {
         this.enemy = enemy;
@@ -18,7 +19,7 @@ public class EnemyIdleState : State<EnemyInputs>
     {
         base.Awake();
         timer = 0f;
-        
+
     }
 
     public override void Execute()
@@ -27,12 +28,12 @@ public class EnemyIdleState : State<EnemyInputs>
 
         if (timer >= idleTime)
         {
-            
+            // (Tu lógica original de timer)
         }
     }
 
     public override void Sleep()
     {
-        
+
     }
 }

@@ -4,13 +4,21 @@ using UnityEngine;
 
 public class State<T>
 {
-    protected FSM<T> _fsm; 
-    protected Dictionary<T, State<T>> transitions = new Dictionary<T, State<T>>(); 
+    protected FSM<T> _fsm;
+    protected Dictionary<T, State<T>> transitions = new Dictionary<T, State<T>>();
 
-    
+
+    /// <summary>
+    /// Método para que la FSM (BombaController) asigne la referencia
+    /// </summary>
+    public void SetFSM(FSM<T> fsm)
+    {
+        _fsm = fsm;
+    }
+
     public virtual void Awake()
     {
-      
+
     }
 
     public virtual void Execute() { }
@@ -19,20 +27,20 @@ public class State<T>
 
     public virtual void Sleep() { }
 
-    
+
     public void AddTransition(T input, State<T> state)
     {
         transitions[input] = state;
     }
 
-    
+
     public void RemoveTransition(T input)
     {
         if (transitions.ContainsKey(input))
             transitions.Remove(input);
     }
 
-   
+
     public void RemoveTransition(State<T> state)
     {
         foreach (var pair in transitions)
@@ -45,11 +53,11 @@ public class State<T>
         }
     }
 
-    
+
     public State<T> GetTransition(T input)
     {
         if (transitions.TryGetValue(input, out State<T> nextState))
             return nextState;
-        return null; 
+        return null;
     }
 }
