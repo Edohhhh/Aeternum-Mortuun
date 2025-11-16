@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using TMPro;
 
 [System.Serializable]
@@ -9,7 +10,7 @@ public class SpawnEntry
     public GameObject prefab;
     public Transform waypoint;
     public float interval = 1f;
-    public int count = 1;       // cuántas instancias spawnear
+    public int count = 1;
     public bool enabled = true;
 }
 
@@ -28,7 +29,7 @@ public class WaveManager : MonoBehaviour
 
     [Header("Behavior")]
     public bool startOnAwake = false;
-    public GameObject destroyTargetOnWavesComplete; // se destruye cuando completes wavesToComplete
+    public GameObject destroyTargetOnWavesComplete;
 
     [Header("Parallel timer (opcional)")]
     public bool startParallelTimerOnStart = false;
@@ -38,25 +39,43 @@ public class WaveManager : MonoBehaviour
     [Header("Parallel timer UI")]
     public TextMeshProUGUI parallelTimerText;
 
+    // ★ NUEVO: UI para waves completadas
+    [Header("Waves UI")]
+    public TextMeshProUGUI wavesCompletedText;
+
+    [Header("Events")]
+    public UnityEvent onWavesComplete;
+
     // internal
     private int _currentWaveIndex = -1;
     private bool _running = false;
 
-    // Conteo de enemigos vivos instanciados por el manager en la wave actual
     private int _aliveEnemies = 0;
-
-    // Conteo de instancias pendientes por crear (spawn planificados pero no todos instanciados aún)
     private int _pendingSpawns = 0;
+
+    // ★ NUEVO: contador interno
+    private int _wavesCompleted = 0;
 
     private void Start()
     {
+        // ★ Inicializar UI al inicio para que muestre "0 / total" aunque no se haya iniciado StartWaves().
+        UpdateWavesUI();
+
         if (startOnAwake)
-        {
             StartWaves();
-        }
     }
 
-    // Llamar para iniciar la secuencia de oleadas
+    // ★ Helper para actualizar la UI desde cualquier lugar (evita duplicación)
+    private void UpdateWavesUI()
+    {
+        if (wavesCompletedText == null) return;
+
+        int total = (wavesToComplete > 0) ? wavesToComplete : waves.Count;
+        // Asegurarse que _wavesCompleted no sea mayor que total (por seguridad).
+        int clamped = Mathf.Clamp(_wavesCompleted, 0, Mathf.Max(0, total));
+        wavesCompletedText.text = clamped + " / " + total;
+    }
+
     public void StartWaves()
     {
         if (_running) return;
@@ -69,16 +88,17 @@ public class WaveManager : MonoBehaviour
         _running = true;
         _currentWaveIndex = -1;
 
+        // ★ Reiniciar contador de waves completadas cuando se inicia el sistema.
+        _wavesCompleted = 0;
+        UpdateWavesUI(); // ★ actualizar UI inmediatamente a "0 / total"
+
         if (startParallelTimerOnStart)
-        {
             StartCoroutine(ParallelTimerRoutine());
-        }
 
         StartCoroutine(NextWaveRoutine());
         Debug.Log("[WaveManager] Waves started.", this);
     }
 
-    // Rutina: inicia la siguiente wave secuencialmente
     private IEnumerator NextWaveRoutine()
     {
         int targetWaves = (wavesToComplete > 0) ? wavesToComplete : waves.Count;
@@ -92,34 +112,55 @@ public class WaveManager : MonoBehaviour
                 break;
             }
 
-            Debug.Log("[WaveManager] Starting wave " + (_currentWaveIndex + 1) + " / " + waves.Count + " (" + waves[_currentWaveIndex].name + ")", this);
+            Debug.Log("[WaveManager] Starting wave " +
+                (_currentWaveIndex + 1) + " / " + waves.Count +
+                " (" + waves[_currentWaveIndex].name + ")", this);
 
-            // Ejecutar la wave y esperar a que termine
             yield return StartCoroutine(RunWave(waves[_currentWaveIndex]));
 
-            // chequeo si alcanzamos el objetivo de wavesToComplete
+            // ★ incrementar contador y actualizar UI cuando termina una wave
+            _wavesCompleted++;
+
+            UpdateWavesUI();
+            // ★ FIN NUEVO -----------------
+
             if ((_currentWaveIndex + 1) >= targetWaves)
             {
                 Debug.Log("[WaveManager] Reached target waves: " + targetWaves, this);
+
                 if (destroyTargetOnWavesComplete != null)
                 {
-                    Debug.Log("[WaveManager] Destroying target on waves complete: " + destroyTargetOnWavesComplete.name, this);
+                    Debug.Log("[WaveManager] Destroying target on waves complete: " +
+                        destroyTargetOnWavesComplete.name, this);
                     Destroy(destroyTargetOnWavesComplete);
                 }
 
-                // Marcar como no corriendo: esto hará que el timer paralelo termine sin ejecutar su acción final.
+                yield return null;
+
+                if (onWavesComplete != null)
+                {
+                    try
+                    {
+                        onWavesComplete.Invoke();
+                        Debug.Log("[WaveManager] onWavesComplete invoked.", this);
+                    }
+                    catch (System.Exception ex)
+                    {
+                        Debug.LogWarning(
+                            "[WaveManager] Exception invoking onWavesComplete: " + ex.Message, this);
+                    }
+                }
+
                 _running = false;
                 yield break;
             }
 
-            // pequeña pausa opcional entre oleadas
             yield return new WaitForSeconds(1f);
         }
 
         _running = false;
     }
 
-    // Ejecuta una sola wave: iniciar todos los spawn entries y esperar hasta completarla
     private IEnumerator RunWave(Wave wave)
     {
         if (wave == null)
@@ -128,24 +169,16 @@ public class WaveManager : MonoBehaviour
             yield break;
         }
 
-        // reset counters para esta wave
         _aliveEnemies = 0;
         _pendingSpawns = 0;
 
-        // Lista de coroutines para los spawn loops (no estrictamente necesaria, pero útil para debugging)
-        List<Coroutine> runningSpawns = new List<Coroutine>();
-
-        // iniciar spawn loops por cada entry válida
         for (int i = 0; i < wave.entries.Count; i++)
         {
             SpawnEntry entry = wave.entries[i];
             if (entry != null && entry.enabled && entry.prefab != null && entry.interval >= 0f && entry.count > 0)
             {
-                // marcar cuántas instancias están pendientes por crear
                 _pendingSpawns += entry.count;
-
-                Coroutine c = StartCoroutine(SpawnLoop(entry));
-                runningSpawns.Add(c);
+                StartCoroutine(SpawnLoop(entry));
             }
             else
             {
@@ -162,33 +195,28 @@ public class WaveManager : MonoBehaviour
             }
         }
 
-        // Esperar hasta que no queden spawns pendientes y no queden enemigos vivos
         while ((_pendingSpawns > 0) || (_aliveEnemies > 0))
         {
             yield return null;
         }
 
         Debug.Log("[WaveManager] Wave '" + wave.name + "' completed.", this);
-        yield break;
     }
 
-    // SpawnLoop que crea 'count' instancias espaciadas por 'interval'
     private IEnumerator SpawnLoop(SpawnEntry entry)
     {
         if (entry == null) yield break;
 
         int remaining = entry.count;
-        Debug.Log("[WaveManager] SpawnLoop starting for prefab " + (entry.prefab != null ? entry.prefab.name : "null") + " count=" + remaining + " interval=" + entry.interval, this);
+        Debug.Log("[WaveManager] SpawnLoop starting for prefab " +
+            (entry.prefab != null ? entry.prefab.name : "null") +
+            " count=" + remaining + " interval=" + entry.interval, this);
 
-        Vector3 pos = (entry.waypoint != null) ? entry.waypoint.position : this.transform.position;
-
-        // spawn inmediata la primera instancia (si preferís esperar antes del primer spawn, mové el yield WaitForSeconds arriba)
         while (remaining > 0)
         {
             if (entry.prefab == null)
             {
                 Debug.LogWarning("[WaveManager] SpawnLoop: prefab is null, skipping remaining.", this);
-                // ajustar pending para no quedar colgado
                 _pendingSpawns -= remaining;
                 if (_pendingSpawns < 0) _pendingSpawns = 0;
                 yield break;
@@ -197,74 +225,63 @@ public class WaveManager : MonoBehaviour
             Vector3 spawnPos = (entry.waypoint != null) ? entry.waypoint.position : this.transform.position;
             GameObject go = Instantiate(entry.prefab, spawnPos, Quaternion.identity);
 
-            // Añadir componente tracker para que notifique cuando el enemigo muera
             SpawnedEnemy tracker = go.AddComponent<SpawnedEnemy>();
             tracker.manager = this;
 
-            // incrementar contador de enemigos vivos
-            _aliveEnemies = _aliveEnemies + 1;
+            _aliveEnemies++;
 
-            Debug.Log("[WaveManager] Spawned " + go.name + " at " + spawnPos + " (alive now: " + _aliveEnemies + ")", this);
+            Debug.Log("[WaveManager] Spawned " + go.name + " at " + spawnPos +
+                " (alive now: " + _aliveEnemies + ")", this);
 
             remaining--;
 
             if (remaining > 0)
-            {
-                // esperar intervalo antes del siguiente spawn
                 yield return new WaitForSeconds(entry.interval);
-            }
         }
 
-        // terminé de spawnear todas las instancias de este entry
         _pendingSpawns -= entry.count;
         if (_pendingSpawns < 0) _pendingSpawns = 0;
 
-        Debug.Log("[WaveManager] SpawnLoop finished for prefab " + (entry.prefab != null ? entry.prefab.name : "null"), this);
-        yield break;
+        Debug.Log("[WaveManager] SpawnLoop finished for prefab " +
+            (entry.prefab != null ? entry.prefab.name : "null"), this);
     }
 
-    // Método llamado por SpawnedEnemy cuando una instancia es destruida
     public void NotifyEnemyDestroyed()
     {
-        _aliveEnemies = _aliveEnemies - 1;
+        _aliveEnemies--;
         if (_aliveEnemies < 0) _aliveEnemies = 0;
+
         Debug.Log("[WaveManager] Enemy destroyed. Alive left: " + _aliveEnemies, this);
     }
 
-    // Timer paralelo opcional
     private IEnumerator ParallelTimerRoutine()
     {
         float elapsed = 0f;
         Debug.Log("[WaveManager] Parallel timer started: " + parallelTimerDuration + "s", this);
 
-        // mientras el manager siga corriendo y no alcance la duración
         while (elapsed < parallelTimerDuration && _running)
         {
             elapsed += Time.deltaTime;
             float remaining = Mathf.Clamp(parallelTimerDuration - elapsed, 0, parallelTimerDuration);
 
-            // ACTUALIZAMOS EL TEXTO
             if (parallelTimerText != null)
-            {
                 parallelTimerText.text = Mathf.CeilToInt(remaining).ToString();
-            }
 
             yield return null;
         }
 
-        // Si el loop terminó porque _running pasó a false => no ejecutamos la acción de terminar timer
         if (!_running)
         {
             Debug.Log("[WaveManager] Parallel timer stopped because waves finished.", this);
             yield break;
         }
 
-        // Si llegamos hasta aquí, el timer llegó a 0 mientras _running sigue true: ejecutamos la acción (ej. destruir target)
         Debug.Log("[WaveManager] Parallel timer finished.", this);
 
         if (parallelTimerDestroyTarget != null)
         {
-            Debug.Log("[WaveManager] Destroying parallelTimerDestroyTarget: " + parallelTimerDestroyTarget.name, this);
+            Debug.Log("[WaveManager] Destroying parallelTimerDestroyTarget: " +
+                parallelTimerDestroyTarget.name, this);
             Destroy(parallelTimerDestroyTarget);
         }
     }

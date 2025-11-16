@@ -15,9 +15,9 @@ MonoBehaviour:
   npcName: "Mu\xF1eco"
   npcPortrait: {fileID: -5559903026567725301, guid: 8f248b06acbe57843b9aaa687c3f2d28, type: 3}
   dialogueLines:
-  - ("Click izquierdo" para atacar) ("Espacio" para rodar)(entrar al portal con la 
-    "F")
-  autoProgressLines: 01
+  - ("Click izquierdo" para atacar) ("Espacio" para rodar)
+  - (entrar al portal con la  "F")(curarse con "Q")
+  autoProgressLines: 0101
   autoProgressDelay: 1.5
   typingSpeed: 0.05
   voiceSound: {fileID: 8300000, guid: bf36fc3e7739b9e45a1567b4e9e858df, type: 3}
