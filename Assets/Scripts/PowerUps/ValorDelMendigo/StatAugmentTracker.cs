@@ -39,7 +39,6 @@ public class StatAugmentTracker : MonoBehaviour
     {
         player.baseDamage = (int)(player.baseDamage - appliedDamage);
 
-        // Revertir velocidad
         player.moveSpeed = (player.moveSpeed - appliedMoveSpeed) / appliedMultiplier;
 
         var ph = player.GetComponent<PlayerHealth>();

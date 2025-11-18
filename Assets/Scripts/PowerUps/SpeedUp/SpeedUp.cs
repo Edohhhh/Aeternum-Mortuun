@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 [CreateAssetMenu(fileName = "PlayerSpeedPowerUp", menuName = "PowerUps/Player Speed Up")]
 public class PlayerSpeedPowerUp : PowerUp
@@ -8,13 +8,23 @@ public class PlayerSpeedPowerUp : PowerUp
 
     public override void Apply(PlayerController player)
     {
+        if (player == null) return;
+
         // Multiplica la velocidad actual
         player.moveSpeed *= speedMultiplier;
+
+        
+        if (GameDataManager.Instance != null)
+        {
+            GameDataManager.Instance.SavePlayerData(player);
+        }
+
+       
+        BeggarValueObserver.RequestReapply();
     }
 
     public override void Remove(PlayerController player)
     {
-        // Si querés revertir al perderlo:
-        // player.moveSpeed /= speedMultiplier;
+        // BeggarValueObserver.RequestReapply();
     }
 }

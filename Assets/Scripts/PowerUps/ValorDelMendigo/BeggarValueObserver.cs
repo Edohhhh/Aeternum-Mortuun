@@ -1,14 +1,19 @@
 ﻿using UnityEngine;
-using UnityEngine.SceneManagement;
 using System.Collections.Generic;
-using System.Reflection;
+using Object = UnityEngine.Object;
 
 public class BeggarValueObserver : MonoBehaviour
 {
     [HideInInspector] public float bonusPerStat = 2f;
 
-    // Lista de perks a las que "potenciamos"
+    // Lista de perks a las que "potenciamos" leyendo de la lista
     private readonly List<PowerUp> targetPerks = new();
+
+    // 👉 Cuántas veces el jugador ha usado LifeUp
+    private int lifeUpStacks = 0;
+
+    // 👉 Flag: solo cuando es true aplicamos el bonus de vida en esta llamada
+    private bool applyLifeBonusThisCall = false;
 
     public void SetTargets(List<PowerUp> list)
     {
@@ -18,94 +23,104 @@ public class BeggarValueObserver : MonoBehaviour
 
     private void Awake()
     {
+        // Solo persistimos. NO usamos SceneManager acá.
         DontDestroyOnLoad(gameObject);
-        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
-    private void OnDestroy()
+    // 🔹 Helper estático genérico (AttackUp, SpeedUp, ruletas, etc.)
+    public static void RequestReapply()
     {
-        SceneManager.sceneLoaded -= OnSceneLoaded;
+        var go = GameObject.Find("BeggarValueObserver");
+        if (go == null) return;
+
+        var obs = go.GetComponent<BeggarValueObserver>();
+        if (obs != null)
+            obs.ReapplyNow();
     }
 
-    private void OnSceneLoaded(Scene s, LoadSceneMode m)
+    // 🔹 Helper ESPECIAL para LifeUp: suma un stack y marca que esta vez sí hay bonus de vida
+    public static void NotifyLifeUpApplied()
     {
-        ReapplyNow();
+        var go = GameObject.Find("BeggarValueObserver");
+        if (go == null) return;
+
+        var obs = go.GetComponent<BeggarValueObserver>();
+        if (obs != null)
+        {
+            obs.lifeUpStacks++;               // llevamos conteo total de LifeUps usados
+            obs.applyLifeBonusThisCall = true; // esta llamada SÍ debe tocar vida
+            obs.ReapplyNow();
+        }
     }
 
+    /// <summary>
+    /// Recalcula desde cero el bonus del Mendigo según las perks actuales
+    /// (AttackUp/SpeedUp) y, solo cuando corresponde, el bonus de vida por LifeUp.
+    /// </summary>
     public void ReapplyNow()
     {
-        var player = FindFirstObjectByType<PlayerController>();
+        var player = Object.FindFirstObjectByType<PlayerController>();
         if (player == null) return;
 
+        // Asegurar tracker
         var tracker = player.GetComponent<StatAugmentTracker>();
-        if (tracker == null) tracker = player.gameObject.AddComponent<StatAugmentTracker>();
+        if (tracker == null)
+            tracker = player.gameObject.AddComponent<StatAugmentTracker>();
 
+        // Quitar cualquier buff previo del mendigo
         tracker.RemoveFrom(player);
 
-        var data = GameDataManager.Instance?.playerData;
-        if (data == null) return;
+        // ==== Perks actuales (para daño/velocidad) ====
+        List<PowerUp> perks = null;
+        if (player.initialPowerUps != null && player.initialPowerUps.Length > 0)
+        {
+            perks = new List<PowerUp>(player.initialPowerUps);
+        }
+        else
+        {
+            var data = GameDataManager.Instance?.playerData;
+            if (data != null && data.initialPowerUps != null)
+                perks = data.initialPowerUps;
+        }
+
+        if (perks == null)
+            perks = new List<PowerUp>();
 
         int addDamage = 0;
         float addMoveSpeed = 0f;
         float addMaxHealth = 0f;
-        float multMoveSpeed = 1f; // multiplicador acumulado
+        float multMoveSpeed = 1f;
 
-        foreach (var perk in targetPerks)
+        foreach (var perkAsset in targetPerks)
         {
-            if (perk == null) continue;
-            bool hasIt = data.initialPowerUps != null && data.initialPowerUps.Contains(perk);
-            if (!hasIt) continue;
+            if (perkAsset == null) continue;
 
-            var t = perk.GetType();
+            int copies = 0;
+            foreach (var p in perks)
+            {
+                if (p == perkAsset)
+                    copies++;
+            }
+            if (copies <= 0) continue;
 
-            // --- SUMA DE STATS PLANOS ---
-            if (HasPositiveField(t, perk, new[] { "flatDamage", "damageBonus", "extraDamage" }))
-                addDamage += Mathf.RoundToInt(bonusPerStat);
+            if (perkAsset is AttackUp)
+            {
+                addDamage += Mathf.RoundToInt(bonusPerStat * copies);
+            }
 
-            if (HasPositiveField(t, perk, new[] { "moveSpeedDelta", "speedBonus" }))
-                addMoveSpeed += bonusPerStat;
-
-            if (HasPositiveField(t, perk, new[] { "extraMaxHealth", "maxHealthIncrease" }))
-                addMaxHealth += bonusPerStat;
-
-            // --- MULTIPLICADORES (como speedMultiplier, damageMultiplier) ---
-            if (TryGetMultiplierField(t, perk, "speedMultiplier", out float sm))
-                multMoveSpeed *= (1f + (bonusPerStat * 0.01f)); // Ejemplo: +2 → +2%
+            if (perkAsset is PlayerSpeedPowerUp)
+            {
+                addMoveSpeed += bonusPerStat * copies;
+            }
         }
 
-        // Aplicar efectos detectados
+        if (applyLifeBonusThisCall && lifeUpStacks > 0)
+        {
+            addMaxHealth += bonusPerStat * lifeUpStacks;
+        }
+
         tracker.ApplyTo(player, addDamage, addMoveSpeed, addMaxHealth, multMoveSpeed);
-    }
 
-    private bool HasPositiveField(System.Type type, object instance, string[] names)
-    {
-        foreach (var n in names)
-        {
-            var f = type.GetField(n, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            if (f == null) continue;
-
-            if (f.FieldType == typeof(int))
-            {
-                int v = (int)f.GetValue(instance);
-                if (v > 0) return true;
-            }
-            else if (f.FieldType == typeof(float))
-            {
-                float v = (float)f.GetValue(instance);
-                if (v > 0f) return true;
-            }
-        }
-        return false;
-    }
-
-    private bool TryGetMultiplierField(System.Type type, object instance, string fieldName, out float value)
-    {
-        value = 0f;
-        var f = type.GetField(fieldName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-        if (f == null) return false;
-        if (f.FieldType != typeof(float)) return false;
-
-        value = (float)f.GetValue(instance);
-        return value > 1f; // multiplicadores mayores a 1 = bonificación
+        applyLifeBonusThisCall = false;
     }
 }

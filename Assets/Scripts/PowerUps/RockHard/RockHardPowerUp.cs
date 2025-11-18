@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Reflection;
 
 public enum RockHardDamageMode { AddFlat, ExponentialSteps }
 
@@ -25,38 +26,95 @@ public class RockHardPowerUp : PowerUp
     [Tooltip("Multiplicador al cooldown del dash (1.5 = +50%).")]
     public float dashCooldownMultiplier = 1.5f;
 
+    // Estado para revertir cooldown
+    private object dashHost;
+    private FieldInfo dashCooldownField;
+    private float originalDashCooldown;
+    private bool dashPatched;
+
     public override void Apply(PlayerController player)
     {
-        // Buscar o crear el observer persistente
-        var existing = GameObject.Find("RockHardObserver");
-        RockHardObserver obs;
-        if (existing == null)
+        if (player == null) return;
+
+        dashPatched = false;
+        dashHost = null;
+        dashCooldownField = null;
+
+        // ====== DAÑO ======
+        if (damageMode == RockHardDamageMode.AddFlat)
         {
-            var go = new GameObject("RockHardObserver");
-            go.name = "RockHardObserver";
-            obs = go.AddComponent<RockHardObserver>();
-            Object.DontDestroyOnLoad(go);
+            int add = Mathf.RoundToInt(flatDamage);
+            player.baseDamage += add;
         }
         else
         {
-            obs = existing.GetComponent<RockHardObserver>();
+            float mult = Mathf.Pow(expFactor, Mathf.Max(0, expSteps));
+            player.baseDamage = Mathf.RoundToInt(player.baseDamage * mult);
         }
 
-        // Pasar config y enlazar player
-        obs.damageMode = damageMode;
-        obs.flatDamage = flatDamage;
-        obs.expFactor = expFactor;
-        obs.expSteps = expSteps;
-        obs.moveSpeedDelta = moveSpeedDelta;
-        obs.dashCooldownMultiplier = dashCooldownMultiplier;
+        // ====== MOVIMIENTO ======
+        player.moveSpeed = Mathf.Max(0f, player.moveSpeed + moveSpeedDelta);
 
-        obs.AttachToPlayer(player);
+        // ====== DASH COOLDOWN (por reflexión) ======
+        PatchDashCooldown(player, dashCooldownMultiplier);
     }
 
     public override void Remove(PlayerController player)
     {
-        // quitar la perk y revertir efectos:
-        var go = GameObject.Find("RockHardObserver");
-        if (go != null) Object.Destroy(go);
+        if (player == null) return;
+
+        // Inverso de lo que hicimos en Apply:
+
+        if (damageMode == RockHardDamageMode.AddFlat)
+        {
+            int add = Mathf.RoundToInt(flatDamage);
+            player.baseDamage -= add;
+        }
+        else
+        {
+            float mult = Mathf.Pow(expFactor, Mathf.Max(0, expSteps));
+            float invMult = 1f / mult;
+            player.baseDamage = Mathf.RoundToInt(player.baseDamage * invMult);
+        }
+
+        player.moveSpeed = player.moveSpeed - moveSpeedDelta; // inverso: si sumé -3, ahora resto -3 (= +3)
+
+        if (dashPatched && dashHost != null && dashCooldownField != null)
+        {
+            dashCooldownField.SetValue(dashHost, originalDashCooldown);
+        }
+
+        dashPatched = false;
+        dashHost = null;
+        dashCooldownField = null;
+    }
+
+    private void PatchDashCooldown(PlayerController player, float multiplier)
+    {
+        string[] names = { "dashCooldown", "DashCooldown", "dashCd", "dashDelay", "cooldown" };
+        var comps = player.GetComponents<MonoBehaviour>();
+
+        foreach (var c in comps)
+        {
+            if (c == null) continue;
+            var t = c.GetType();
+
+            foreach (var n in names)
+            {
+                var f = t.GetField(n, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                if (f != null && f.FieldType == typeof(float))
+                {
+                    dashHost = c;
+                    dashCooldownField = f;
+
+                    originalDashCooldown = (float)dashCooldownField.GetValue(dashHost);
+                    float newCd = originalDashCooldown * Mathf.Max(0.01f, multiplier);
+                    dashCooldownField.SetValue(dashHost, newCd);
+
+                    dashPatched = true;
+                    return;
+                }
+            }
+        }
     }
 }

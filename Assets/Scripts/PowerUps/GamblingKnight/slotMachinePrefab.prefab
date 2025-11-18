@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5011970476885625618}
   - component: {fileID: 5905826957588330245}
   - component: {fileID: 7099361565763167011}
+  - component: {fileID: -4199966175816767364}
   m_Layer: 0
   m_Name: slotMachinePrefab
   m_TagString: Untagged
@@ -147,3 +148,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20fce1715aa8dff418e415682ca88765, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &-4199966175816767364
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6849842914849361971}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b556bc7d88f4c834dbb55d7ea589bfc7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  promptSprite: {fileID: 1253522814677020843, guid: 38383c36755a9b542aac52d3ba45b273, type: 3}
+  offset: {x: 0, y: 1.5, z: 0}
+  sortingLayer: 
+  sortingOrder: 5000
+  duration: 1
+  showOnEveryEnter: 1
