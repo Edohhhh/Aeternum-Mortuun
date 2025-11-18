@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using Object = UnityEngine.Object;
 
 public class GlobalEnemyDamageObserver : MonoBehaviour
 {
@@ -12,20 +13,65 @@ public class GlobalEnemyDamageObserver : MonoBehaviour
     [Header("VFX")]
     public GameObject slowEffectPrefab; // <-- referencia al prefab
 
+    // Cada enemigo que tiene slow activo tiene una corrutina asociada
     private Dictionary<GameObject, Coroutine> slowCoroutines = new();
 
+    [Header("Auto Hook")]
+    [Tooltip("Cada cuántos segundos se escanean enemigos nuevos para agregarles EnemyDamageHook.")]
+    public float rescanInterval = 0.5f;
+    private float rescanTimer = 0f;
+
+    private void Awake()
+    {
+        DontDestroyOnLoad(gameObject);
+    }
+
+    private void Update()
+    {
+        rescanTimer -= Time.deltaTime;
+        if (rescanTimer <= 0f)
+        {
+            rescanTimer = rescanInterval;
+            AttachHooksToExistingEnemies();
+        }
+    }
+
+    /// <summary>
+    /// Llamado por EnemyDamageHook cuando un enemigo recibe daño.
+    /// </summary>
     public static void RegisterDamage(GameObject enemyObject)
     {
-        var observer = FindAnyObjectByType<GlobalEnemyDamageObserver>();
-        if (observer != null && enemyObject.CompareTag("Enemy"))
+        var observer = Object.FindAnyObjectByType<GlobalEnemyDamageObserver>();
+        if (observer != null && enemyObject != null && enemyObject.CompareTag("Enemy"))
         {
             observer.TryApplySlow(enemyObject);
         }
     }
 
+    /// <summary>
+    /// Recorre todos los enemigos actuales y les agrega EnemyDamageHook si tienen EnemyHealth.
+    /// Lo usamos tanto desde la perk al aplicarse como en el auto-scan.
+    /// </summary>
+    public void AttachHooksToExistingEnemies()
+    {
+        var enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        foreach (var enemy in enemies)
+        {
+            if (enemy == null) continue;
+
+            if (enemy.GetComponent<EnemyDamageHook>() == null &&
+                enemy.GetComponent<EnemyHealth>() != null)
+            {
+                enemy.AddComponent<EnemyDamageHook>();
+            }
+        }
+    }
+
     private void TryApplySlow(GameObject enemy)
     {
-        // Si ya est? ralentizado, no lo aplicamos de nuevo
+        if (enemy == null) return;
+
+        // Si ya está ralentizado, no lo aplicamos de nuevo
         if (slowCoroutines.ContainsKey(enemy)) return;
 
         Coroutine routine = StartCoroutine(ApplySlowViaReflection(enemy));
@@ -34,20 +80,22 @@ public class GlobalEnemyDamageObserver : MonoBehaviour
 
     private IEnumerator ApplySlowViaReflection(GameObject enemy)
     {
+        if (enemy == null) yield break;
+
         var controller = enemy.GetComponent<MonoBehaviour>();
         if (controller == null)
         {
             yield break;
         }
 
-        FieldInfo maxSpeedField = controller.GetType().GetField(
+        var maxSpeedField = controller.GetType().GetField(
             "maxSpeed",
             BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance
         );
 
         if (maxSpeedField == null || maxSpeedField.FieldType != typeof(float))
         {
-            Debug.LogWarning($"[Slow] {enemy.name} no tiene 'maxSpeed' accesible por reflexi?n.");
+            Debug.LogWarning($"[Slow] {enemy.name} no tiene 'maxSpeed' accesible por reflexión.");
             yield break;
         }
 
@@ -56,7 +104,7 @@ public class GlobalEnemyDamageObserver : MonoBehaviour
         maxSpeedField.SetValue(controller, slowedSpeed);
         Debug.Log($"[Slow] {enemy.name} ralentizado a {slowedSpeed}");
 
-        // ?? Instanciar el prefab de la part?cula sobre el enemigo
+        // VFX parentado al enemigo
         GameObject vfxInstance = null;
         if (slowEffectPrefab != null && enemy != null)
         {
@@ -64,11 +112,11 @@ public class GlobalEnemyDamageObserver : MonoBehaviour
                 slowEffectPrefab,
                 enemy.transform.position,
                 Quaternion.identity,
-                enemy.transform   // lo parentamos al enemigo para que lo siga
+                enemy.transform
             );
         }
 
-        // Mantener el slow por la duraci?n
+        // Mantener el slow por la duración
         yield return new WaitForSeconds(duration);
 
         // Restaurar velocidad

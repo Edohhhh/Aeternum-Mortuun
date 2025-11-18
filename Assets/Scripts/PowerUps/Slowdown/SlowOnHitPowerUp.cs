@@ -1,4 +1,5 @@
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 [CreateAssetMenu(fileName = "SlowOnHitPowerUp", menuName = "PowerUps/Slow On Any Damage")]
 public class SlowOnHitPowerUp : PowerUp
@@ -26,18 +27,12 @@ public class SlowOnHitPowerUp : PowerUp
         observer.duration = Slowduration;
         observer.slowEffectPrefab = slowEffectPrefab;
 
-        // Agregar hook a todos los enemigos activos
-        foreach (var enemy in GameObject.FindGameObjectsWithTag("Enemy"))
-        {
-            if (enemy.GetComponent<EnemyDamageHook>() == null && enemy.GetComponent<EnemyHealth>() != null)
-            {
-                enemy.AddComponent<EnemyDamageHook>();
-            }
-        }
+        // Agregar hook a todos los enemigos activos (primera pasada)
+        observer.AttachHooksToExistingEnemies();
     }
 
     public override void Remove(PlayerController player)
     {
-        // Nada, efecto es temporal y autocontrolado
+        // Nada, efecto manejado por el observer
     }
 }

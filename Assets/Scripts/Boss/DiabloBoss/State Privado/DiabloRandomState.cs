@@ -1,0 +1,16 @@
+using UnityEngine;
+
+public class DiabloRandomState : State<EnemyInputs>
+{
+    private readonly DiabloController ctrl;
+    public DiabloRandomState(DiabloController c) { ctrl = c; }
+
+    public override void Awake()
+    {
+        base.Awake();
+        int id = ctrl.DoRoll();          // 1..N (guarda en ctrl.Roll)
+        // Podés loguear si querés: Debug.Log($"[DIABLO] Roll={id}");
+        ctrl.Transition(EnemyInputs.SpecialAttack); //  Anim
+    }
+}
+

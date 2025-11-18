@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using Object = UnityEngine.Object;
 
 public class BurnOnHitObserver : MonoBehaviour
 {
@@ -12,16 +13,58 @@ public class BurnOnHitObserver : MonoBehaviour
     [Header("VFX")]
     public GameObject burnVfxPrefab;
 
+    // Estado de quemadura por enemigo
     private Dictionary<GameObject, Coroutine> activeBurns = new();
     private Dictionary<GameObject, float> cooldowns = new();
     private Dictionary<GameObject, GameObject> activeVfx = new();
+
+    [Header("Auto Hook")]
+    [Tooltip("Cada cuántos segundos se escanean enemigos nuevos para agregarles EnemyBurnHook.")]
+    public float rescanInterval = 0.5f;
+    private float rescanTimer = 0f;
 
     public static BurnOnHitObserver Instance { get; private set; }
 
     private void Awake()
     {
-        if (Instance == null) Instance = this;
-        else Destroy(gameObject);
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    private void Update()
+    {
+        // Auto-scan para enemigos nuevos (oleadas, spawns, pooling, etc.)
+        rescanTimer -= Time.deltaTime;
+        if (rescanTimer <= 0f)
+        {
+            rescanTimer = rescanInterval;
+            AttachHooksToExistingEnemies();
+        }
+    }
+
+    /// <summary>
+    /// Escanea todos los enemigos actuales y les agrega EnemyBurnHook si hace falta.
+    /// </summary>
+    public void AttachHooksToExistingEnemies()
+    {
+        var enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        foreach (var enemy in enemies)
+        {
+            if (enemy == null) continue;
+
+            if (enemy.GetComponent<EnemyHealth>() != null &&
+                enemy.GetComponent<EnemyBurnHook>() == null)
+            {
+                enemy.AddComponent<EnemyBurnHook>();
+            }
+        }
     }
 
     public void ApplyBurn(GameObject enemy)
@@ -53,12 +96,11 @@ public class BurnOnHitObserver : MonoBehaviour
             GameObject vfx = Instantiate(
                 burnVfxPrefab,
                 enemy.transform.position,
-                Quaternion.identity
+                Quaternion.identity,
+                enemy.transform
             );
 
-            vfx.transform.SetParent(enemy.transform);
             vfx.transform.localPosition = Vector3.zero;
-
             activeVfx[enemy] = vfx;
         }
     }
