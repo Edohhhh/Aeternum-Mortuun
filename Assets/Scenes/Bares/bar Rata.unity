@@ -568,6 +568,7 @@ GameObject:
   - component: {fileID: 83027758}
   - component: {fileID: 83027757}
   - component: {fileID: 83027761}
+  - component: {fileID: 83027762}
   m_Layer: 0
   m_Name: Bartender
   m_TagString: Untagged
@@ -738,6 +739,19 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 2, y: 3.3953953}
   m_EdgeRadius: 0
+--- !u!114 &83027762
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 83027756}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 246f4b3cc7775a848b481e87d859c765, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interactKey: 102
 --- !u!1 &93830545
 GameObject:
   m_ObjectHideFlags: 0
@@ -19360,6 +19374,7 @@ GameObject:
   - component: {fileID: 1715398201}
   - component: {fileID: 1715398202}
   - component: {fileID: 1715398203}
+  - component: {fileID: 1715398206}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -19388,7 +19403,7 @@ MonoBehaviour:
   healthUI: {fileID: 9783276}
   healCounterUI: {fileID: 1715398204}
   healAmount: 1
-  maxHealsPerScene: 3
+  healsLeft: 0
 --- !u!114 &1715398194
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19413,7 +19428,8 @@ MonoBehaviour:
   animator: {fileID: 0}
   rb: {fileID: 0}
   hitbox: {fileID: 1715398195}
-  initialPowerUps: []
+  initialPowerUps:
+  - {fileID: 11400000, guid: c86b4ba0e5671c744b02b05d9e18fe87, type: 2}
   lastNonZeroMoveInput: {x: 1, y: 0}
   dashCooldownTimer: 0
   knockbackDecay: 18
@@ -19737,6 +19753,19 @@ MonoBehaviour:
   suffix: 
   normalColor: {r: 1, g: 1, b: 1, a: 1}
   emptyColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+--- !u!114 &1715398206
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1715398191}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73181cebac7e1224d99c95f7c29e8a19, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interactKey: 102
 --- !u!1001 &1732526796
 PrefabInstance:
   m_ObjectHideFlags: 0

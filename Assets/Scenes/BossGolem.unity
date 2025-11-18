@@ -10994,6 +10994,7 @@ GameObject:
   - component: {fileID: 1715398196}
   - component: {fileID: 1715398195}
   - component: {fileID: 1715398194}
+  - component: {fileID: 1715398205}
   - component: {fileID: 1715398193}
   - component: {fileID: 1715398199}
   - component: {fileID: 1715398200}
@@ -11029,7 +11030,7 @@ MonoBehaviour:
   healthUI: {fileID: 9783276}
   healCounterUI: {fileID: 1715398204}
   healAmount: 1
-  maxHealsPerScene: 3
+  healsLeft: 0
 --- !u!114 &1715398194
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11378,6 +11379,19 @@ MonoBehaviour:
   suffix: 
   normalColor: {r: 1, g: 1, b: 1, a: 1}
   emptyColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+--- !u!114 &1715398205
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1715398191}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73181cebac7e1224d99c95f7c29e8a19, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interactKey: 102
 --- !u!1 &1730274306
 GameObject:
   m_ObjectHideFlags: 0

@@ -5208,6 +5208,52 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &980554230
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 980554232}
+  - component: {fileID: 980554231}
+  m_Layer: 0
+  m_Name: DataHealth
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &980554231
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 980554230}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4b81effd50897c47adcdde22341e5ed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  healsLeft: 0
+  maxHeals: 3
+--- !u!4 &980554232
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 980554230}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.036937, y: -2.109101, z: -0.071321405}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &999505153
 GameObject:
   m_ObjectHideFlags: 0
@@ -5538,6 +5584,7 @@ GameObject:
   - component: {fileID: 1046449094}
   - component: {fileID: 1046449093}
   - component: {fileID: 1046449096}
+  - component: {fileID: 1046449097}
   m_Layer: 0
   m_Name: PoorOldMan
   m_TagString: Untagged
@@ -5686,6 +5733,19 @@ MonoBehaviour:
   iconSortingLayer: UI
   iconSortingOrder: 50
   maxDialogueDistance: 3.5
+--- !u!114 &1046449097
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1046449092}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 246f4b3cc7775a848b481e87d859c765, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interactKey: 102
 --- !u!1 &1047293633
 GameObject:
   m_ObjectHideFlags: 0
@@ -19674,7 +19734,7 @@ MonoBehaviour:
   healthUI: {fileID: 9783276}
   healCounterUI: {fileID: 1715398204}
   healAmount: 1
-  maxHealsPerScene: 3
+  healsLeft: 0
 --- !u!114 &1715398194
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23223,3 +23283,4 @@ SceneRoots:
   - {fileID: 1240848016}
   - {fileID: 764191863}
   - {fileID: 200028057}
+  - {fileID: 980554232}

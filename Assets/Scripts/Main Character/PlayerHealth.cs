@@ -1,7 +1,6 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.SceneManagement;
-using System.Diagnostics;
 
 public class PlayerHealth : MonoBehaviour
 {
@@ -10,7 +9,6 @@ public class PlayerHealth : MonoBehaviour
     public float currentHealth = 5f;
 
     [Header("Regeneration")]
-    [Tooltip("Si est? activo, el jugador regenerar? vida despu?s de recibir/esperar regenDelay.")]
     public bool enableRegeneration = false;
     public float regenerationRate = 2f;
     public float regenDelay = 3f;
@@ -20,29 +18,19 @@ public class PlayerHealth : MonoBehaviour
     public float invulnerableTime = 1f;
     private bool invulnerable = false;
 
-    public bool IsInvulnerable => invulnerable || (playerController != null && playerController.isInvulnerable);
-
     private Coroutine regenRoutine;
 
     [Header("UI")]
     public HealthUI healthUI;
-    public HealCounterUI healCounterUI; // Tu script ya ten?a esto
+    public HealCounterUI healCounterUI;
 
     private PlayerController playerController;
 
     [Header("Debug/Testing")]
     public float healAmount = 1f;
 
-    [Header("Heal (Q) - L?mite por escena")]
-    [Tooltip("Cu?ntas veces puede curarse el jugador por escena con Q.")]
-    public int maxHealsPerScene = 3;
-    private int healsLeft;
-
-    // --- Variables de Knockback por defecto ---
-    // (Estos son los valores que se usar?n si un enemigo no especifica otros)
-    private float defaultKnockbackForce = 10f;
-    private float defaultKnockbackDuration = 0.2f;
-
+    [Header("Curas (ya NO se reinician por escena)")]
+    public int healsLeft; // se toma desde HealthDataNashe
 
     private void Awake()
     {
@@ -52,12 +40,15 @@ public class PlayerHealth : MonoBehaviour
     private void Start()
     {
         currentHealth = maxHealth;
-        if (healthUI != null) healthUI.Initialize(maxHealth);
+        if (healthUI != null)
+            healthUI.Initialize(maxHealth);
 
-        healsLeft = maxHealsPerScene;
+        // Cargar curas desde el sistema persistente
+        healsLeft = HealthDataNashe.Instance.healsLeft;
         UpdateHealCounterUI();
 
-        if (regenRoutine != null) StopCoroutine(regenRoutine);
+        if (regenRoutine != null)
+            StopCoroutine(regenRoutine);
         regenActive = false;
     }
 
@@ -71,25 +62,31 @@ public class PlayerHealth : MonoBehaviour
 
     private void TryUseHeal()
     {
-        if (healsLeft <= 0)
+        if (HealthDataNashe.Instance.healsLeft <= 0)
         {
-            UnityEngine.Debug.Log("[Heal] No quedan curas (Q) para esta escena.");
+            Debug.Log("[Heal] No quedan curas.");
             return;
         }
+
         if (currentHealth <= 0f)
         {
-            UnityEngine.Debug.Log("[Heal] No puedes curarte: est?s muerto.");
+            Debug.Log("[Heal] Estás muerto, no podés curarte.");
             return;
         }
 
         ModifyHealthFlat(healAmount);
-        healsLeft--;
+
+        // Q restada
+        HealthDataNashe.Instance.healsLeft--;
+        healsLeft = HealthDataNashe.Instance.healsLeft;
+
         UpdateHealCounterUI();
-        UnityEngine.Debug.Log($"[Heal] Usada Q. Cur? {healAmount}. Health actual: {currentHealth}. Q restantes: {healsLeft}");
+
+        Debug.Log($"[Heal] Curación usada. Vida actual: {currentHealth}. Curas restantes: {healsLeft}");
     }
 
-    // --- ESTE ES EL M?TODO MODIFICADO ---
-    // A?adimos 'knockbackForce' y 'knockbackDuration' como par?metros opcionales
+    public bool IsInvulnerable => invulnerable || (playerController != null && playerController.isInvulnerable);
+
     public void TakeDamage(float amount, Vector2 sourcePosition, float knockbackForce = 10f, float knockbackDuration = 0.2f)
     {
         if (IsInvulnerable || (playerController != null && playerController.stateMachine.CurrentState == playerController.KnockbackState))
@@ -104,12 +101,11 @@ public class PlayerHealth : MonoBehaviour
             return;
         }
 
-        // Usa la fuerza y duraci?n recibidas (la explosi?n enviar? valores altos)
         Vector2 knockDir = (transform.position - (Vector3)sourcePosition).normalized;
-        if (knockDir == Vector2.zero) knockDir = Vector2.up; // Evitar divisi?n por cero
+        if (knockDir == Vector2.zero) knockDir = Vector2.up;
 
         var knockback = playerController.KnockbackState;
-        knockback.SetKnockback(knockDir, knockbackForce, knockbackDuration); // Usa los nuevos valores
+        knockback.SetKnockback(knockDir, knockbackForce, knockbackDuration);
         playerController.stateMachine.ChangeState(knockback);
 
         StartCoroutine(DamageFlash());
@@ -150,6 +146,7 @@ public class PlayerHealth : MonoBehaviour
 
         if (regenRoutine != null)
             StopCoroutine(regenRoutine);
+
         regenRoutine = StartCoroutine(RegenRoutine());
     }
 
@@ -182,21 +179,18 @@ public class PlayerHealth : MonoBehaviour
             healthUI.UpdateHearts(currentHealth);
     }
 
-    private void UpdateHealCounterUI()
+    public void UpdateHealCounterUI()
     {
         if (healCounterUI != null)
-            healCounterUI.SetHealsRemaining(healsLeft, maxHealsPerScene);
+            healCounterUI.SetHealsRemaining(
+                HealthDataNashe.Instance.healsLeft,
+                HealthDataNashe.Instance.maxHeals
+            );
     }
 
     private void Die()
     {
-        UnityEngine.Debug.Log("Player Died");
+        Debug.Log("Player Died");
         SceneManager.LoadScene("Lose");
-    }
-
-    private void OnEnable()
-    {
-        healsLeft = maxHealsPerScene;
-        UpdateHealCounterUI();
     }
 }

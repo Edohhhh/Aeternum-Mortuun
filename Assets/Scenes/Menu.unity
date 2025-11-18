@@ -930,36 +930,34 @@ MonoBehaviour:
   - id: 1
     roomName: LoopSlime1
   mediumRooms:
-  - id: 3
+  - id: 2
     roomName: LoopEsqueleto1
-  - id: 4
+  - id: 3
     roomName: Coliseo slime
-  - id: 5
-    roomName: Coliseo Esqueleto
-  - id: 6
+  - id: 4
     roomName: bar
-  - id: 7
-    roomName: "EspecialAra\xF1a"
-  - id: 8
-    roomName: Coliseo
-  - id: 6
+  - id: 4
     roomName: bar Rata
+  - id: 5
+    roomName: "EspecialAra\xF1a"
+  - id: 6
+    roomName: BossGolem
   hardRooms:
   - id: 7
-    roomName: BossGolem
-  - id: 8
     roomName: BossTopo
+  - id: 8
+    roomName: Coliseo Esqueleto Arquero
   - id: 9
-    roomName: LoopMiniEsqueletosYSlimes
-  - id: 10
     roomName: BossMimico
-  - id: 11
-    roomName: "EspecialAra\xF1a"
-  - id: 12
+  - id: 10
     roomName: Coliseo
+  - id: 11
+    roomName: bar
+  - id: 11
+    roomName: bar Rata
   easyCount: 1
-  mediumCount: 4
-  hardCount: 5
+  mediumCount: 5
+  hardCount: 6
   generatedRun: []
 --- !u!4 &195921830
 Transform:

@@ -7,10 +7,13 @@ public class SkeletonController : MonoBehaviour, IEnemyDataProvider, IMeleeHost
     [SerializeField] private Transform player;
 
     [Header("Minions")]
-    [Tooltip("Prefab del mini-esqueleto que invoca el jefe")]
-    [SerializeField] private GameObject minionPrefab;
-    [Tooltip("Puntos de spawn (Transforms) donde aparecerán los mini-esqueletos")]
-    [SerializeField] private Transform[] minionSpawnPoints;
+    [SerializeField] private MinionSpawnEntry[] minionEntries;
+    [System.Serializable]
+    public struct MinionSpawnEntry
+    {
+        public GameObject prefab;
+        public Transform spawnPoint;
+    }
 
     [Header("Stats")]
     [SerializeField] private float detectionRadius = 5f;
@@ -118,7 +121,7 @@ public class SkeletonController : MonoBehaviour, IEnemyDataProvider, IMeleeHost
         var spawn = new EsqueletoSpawnState(this, spawnAnimDuration);
         var follow = new EnemyFollowState(transform, player, maxSpeed);
         var underGround = new UnderGroundAttackState(this, undergroundBuryDuration, undergroundEmergeDuration);
-        var spawnMin = new SpawnMinionState(this, minionPrefab, minionSpawnPoints, 1.5f);
+        var spawnMin = new SpawnMinionState(this, minionEntries, 1.5f);
         var death = new EnemyDeathState(this);
         var melee = new MeleeAttackState(this /* IMeleeHost */);
 

@@ -1,11 +1,12 @@
 using UnityEngine;
+using static SkeletonController;
 
 public class SpawnMinionState : State<EnemyInputs>
 {
     private readonly SkeletonController controller;
-    private readonly GameObject prefab;
-    private readonly Transform[] spawnPoints;
-    private readonly float duration;   // Duraci�n de la anim
+    private readonly MinionSpawnEntry[] entries;   // ← NUEVO
+    private readonly float duration;
+
     private float timer = 0f;
     private bool invoked = false;
 
@@ -14,59 +15,67 @@ public class SpawnMinionState : State<EnemyInputs>
 
     public SpawnMinionState(
         SkeletonController controller,
-        GameObject prefab,
-        Transform[] spawnPoints,
-        float duration          // lo recibimos
+        MinionSpawnEntry[] entries,   // ← NUEVO
+        float duration
     )
     {
         this.controller = controller;
-        this.prefab = prefab;
-        this.spawnPoints = spawnPoints;
+        this.entries = entries;       // ← NUEVO
         this.duration = duration;
     }
 
     public override void Awake()
     {
         base.Awake();
-        // 1) Bloquea la f�sica para que no caiga ni se desplace
+
+        // 1) Bloquea físicas igual que antes
         var rb = controller.GetComponent<Rigidbody2D>();
         if (rb != null)
         {
-            // guarda estado original
             originalGravity = rb.gravityScale;
             originalConstraints = rb.constraints;
 
-            // anula gravedad y congela posici�n
             rb.gravityScale = 0f;
             rb.linearVelocity = Vector2.zero;
             rb.constraints |= RigidbodyConstraints2D.FreezePosition;
         }
+
         timer = 0f;
         invoked = false;
-        // Disparamos la anim de invocaci�n
+
+        // 2) Disparar trigger de animación
         controller.GetComponent<Animator>()?.SetTrigger("SpawnMinions");
     }
 
     public override void Execute()
     {
-        // 1) Vamos acumulando tiempo
-        //Debug.Log($"[SpawnMinionState] timer={timer:F2}, invoked={invoked}");
         timer += Time.deltaTime;
 
-        // 2) Cuando pasa la duraci�n de la anim Y a�n no hemos invocado:
+        // Si pasa la duración y aun no invocó
         if (timer >= duration && !invoked)
         {
             invoked = true;
             Debug.Log("[SpawnMinionState] Timer completo: instanciando minions");
 
-            // Instanciamos
-            foreach (var pt in spawnPoints)
-                Object.Instantiate(prefab, pt.position, pt.rotation);
+            // ---------------------------
+            //   MULTI-PREFAB + MULTI-POINT
+            // ---------------------------
+            foreach (var e in entries)
+            {
+                if (e.prefab == null || e.spawnPoint == null)
+                    continue;
 
-            // Volvemos a Follow
+                Object.Instantiate(
+                    e.prefab,
+                    e.spawnPoint.position,
+                    e.spawnPoint.rotation
+                );
+            }
+
+            // Vuelve al estado Follow
             controller.Transition(EnemyInputs.SeePlayer);
 
-            // Programamos el UnderGroundAttack tras un peque�o delay
+            // Programa UnderGroundAttack luego del delay
             controller.Invoke(
                 nameof(SkeletonController.DoUnderGroundAttack),
                 controller.postSpawnUnderGroundDelay
@@ -78,7 +87,7 @@ public class SpawnMinionState : State<EnemyInputs>
     {
         base.Sleep();
 
-        // 2) Restaura la f�sica justo al salir del estado
+        // Restaurar físicas
         var rb = controller.GetComponent<Rigidbody2D>();
         if (rb != null)
         {
