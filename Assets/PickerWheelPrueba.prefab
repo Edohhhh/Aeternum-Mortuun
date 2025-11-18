@@ -190,7 +190,12 @@ MonoBehaviour:
     weight: 50
   - pool: {fileID: 11400000, guid: f627dc7b1b3a4e34e9b6e86b241a12ef, type: 2}
     weight: 50
+  - pool: {fileID: 11400000, guid: 1e026c011f61c47119d4eb5575f2924f, type: 2}
+    weight: 50
+  - pool: {fileID: 11400000, guid: a914b7ea646324dd388dc8f834a11c28, type: 2}
+    weight: 50
   powerUpPool: {fileID: 11400000, guid: 741a22992651e1646a7ace4cfab2b8e7, type: 2}
+  rewardPopup: {fileID: 0}
   linePrefab: {fileID: 1258666099951334, guid: 93bc1e8842fde884f878e59843c9706d, type: 3}
   linesParent: {fileID: 2845754903725659257}
   selector: {fileID: 6718008529401278016}
@@ -207,46 +212,46 @@ MonoBehaviour:
   wheelPieces:
   - Icon: {fileID: 1753655533966520807, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
     Label: 
+    Effect: {fileID: 0}
     Amount: 1
     Chance: 73.3
     Index: 0
     _weight: 0
-    Effect: {fileID: 0}
   - Icon: {fileID: -6379153957335788890, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
     Label: 
+    Effect: {fileID: 0}
     Amount: 2
     Chance: 56.6
     Index: 0
     _weight: 0
-    Effect: {fileID: 0}
   - Icon: {fileID: 3622378070614508730, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
     Label: 
+    Effect: {fileID: 0}
     Amount: 3
     Chance: 60
     Index: 0
     _weight: 0
-    Effect: {fileID: 0}
   - Icon: {fileID: -3436129635470280944, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
     Label: 
+    Effect: {fileID: 0}
     Amount: 4
     Chance: 25
     Index: 0
     _weight: 0
-    Effect: {fileID: 0}
   - Icon: {fileID: 7005750741070879577, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
     Label: 
+    Effect: {fileID: 0}
     Amount: 5
     Chance: 10
     Index: 0
     _weight: 0
-    Effect: {fileID: 0}
   - Icon: {fileID: 7005750741070879577, guid: 4f706def4c0d68845858ebae892dc1b3, type: 3}
     Label: 
+    Effect: {fileID: 0}
     Amount: 5
     Chance: 10
     Index: 0
     _weight: 0
-    Effect: {fileID: 0}
   usosMaximos: 3
 --- !u!114 &5459272809994230601
 MonoBehaviour:

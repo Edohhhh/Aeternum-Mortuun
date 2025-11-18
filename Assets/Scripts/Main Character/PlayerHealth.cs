@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using UnityEngine.SceneManagement;
+using System.Diagnostics;
 
 public class PlayerHealth : MonoBehaviour
 {
@@ -9,8 +10,8 @@ public class PlayerHealth : MonoBehaviour
     public float currentHealth = 5f;
 
     [Header("Regeneration")]
-    [Tooltip("Si está activo, el jugador regenerará vida después de recibir/esperar regenDelay.")]
-    public bool enableRegeneration = false;     // <-- Nuevo toggle
+    [Tooltip("Si est? activo, el jugador regenerar? vida despu?s de recibir/esperar regenDelay.")]
+    public bool enableRegeneration = false;
     public float regenerationRate = 2f;
     public float regenDelay = 3f;
     private bool regenActive = false;
@@ -25,17 +26,23 @@ public class PlayerHealth : MonoBehaviour
 
     [Header("UI")]
     public HealthUI healthUI;
-    public HealCounterUI healCounterUI;
+    public HealCounterUI healCounterUI; // Tu script ya ten?a esto
 
     private PlayerController playerController;
 
     [Header("Debug/Testing")]
     public float healAmount = 1f;
 
-    [Header("Heal (Q) - Límite por escena")]
-    [Tooltip("Cuántas veces puede curarse el jugador por escena con Q.")]
+    [Header("Heal (Q) - L?mite por escena")]
+    [Tooltip("Cu?ntas veces puede curarse el jugador por escena con Q.")]
     public int maxHealsPerScene = 3;
     private int healsLeft;
+
+    // --- Variables de Knockback por defecto ---
+    // (Estos son los valores que se usar?n si un enemigo no especifica otros)
+    private float defaultKnockbackForce = 10f;
+    private float defaultKnockbackDuration = 0.2f;
+
 
     private void Awake()
     {
@@ -50,7 +57,6 @@ public class PlayerHealth : MonoBehaviour
         healsLeft = maxHealsPerScene;
         UpdateHealCounterUI();
 
-        // Asegurar que no haya coroutines de regen colgando
         if (regenRoutine != null) StopCoroutine(regenRoutine);
         regenActive = false;
     }
@@ -70,26 +76,21 @@ public class PlayerHealth : MonoBehaviour
             UnityEngine.Debug.Log("[Heal] No quedan curas (Q) para esta escena.");
             return;
         }
-
         if (currentHealth <= 0f)
         {
-            UnityEngine.Debug.Log("[Heal] No puedes curarte: estás muerto.");
+            UnityEngine.Debug.Log("[Heal] No puedes curarte: est?s muerto.");
             return;
         }
 
         ModifyHealthFlat(healAmount);
-
         healsLeft--;
         UpdateHealCounterUI();
-
-        UnityEngine.Debug.Log($"[Heal] Usada Q. Curó {healAmount}. Health actual: {currentHealth}. Q restantes: {healsLeft}");
-
-        // Nota: NO reiniciamos el delay de regen aquí para evitar que usar Q active la regeneración.
-        // Si preferís lo contrario, descomenta la siguiente línea:
-        // RestartRegenDelay();
+        UnityEngine.Debug.Log($"[Heal] Usada Q. Cur? {healAmount}. Health actual: {currentHealth}. Q restantes: {healsLeft}");
     }
 
-    public void TakeDamage(float amount, Vector2 sourcePosition)
+    // --- ESTE ES EL M?TODO MODIFICADO ---
+    // A?adimos 'knockbackForce' y 'knockbackDuration' como par?metros opcionales
+    public void TakeDamage(float amount, Vector2 sourcePosition, float knockbackForce = 10f, float knockbackDuration = 0.2f)
     {
         if (IsInvulnerable || (playerController != null && playerController.stateMachine.CurrentState == playerController.KnockbackState))
             return;
@@ -103,15 +104,17 @@ public class PlayerHealth : MonoBehaviour
             return;
         }
 
+        // Usa la fuerza y duraci?n recibidas (la explosi?n enviar? valores altos)
         Vector2 knockDir = (transform.position - (Vector3)sourcePosition).normalized;
+        if (knockDir == Vector2.zero) knockDir = Vector2.up; // Evitar divisi?n por cero
+
         var knockback = playerController.KnockbackState;
-        knockback.SetKnockback(knockDir, 10f, 0.2f);
+        knockback.SetKnockback(knockDir, knockbackForce, knockbackDuration); // Usa los nuevos valores
         playerController.stateMachine.ChangeState(knockback);
 
         StartCoroutine(DamageFlash());
         StartCoroutine(TemporaryInvulnerability());
 
-        // Reinicia la cuenta atrás de regeneración SOLO si la regeneración está habilitada
         if (enableRegeneration)
             RestartRegenDelay();
     }
@@ -143,7 +146,7 @@ public class PlayerHealth : MonoBehaviour
 
     private void RestartRegenDelay()
     {
-        if (!enableRegeneration) return; // protección extra
+        if (!enableRegeneration) return;
 
         if (regenRoutine != null)
             StopCoroutine(regenRoutine);

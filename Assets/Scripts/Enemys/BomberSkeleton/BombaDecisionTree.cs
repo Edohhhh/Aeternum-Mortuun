@@ -1,10 +1,5 @@
 using UnityEngine;
 
-// Asumo que tienes clases base:
-// public interface IDesitionNode { void Execute(); }
-// public class ActionNode : IDesitionNode { ... }
-// public class QuestionNode : IDesitionNode { ... }
-
 public class BombaDecisionTree : MonoBehaviour
 {
     private IDesitionNode rootNode;
@@ -18,36 +13,34 @@ public class BombaDecisionTree : MonoBehaviour
 
     private void Update()
     {
-        // No tomar decisiones si está spawneando o ya está en proceso de explotar/morir
         if (boss.IsSpawning() || boss.IsExploding())
             return;
 
         rootNode.Execute();
     }
 
+    // Asegúrate de que tu CreateTree tenga esta lógica
     private void CreateTree()
     {
-        // 1. Acciones (Nodos Hoja)
+        // 1. Acciones
         var deathAction = new ActionNode(() => boss.Transition(EnemyInputs.Die));
         var explodeAction = new ActionNode(() => boss.Transition(EnemyInputs.Explode));
         var followAction = new ActionNode(() => boss.Transition(EnemyInputs.SeePlayer));
         var idleAction = new ActionNode(() => boss.Transition(EnemyInputs.LostPlayer));
 
-        // 2. Decisiones (Nodos Rama)
+        // 2. Decisiones
 
-        // Pregunta 3: ¿Veo al jugador?
-        // Si sí -> Sigue (followAction)
-        // Si no -> Quieto (idleAction)
+        // Pregunta 4: ¿Veo al jugador (rango exterior)?
         var canSee = new QuestionNode(followAction, idleAction, boss.IsPlayerInDetectionRange);
 
+        // Pregunta 3: ¿Está el jugador DEMASIADO cerca (rango interior)?
+        // Esta función 'IsPlayerInStandoffRange' ahora lee la bandera del trigger
+        var isTooClose = new QuestionNode(idleAction, canSee, boss.IsPlayerInStandoffRange);
+
         // Pregunta 2: ¿Se acabó el tiempo?
-        // Si sí -> Explota (explodeAction)
-        // Si no -> Pregunta 3 (canSee)
-        var isTimerDone = new QuestionNode(explodeAction, canSee, boss.IsExplosionTimerDone);
+        var isTimerDone = new QuestionNode(explodeAction, isTooClose, boss.IsExplosionTimerDone);
 
         // Pregunta 1 (Raíz): ¿Estoy muerto?
-        // Si sí -> Muere (deathAction)
-        // Si no -> Pregunta 2 (isTimerDone)
         var isDead = new QuestionNode(deathAction, isTimerDone, IsDead);
 
         rootNode = isDead;

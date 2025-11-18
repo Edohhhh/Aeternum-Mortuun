@@ -8,7 +8,6 @@ public class BombaFollowState : State<EnemyInputs>
     private readonly Transform enemyTransform;
     private Vector2 currentVelocity = Vector2.zero;
 
-    // Constructor de 4 argumentos para BombaController
     public BombaFollowState(IEnemyDataProvider dataProvider, Animator anim, Rigidbody2D rigidBody, Transform transform)
     {
         this.data = dataProvider;
@@ -36,25 +35,19 @@ public class BombaFollowState : State<EnemyInputs>
     public override void FixedExecute()
     {
         if (data == null || data.GetPlayer() == null || rb == null) return;
-
         Vector2 toPlayer = (Vector2)data.GetPlayer().position - (Vector2)enemyTransform.position;
         Vector2 dir = toPlayer.sqrMagnitude > 0.0001f ? toPlayer.normalized : Vector2.zero;
-
         Vector2 desiredVel = dir * data.GetMaxSpeed();
         float accel = Mathf.Max(0f, data.GetAcceleration());
-
-        currentVelocity = Vector2.MoveTowards(
-            currentVelocity,
-            desiredVel,
-            accel * Time.fixedDeltaTime
-        );
-
+        currentVelocity = Vector2.MoveTowards(currentVelocity, desiredVel, accel * Time.fixedDeltaTime);
         rb.MovePosition(rb.position + currentVelocity * Time.fixedDeltaTime);
     }
 
+    // ESTA PARTE ES CRUCIAL para evitar el "empujón"
     public override void Sleep()
     {
         if (animator) animator.SetBool("isWalking", false);
+        currentVelocity = Vector2.zero; // Resetea la inercia
         base.Sleep();
     }
 }

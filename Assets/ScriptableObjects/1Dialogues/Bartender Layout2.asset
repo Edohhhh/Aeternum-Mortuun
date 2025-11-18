@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98845fb8652284d9caf1c1de16fafd3f, type: 3}
+  m_Name: Bartender Layout2
+  m_EditorClassIdentifier: 
+  npcName: Bartender
+  npcPortrait: {fileID: 7481529506853502804, guid: 4b8aa57e80bbc4c688b9314355fe3fca, type: 3}
+  dialogueLines:
+  - Buenos dias.
+  - Lo lamento, no tengo tiempo para preparar bebidas.
+  - Hay una rata gigante en mi despensa y la puerta esta atorada...
+  - Quizas un fuerte Golpe sea capaz de abrirla...
+  autoProgressLines: 01010101
+  autoProgressDelay: 1.5
+  typingSpeed: 0.05
+  voiceSound: {fileID: 0}
+  voicePitch: 1

@@ -1,0 +1,25 @@
+using UnityEngine;
+
+public class ArqueroIdleState : State<EnemyInputs>
+{
+    private readonly Animator animator;
+    private readonly Rigidbody2D rb;
+
+    public ArqueroIdleState(ArqueroController ctrl, Animator anim, Rigidbody2D rigidBody)
+    {
+        animator = anim;
+        rb = rigidBody;
+    }
+
+    public override void Awake()
+    {
+        base.Awake();
+
+        if (animator != null)
+            animator.SetBool("isWalking", false);
+
+        // El Arquero siempre est� quieto
+        if (rb != null)
+            rb.linearVelocity = Vector2.zero;
+    }
+}

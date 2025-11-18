@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3776c956bb381e4593c8bdf8a355b12, type: 3}
+  m_Name: RuletaPobrePool 3
+  m_EditorClassIdentifier: 
+  entries:
+  - effect: {fileID: 11400000, guid: fa4e204fd2a8d514185a1f2078563560, type: 2}
+    chance: 5
+  - effect: {fileID: 11400000, guid: 5ec49369cfde9425d8b8092a079a84ce, type: 2}
+    chance: 1
+  - effect: {fileID: 11400000, guid: 805f890e7de212e44a586f0cc0c0d0d6, type: 2}
+    chance: 5
+  - effect: {fileID: 11400000, guid: 6a1daedc5333e4e98ad89786e0372ea8, type: 2}
+    chance: 5
+  - effect: {fileID: 11400000, guid: 27fed1059bc2f4512b32b81ba551bef9, type: 2}
+    chance: 3
+  - effect: {fileID: 11400000, guid: b3931077e08daca47bf5274491c655de, type: 2}
+    chance: 3

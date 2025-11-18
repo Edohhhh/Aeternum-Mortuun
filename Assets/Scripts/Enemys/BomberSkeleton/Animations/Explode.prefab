@@ -13,9 +13,10 @@ GameObject:
   - component: {fileID: 153703613950993540}
   - component: {fileID: 7692318175843615427}
   - component: {fileID: 5206374753000819348}
-  m_Layer: 0
+  - component: {fileID: -1560669956897285703}
+  m_Layer: 3
   m_Name: Explode
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -127,7 +128,12 @@ MonoBehaviour:
   initialRadius: 0.82
   finalRadius: 2.95
   growthDuration: 0.5
-  damageAmount: 4
+  damageAmount: 2
+  recoilForce: 13.36
+  recoilDuration: 0.3
+  playerLayerMask:
+    serializedVersion: 2
+    m_Bits: 64
 --- !u!58 &5206374753000819348
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -162,5 +168,32 @@ CircleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
-  m_Radius: 2.5
+  m_Offset: {x: -0.014001846, y: 0}
+  m_Radius: 2.9181027
+--- !u!50 &-1560669956897285703
+Rigidbody2D:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3472978729823498716}
+  m_BodyType: 1
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 4
