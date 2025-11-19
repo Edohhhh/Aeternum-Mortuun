@@ -425,6 +425,9 @@ MonoBehaviour:
   startRoom:
     id: 0
     roomName: Tutorial
+  bossRoom:
+    id: 27
+    roomName: BossDiablo
   winRoom:
     id: 28
     roomName: Victory
@@ -438,14 +441,10 @@ MonoBehaviour:
     roomName: Coliseo slime
   - id: 5
     roomName: Coliseo Esqueleto
-  - id: 6
-    roomName: bar
   - id: 7
     roomName: "EspecialAra\xF1a"
   - id: 8
     roomName: Coliseo
-  - id: 6
-    roomName: bar Rata
   hardRooms:
   - id: 7
     roomName: BossGolem
@@ -459,6 +458,14 @@ MonoBehaviour:
     roomName: "EspecialAra\xF1a"
   - id: 12
     roomName: Coliseo
+  intermediateRooms:
+  - id: 24
+    roomName: bar
+  - id: 25
+    roomName: bar Rata
+  - id: 26
+    roomName: barLayout2
+  roomsPerIntermediate: 3
   easyCount: 1
   mediumCount: 4
   hardCount: 5
