@@ -6,7 +6,14 @@ public class DiabloAttack_Walls : IDiabloAttack
 
     private DiabloController ctrl;
 
-    private enum Phase { Warning, MovingIn, Gap }
+    // Fases:
+    //  - Warning: delay antes de que aparezcan
+    //  - SlowIn: van desde spawn -> mid (lento)
+    //  - BackOut: vuelven desde mid -> spawn (lento)
+    //  - FastIn: van desde spawn -> centro (rápido, se frenan al chocar)
+    //  - Holding: se quedan un rato apretando
+    //  - Gap: pausa entre olas
+    private enum Phase { Warning, SlowIn, BackOut, FastIn, Holding, Gap }
     private Phase phase;
 
     private float timer;
@@ -15,6 +22,9 @@ public class DiabloAttack_Walls : IDiabloAttack
     private GameObject leftInst;
     private GameObject rightInst;
 
+    // Para fallback si no hay mid-points
+    private bool useFancyMovement = false;
+
     public void Start(DiabloController c)
     {
         ctrl = c;
@@ -22,6 +32,7 @@ public class DiabloAttack_Walls : IDiabloAttack
         waveIndex = 0;
         StartWarning();
 
+        // enemigos extra configurados para este ataque
         ctrl.SpawnExtraEnemiesForAttack(4);
     }
 
@@ -38,8 +49,20 @@ public class DiabloAttack_Walls : IDiabloAttack
                 UpdateWarning();
                 break;
 
-            case Phase.MovingIn:
-                UpdateMoving(dt);
+            case Phase.SlowIn:
+                UpdateSlowIn(dt);
+                break;
+
+            case Phase.BackOut:
+                UpdateBackOut(dt);
+                break;
+
+            case Phase.FastIn:
+                UpdateFastIn(dt);
+                break;
+
+            case Phase.Holding:
+                UpdateHolding();
                 break;
 
             case Phase.Gap:
@@ -76,7 +99,6 @@ public class DiabloAttack_Walls : IDiabloAttack
     private void StartWave()
     {
         timer = 0f;
-        phase = Phase.MovingIn;
 
         if (ctrl.A4_LeftWallPrefab == null ||
             ctrl.A4_RightWallPrefab == null ||
@@ -98,22 +120,97 @@ public class DiabloAttack_Walls : IDiabloAttack
             ctrl.A4_RightSpawn.position,
             ctrl.A4_RightSpawn.rotation);
 
+        useFancyMovement = (ctrl.A4_LeftMid && ctrl.A4_RightMid);
+
+        if (useFancyMovement)
+        {
+            phase = Phase.SlowIn;
+        }
+        else
+        {
+            // si no hay mid-points, vamos directo al comportamiento clásico
+            phase = Phase.FastIn;
+        }
+
         Debug.Log($"[DIABLO/Walls] Spawn walls L={leftInst.transform.position} R={rightInst.transform.position}");
     }
 
-    // ---------- MOVIMIENTO + COLISIÓN ----------
+    // ---------- MOVIMIENTO LENTO HASTA LA MITAD ----------
 
-    private void UpdateMoving(float dt)
+    private void UpdateSlowIn(float dt)
     {
         if (!leftInst || !rightInst)
         {
-            phase = Phase.Gap;
-            timer = 0f;
+            StartGapAfterError();
             return;
         }
 
-        // mover hacia el centro
         float speed = ctrl.A4_MoveSpeed;
+
+        // ir desde spawn -> mid
+        Vector3 lTarget = ctrl.A4_LeftMid.position;
+        Vector3 rTarget = ctrl.A4_RightMid.position;
+
+        leftInst.transform.position =
+            Vector3.MoveTowards(leftInst.transform.position, lTarget, speed * dt);
+
+        rightInst.transform.position =
+            Vector3.MoveTowards(rightInst.transform.position, rTarget, speed * dt);
+
+        bool leftReached = Vector3.Distance(leftInst.transform.position, lTarget) < 0.01f;
+        bool rightReached = Vector3.Distance(rightInst.transform.position, rTarget) < 0.01f;
+
+        // cuando ambas llegaron a mitad, pasamos a BackOut
+        if (leftReached && rightReached)
+        {
+            phase = Phase.BackOut;
+            timer = 0f;
+        }
+    }
+
+    // ---------- VUELTA HACIA ATRÁS (MID -> SPAWN) ----------
+
+    private void UpdateBackOut(float dt)
+    {
+        if (!leftInst || !rightInst)
+        {
+            StartGapAfterError();
+            return;
+        }
+
+        float speed = ctrl.A4_MoveSpeed;
+
+        Vector3 lTarget = ctrl.A4_LeftSpawn.position;
+        Vector3 rTarget = ctrl.A4_RightSpawn.position;
+
+        leftInst.transform.position =
+            Vector3.MoveTowards(leftInst.transform.position, lTarget, speed * dt);
+
+        rightInst.transform.position =
+            Vector3.MoveTowards(rightInst.transform.position, rTarget, speed * dt);
+
+        bool leftReached = Vector3.Distance(leftInst.transform.position, lTarget) < 0.01f;
+        bool rightReached = Vector3.Distance(rightInst.transform.position, rTarget) < 0.01f;
+
+        if (leftReached && rightReached)
+        {
+            // ahora sí, rush rápido al centro
+            phase = Phase.FastIn;
+            timer = 0f;
+        }
+    }
+
+    // ---------- RUSH RÁPIDO AL CENTRO + COLISIÓN ----------
+
+    private void UpdateFastIn(float dt)
+    {
+        if (!leftInst || !rightInst)
+        {
+            StartGapAfterError();
+            return;
+        }
+
+        float speed = useFancyMovement ? ctrl.A4_FastMoveSpeed : ctrl.A4_MoveSpeed;
 
         Vector3 lp = leftInst.transform.position;
         Vector3 rp = rightInst.transform.position;
@@ -124,7 +221,7 @@ public class DiabloAttack_Walls : IDiabloAttack
         leftInst.transform.position = lp;
         rightInst.transform.position = rp;
 
-        // Comprobamos colisión usando los BoxCollider2D
+        // Comprobamos colisión usando los colliders
         var leftCol = leftInst.GetComponent<Collider2D>();
         var rightCol = rightInst.GetComponent<Collider2D>();
 
@@ -135,12 +232,11 @@ public class DiabloAttack_Walls : IDiabloAttack
             Bounds lb = leftCol.bounds;
             Bounds rb = rightCol.bounds;
 
-            // Se tocan cuando el max.x de la izquierda llega al min.x de la derecha
             collided = lb.max.x >= rb.min.x;
 
             if (collided)
             {
-                // Corrige el solapamiento para que queden justo tocándose
+                // ajustar para que queden justito tocándose
                 float overlap = lb.max.x - rb.min.x;
                 if (overlap > 0f)
                 {
@@ -159,13 +255,30 @@ public class DiabloAttack_Walls : IDiabloAttack
         }
         else
         {
-            // Fallback por si algún prefab no tiene collider
+            // Fallback si falta algún collider
             collided = lp.x >= rp.x;
         }
 
         if (collided)
         {
-            Debug.Log("[DIABLO/Walls] Colliders contact → destroy walls");
+            Debug.Log("[DIABLO/Walls] Colliders contact → holding");
+            phase = Phase.Holding;
+            timer = 0f;
+        }
+    }
+
+    // ---------- HOLDING (SE QUEDAN APRETANDO) ----------
+
+    private void UpdateHolding()
+    {
+        if (!leftInst || !rightInst)
+        {
+            StartGapAfterError();
+            return;
+        }
+
+        if (timer >= ctrl.A4_HoldTime)
+        {
             DestroyWalls();
             phase = Phase.Gap;
             timer = 0f;
@@ -190,6 +303,15 @@ public class DiabloAttack_Walls : IDiabloAttack
                 IsFinished = true;
             }
         }
+    }
+
+    private void StartGapAfterError()
+    {
+        // Si por algún motivo las paredes desaparecen antes,
+        // evitamos que se quede colgado el ataque.
+        DestroyWalls();
+        phase = Phase.Gap;
+        timer = 0f;
     }
 
     private void DestroyWalls()

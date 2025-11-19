@@ -118,8 +118,17 @@ public class DiabloController : MonoBehaviour, IEnemyDataProvider
     [SerializeField] private Transform a4_leftSpawn;
     [SerializeField] private Transform a4_rightSpawn;
 
-    [SerializeField] private float a4_warnTime = 0.6f;   // tiempo de aviso (por ahora solo delay)
-    [SerializeField] private float a4_moveSpeed = 6f;    // velocidad hacia el centro
+  
+    [SerializeField] private Transform a4_leftMid;
+    [SerializeField] private Transform a4_rightMid;
+
+    [SerializeField] private float a4_warnTime = 0.6f;   // tiempo de aviso
+
+    // velocidad lenta (hasta mitad y al volver)
+    [SerializeField] private float a4_moveSpeed = 6f;
+
+    [SerializeField] private float a4_fastMoveSpeed = 12f;
+
     [SerializeField] private float a4_holdTime = 0.4f;   // cuánto tiempo quedan apretando
     [SerializeField] private int a4_waves = 3;           // cuántas veces se repite
     [SerializeField] private float a4_waveGap = 1f;      // pausa entre ola y ola
@@ -156,14 +165,20 @@ public class DiabloController : MonoBehaviour, IEnemyDataProvider
     [SerializeField] private LayerMask a6_playerMask;        // capa del jugador
 
     [System.Serializable]
-    public class ExtraSpawnConfig
+    public class ExtraSpawn
     {
-        public string name;           // solo para que se vea bonito en el inspector
-        public GameObject prefab;     // qué enemigo spawnea
-        public Transform[] points;    // dónde spawnearlo (uno por waypoint)
+        public string name = "Extra Spawn";
+
+        [Tooltip("Prefabs de enemigos que se pueden spawnear en este ataque")]
+        public GameObject[] prefabs;
+
+        [Tooltip("Puntos donde aparecerán los enemigos")]
+        public Transform[] points;
     }
     [Header("Extra enemy spawns (por ataque)")]
-    [SerializeField] private ExtraSpawnConfig[] extraSpawns;
+    [SerializeField]
+    private ExtraSpawn[] extraSpawns;
+    public ExtraSpawn[] ExtraSpawns => extraSpawns;
 
 
     private float idleCharge = 0f;
@@ -426,8 +441,12 @@ public class DiabloController : MonoBehaviour, IEnemyDataProvider
     public Transform A4_LeftSpawn => a4_leftSpawn;
     public Transform A4_RightSpawn => a4_rightSpawn;
 
+    public Transform A4_LeftMid => a4_leftMid;
+    public Transform A4_RightMid => a4_rightMid;
+
     public float A4_WarnTime => a4_warnTime;
     public float A4_MoveSpeed => a4_moveSpeed;
+    public float A4_FastMoveSpeed => a4_fastMoveSpeed;
     public float A4_HoldTime => a4_holdTime;
     public int A4_Waves => a4_waves;
     public float A4_WaveGap => a4_waveGap;
@@ -462,20 +481,29 @@ public class DiabloController : MonoBehaviour, IEnemyDataProvider
     public int A6_Damage => a6_damage;
     public LayerMask A6_PlayerMask => a6_playerMask;
 
-    public void SpawnExtraEnemiesForAttack(int attackId)
+    public void SpawnExtraEnemiesForAttack(int attackIndex)
     {
         if (extraSpawns == null) return;
+        if (attackIndex < 0 || attackIndex >= extraSpawns.Length) return;
 
-        int idx = attackId - 1; // ataques son 1..6
-        if (idx < 0 || idx >= extraSpawns.Length) return;
+        var set = extraSpawns[attackIndex];
+        if (set == null) return;
 
-        var cfg = extraSpawns[idx];
-        if (!cfg.prefab || cfg.points == null) return;
+        if (set.prefabs == null || set.prefabs.Length == 0) return;
+        if (set.points == null || set.points.Length == 0) return;
 
-        foreach (var p in cfg.points)
+        for (int i = 0; i < set.points.Length; i++)
         {
+            Transform p = set.points[i];
             if (!p) continue;
-            Object.Instantiate(cfg.prefab, p.position, p.rotation);
+
+            // Elegís cómo seleccionar el prefab:
+            GameObject prefab = set.prefabs[i % set.prefabs.Length];   // cíclico
+                                                                       // GameObject prefab = set.prefabs[Random.Range(0, set.prefabs.Length)]; // aleatorio
+
+            if (!prefab) continue;
+
+            Object.Instantiate(prefab, p.position, p.rotation);
         }
     }
 

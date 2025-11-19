@@ -6,6 +6,7 @@ public class EnemyFollowState : State<EnemyInputs>
     private readonly IEnemyDataProvider data;
     private readonly Rigidbody2D rb;
     private readonly Animator animator;
+    private readonly EnemyHealth health;
     private Vector2 currentVelocity = Vector2.zero;
 
     // Este es el constructor de 3 argumentos que usan tus otros enemigos
@@ -15,6 +16,7 @@ public class EnemyFollowState : State<EnemyInputs>
         this.data = enemy.GetComponent<IEnemyDataProvider>();
         this.rb = enemy.GetComponent<Rigidbody2D>();
         this.animator = enemy.GetComponent<Animator>();
+        this.health = enemy.GetComponent<EnemyHealth>();
     }
 
     public override void Awake()
@@ -30,12 +32,15 @@ public class EnemyFollowState : State<EnemyInputs>
 
     public override void Execute()
     {
+        if (health != null && health.IsStunned) return;
+
         if (data == null || data.GetPlayer() == null) return;
         enemy.rotation = Quaternion.identity;
     }
 
     public override void FixedExecute()
     {
+        if (health != null && health.IsStunned) return;  // importantísimo
         if (data == null || data.GetPlayer() == null || rb == null) return;
 
         Vector2 toPlayer = (Vector2)data.GetPlayer().position - (Vector2)enemy.position;

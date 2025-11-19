@@ -30,8 +30,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -21.034512, y: 18.54, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 1
+  m_LocalScale: {x: 0.7, y: 3.2836454, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -78,7 +78,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   m_Color: {r: 0.9150943, g: 0.15107687, b: 0.6031967, a: 1}
   m_FlipX: 0
@@ -150,7 +150,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetPoint: {fileID: 0}
   moveSpeed: 1000000
-  startActive: 1
+  startActive: 0
 --- !u!95 &6061030069195974300
 Animator:
   serializedVersion: 7

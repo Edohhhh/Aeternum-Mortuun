@@ -4,6 +4,7 @@ public class EnemyDeathState : State<EnemyInputs>
 {
     private readonly MonoBehaviour enemy;
     private readonly float fallbackDuration;
+    private readonly float destroyDelay;
     private float timer;
 
     private Animator animator;
@@ -14,10 +15,11 @@ public class EnemyDeathState : State<EnemyInputs>
     private float savedGravity;
     private bool hadRb;
 
-    public EnemyDeathState(MonoBehaviour enemy, float fallbackDuration = 1.0f)
+    public EnemyDeathState(MonoBehaviour enemy,float fallbackDuration = 1.0f,float destroyDelay = 2.0f)
     {
         this.enemy = enemy;
         this.fallbackDuration = Mathf.Max(0.1f, fallbackDuration);
+        this.destroyDelay = Mathf.Max(0f, destroyDelay);
     }
 
     public override void Awake()
@@ -86,8 +88,13 @@ public class EnemyDeathState : State<EnemyInputs>
 
     private void SafeDestroy()
     {
-        if (EnemyManager.Instance) EnemyManager.Instance.UnregisterEnemy();
-        Object.Destroy(enemy.gameObject);
+        if (EnemyManager.Instance)
+            EnemyManager.Instance.UnregisterEnemy();
+
+        if (destroyDelay > 0f)
+            Object.Destroy(enemy.gameObject, destroyDelay);
+        else
+            Object.Destroy(enemy.gameObject);
     }
 
 }

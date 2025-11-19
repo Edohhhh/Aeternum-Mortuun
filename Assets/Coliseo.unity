@@ -10488,7 +10488,7 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 0
-      m_TileSpriteIndex: 0
+      m_TileSpriteIndex: 1
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
@@ -10501,10 +10501,10 @@ Tilemap:
   - m_RefCount: 0
     m_Data: {fileID: 0}
   m_TileSpriteArray:
-  - m_RefCount: 1
-    m_Data: {fileID: -110766199935775122, guid: cc5fe9e6c7a519a44b955a28dc77189c, type: 3}
   - m_RefCount: 0
     m_Data: {fileID: 0}
+  - m_RefCount: 1
+    m_Data: {fileID: -110766199935775122, guid: cc5fe9e6c7a519a44b955a28dc77189c, type: 3}
   m_TileMatrixArray:
   - m_RefCount: 1
     m_Data:
@@ -11779,13 +11779,7 @@ MonoBehaviour:
   animator: {fileID: 0}
   rb: {fileID: 0}
   hitbox: {fileID: 1715398195}
-  initialPowerUps:
-  - {fileID: 11400000, guid: ac29896c0cfd9c045a395ac8ca84a45d, type: 2}
-  - {fileID: 11400000, guid: ac29896c0cfd9c045a395ac8ca84a45d, type: 2}
-  - {fileID: 11400000, guid: ac29896c0cfd9c045a395ac8ca84a45d, type: 2}
-  - {fileID: 11400000, guid: ac29896c0cfd9c045a395ac8ca84a45d, type: 2}
-  - {fileID: 11400000, guid: ac29896c0cfd9c045a395ac8ca84a45d, type: 2}
-  - {fileID: 11400000, guid: ac29896c0cfd9c045a395ac8ca84a45d, type: 2}
+  initialPowerUps: []
   lastNonZeroMoveInput: {x: 1, y: 0}
   dashCooldownTimer: 0
   knockbackDecay: 18

@@ -476,7 +476,7 @@ MonoBehaviour:
   m_LightType: 1
   m_BlendStyleIndex: 0
   m_FalloffIntensity: 0.5
-  m_Color: {r: 1, g: 0.10611947, b: 0, a: 1}
+  m_Color: {r: 1, g: 0.96754205, b: 0, a: 1}
   m_Intensity: 1.5
   m_LightVolumeIntensity: 1
   m_LightVolumeEnabled: 0
@@ -7007,10 +7007,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 923966672}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 974bab89db59b462cac77d74b31df874, type: 3}
+  m_Script: {fileID: 11500000, guid: fea10051931574f6f8ece003218df77e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dialogueData: {fileID: 11400000, guid: f28be37b4a1654d7683fefda4e498964, type: 2}
+  dialogueData: {fileID: 11400000, guid: 576b2722af1404fb9b43f3fd5bcc8885, type: 2}
   dialoguePanel: {fileID: 1522769985}
   dialogueText: {fileID: 93830546}
   nameText: {fileID: 1071497208}
@@ -7020,8 +7020,9 @@ MonoBehaviour:
   playerTag: Player
   interactIcon: {fileID: 3586741604311950002, guid: e5c2a70ce542543008496729a857058b, type: 3}
   iconOffsetY: 1.5
-  vidaACobrar: 1
-  noHealthMessage: No tienes suficiente vida para usar este altar.
+  vidaACobrar: 0.5
+  minMaxHealth: 0.5
+  noHealthMessage: "No tienes suficiente vida m\xE1xima para seguir apostando."
   wheelUIController: {fileID: 0}
 --- !u!1 &932963960
 GameObject:

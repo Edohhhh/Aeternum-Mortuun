@@ -120,7 +120,7 @@ public class DiabloAttack_XPlus : IDiabloAttack
         t = 0f;
         phase = Phase.WarnX;
 
-        ctrl.SpawnExtraEnemiesForAttack(1);
+        ctrl.SpawnExtraEnemiesForAttack(0);
 
         // AVISO de la X: dos rayos diagonales entre las esquinas
         beams = new[]
