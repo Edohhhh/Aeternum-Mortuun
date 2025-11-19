@@ -9385,7 +9385,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!82 &1714177117
 AudioSource:
   m_ObjectHideFlags: 0
@@ -9395,7 +9395,7 @@ AudioSource:
   m_GameObject: {fileID: 1714177116}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: -6735070044237822930, guid: 2589dda68bd2be64cbfc6d2537e9369f, type: 2}
   m_audioClip: {fileID: 8300000, guid: b8136a7ae38baee4ca474abb73725d52, type: 3}
   m_Resource: {fileID: 8300000, guid: b8136a7ae38baee4ca474abb73725d52, type: 3}
   m_PlayOnAwake: 1
@@ -12530,6 +12530,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 558813016}
     - target: {fileID: 8938823856803099788, guid: 65b3dd1001982684695ee6c7c9145c96, type: 3}
+      propertyPath: animCount
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8938823856803099788, guid: 65b3dd1001982684695ee6c7c9145c96, type: 3}
       propertyPath: a1_topLeft
       value: 
       objectReference: {fileID: 468498605}
@@ -12565,6 +12569,30 @@ PrefabInstance:
       propertyPath: a1_bottomRight
       value: 
       objectReference: {fileID: 156072452}
+    - target: {fileID: 8938823856803099788, guid: 65b3dd1001982684695ee6c7c9145c96, type: 3}
+      propertyPath: ch_fireColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8938823856803099788, guid: 65b3dd1001982684695ee6c7c9145c96, type: 3}
+      propertyPath: ch_fireColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8938823856803099788, guid: 65b3dd1001982684695ee6c7c9145c96, type: 3}
+      propertyPath: ch_fireColor.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8938823856803099788, guid: 65b3dd1001982684695ee6c7c9145c96, type: 3}
+      propertyPath: ch_warnColor.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8938823856803099788, guid: 65b3dd1001982684695ee6c7c9145c96, type: 3}
+      propertyPath: ch_warnColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8938823856803099788, guid: 65b3dd1001982684695ee6c7c9145c96, type: 3}
+      propertyPath: ch_warnColor.g
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8938823856803099788, guid: 65b3dd1001982684695ee6c7c9145c96, type: 3}
       propertyPath: a6_damageRadius
       value: 1
@@ -12633,6 +12661,34 @@ PrefabInstance:
       propertyPath: 'a1_waypointsPlus.Array.data[3]'
       value: 
       objectReference: {fileID: 444871899}
+    - target: {fileID: 8938823856803099788, guid: 65b3dd1001982684695ee6c7c9145c96, type: 3}
+      propertyPath: extraSpawns.Array.data[0].points.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8938823856803099788, guid: 65b3dd1001982684695ee6c7c9145c96, type: 3}
+      propertyPath: extraSpawns.Array.data[3].points.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8938823856803099788, guid: 65b3dd1001982684695ee6c7c9145c96, type: 3}
+      propertyPath: extraSpawns.Array.data[4].points.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8938823856803099788, guid: 65b3dd1001982684695ee6c7c9145c96, type: 3}
+      propertyPath: extraSpawns.Array.data[0].prefabs.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8938823856803099788, guid: 65b3dd1001982684695ee6c7c9145c96, type: 3}
+      propertyPath: extraSpawns.Array.data[3].prefabs.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8938823856803099788, guid: 65b3dd1001982684695ee6c7c9145c96, type: 3}
+      propertyPath: extraSpawns.Array.data[4].prefabs.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8938823856803099788, guid: 65b3dd1001982684695ee6c7c9145c96, type: 3}
+      propertyPath: extraSpawns.Array.data[5].prefabs.Array.size
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8938823856803099788, guid: 65b3dd1001982684695ee6c7c9145c96, type: 3}
       propertyPath: 'extraSpawns.Array.data[0].points.Array.data[0]'
       value: 
@@ -12713,6 +12769,26 @@ PrefabInstance:
       propertyPath: 'extraSpawns.Array.data[5].points.Array.data[3]'
       value: 
       objectReference: {fileID: 1480085862}
+    - target: {fileID: 8938823856803099788, guid: 65b3dd1001982684695ee6c7c9145c96, type: 3}
+      propertyPath: 'extraSpawns.Array.data[0].prefabs.Array.data[0]'
+      value: 
+      objectReference: {fileID: 7460429868912593326, guid: 66c7741e70877429fa80ff187c586c60, type: 3}
+    - target: {fileID: 8938823856803099788, guid: 65b3dd1001982684695ee6c7c9145c96, type: 3}
+      propertyPath: 'extraSpawns.Array.data[3].prefabs.Array.data[0]'
+      value: 
+      objectReference: {fileID: 7460429868912593326, guid: 66c7741e70877429fa80ff187c586c60, type: 3}
+    - target: {fileID: 8938823856803099788, guid: 65b3dd1001982684695ee6c7c9145c96, type: 3}
+      propertyPath: 'extraSpawns.Array.data[3].prefabs.Array.data[1]'
+      value: 
+      objectReference: {fileID: 7460429868912593326, guid: 66c7741e70877429fa80ff187c586c60, type: 3}
+    - target: {fileID: 8938823856803099788, guid: 65b3dd1001982684695ee6c7c9145c96, type: 3}
+      propertyPath: 'extraSpawns.Array.data[4].prefabs.Array.data[0]'
+      value: 
+      objectReference: {fileID: 7386942438368151386, guid: e5935819e410d44f6b7998b650b57b48, type: 3}
+    - target: {fileID: 8938823856803099788, guid: 65b3dd1001982684695ee6c7c9145c96, type: 3}
+      propertyPath: 'extraSpawns.Array.data[5].prefabs.Array.data[0]'
+      value: 
+      objectReference: {fileID: 7460429868912593326, guid: 66c7741e70877429fa80ff187c586c60, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

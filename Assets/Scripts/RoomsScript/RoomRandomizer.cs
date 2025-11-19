@@ -22,18 +22,25 @@ public class RoomRandomizer : MonoBehaviour
     public static RoomRandomizer Instance { get; private set; }
 
     [Header("Sala inicial fija")]
-    [Tooltip("Sala que siempre aparecer? al inicio de la run")]
     public RoomData startRoom;
+
+    [Header("Sala ante-última fija (combate final previo)")]
+    public RoomData finalCombatRoom;
+
+    [Header("Sala de victoria")]
     public RoomData winRoom;
 
     [Header("Listas de escenas por dificultad")]
     public List<RoomData> easyRooms = new List<RoomData>();
+    public List<RoomData> intermediateRooms = new List<RoomData>();  // NUEVO
     public List<RoomData> mediumRooms = new List<RoomData>();
     public List<RoomData> hardRooms = new List<RoomData>();
 
-    [Header("Configuraci?n de la run")]
+    [Header("Configuración de la run")]
     public int easyCount = 2;
+    public int intermediateCount = 1;  // NUEVO
     public int mediumCount = 2;
+    public int intermediate2Count = 1; // NUEVO (segunda intermedia)
     public int hardCount = 1;
 
     [Header("Debug - Lista generada (orden final)")]
@@ -62,23 +69,31 @@ public class RoomRandomizer : MonoBehaviour
         generatedRun.Clear();
         currentIndex = 0;
 
-        // Si hay una sala fija asignada, agregarla al principio
-        if (startRoom != null)
-        {
-            generatedRun.Add(startRoom);
-        }
+        // 1. Sala inicial
+        if (startRoom != null) generatedRun.Add(startRoom);
 
-        // Luego agregar las salas aleatorias
+        // 2. Easy
         AddRandomRooms(easyRooms, easyCount);
+
+        // 3. Intermedio 1
+        AddRandomRooms(intermediateRooms, intermediateCount);
+
+        // 4. Medium
         AddRandomRooms(mediumRooms, mediumCount);
+
+        // 5. Intermedio 2
+        AddRandomRooms(intermediateRooms, intermediate2Count);
+
+        // 6. Hard
         AddRandomRooms(hardRooms, hardCount);
 
-        if (winRoom != null)
-        {
-            generatedRun.Add(winRoom);
-        }
+        // 7. Ante-última (combate final)
+        if (finalCombatRoom != null) generatedRun.Add(finalCombatRoom);
 
-        // Evitar IDs duplicados (mantiene el orden)
+        // 8. Sala final (ganar)
+        if (winRoom != null) generatedRun.Add(winRoom);
+
+        // Evitar duplicados por ID, respetando orden
         HashSet<int> usedIDs = new HashSet<int>();
         generatedRun = generatedRun
             .Where(r => usedIDs.Add(r.id))
@@ -109,7 +124,7 @@ public class RoomRandomizer : MonoBehaviour
         }
         else
         {
-            Debug.Log("[RoomRandomizer] No quedan m?s salas en la run.");
+            Debug.Log("[RoomRandomizer] No quedan más salas en la run.");
             SceneManager.LoadScene("Victory");
             return null;
         }

@@ -425,39 +425,47 @@ MonoBehaviour:
   startRoom:
     id: 0
     roomName: Tutorial
+  finalCombatRoom:
+    id: 15
+    roomName: BossDiablo
   winRoom:
     id: 28
     roomName: Victory
   easyRooms:
   - id: 1
     roomName: LoopSlime1
-  mediumRooms:
+  intermediateRooms:
   - id: 2
-    roomName: LoopEsqueleto1
+    roomName: bar
   - id: 3
-    roomName: Coliseo slime
+    roomName: bar Layout2
   - id: 4
-    roomName: Coliseo Esqueleto
+    roomName: bar Rata
+  mediumRooms:
   - id: 5
-    roomName: "EspecialAra\xF1a"
+    roomName: LoopEsqueleto1
   - id: 6
-    roomName: Coliseo
-  hardRooms:
+    roomName: Coliseo slime
   - id: 7
     roomName: BossGolem
   - id: 8
-    roomName: BossTopo
-  - id: 9
-    roomName: LoopMiniEsqueletosYSlimes
-  - id: 10
-    roomName: BossMimico
-  - id: 11
     roomName: "EspecialAra\xF1a"
-  - id: 12
+  - id: 9
     roomName: Coliseo
+  hardRooms:
+  - id: 10
+    roomName: Coliseo Esqueleto Arquero
+  - id: 11
+    roomName: BossTopo
+  - id: 12
+    roomName: bar
+  - id: 13
+    roomName: BossMimico
   easyCount: 1
-  mediumCount: 4
-  hardCount: 5
+  intermediateCount: 1
+  mediumCount: 5
+  intermediate2Count: 1
+  hardCount: 4
   generatedRun: []
 --- !u!4 &195921830
 Transform:
