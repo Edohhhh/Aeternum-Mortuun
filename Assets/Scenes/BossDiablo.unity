@@ -5854,6 +5854,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Portal
       objectReference: {fileID: 0}
+    - target: {fileID: 1988901040745496480, guid: 8bc3e2cbeb4a8412f8a93c0783f032af, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3090698038634401969, guid: 8bc3e2cbeb4a8412f8a93c0783f032af, type: 3}
       propertyPath: targetPoint
       value: 
@@ -5864,11 +5868,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4228299132235185309, guid: 8bc3e2cbeb4a8412f8a93c0783f032af, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -21.034512
+      value: 6.64
       objectReference: {fileID: 0}
     - target: {fileID: 4228299132235185309, guid: 8bc3e2cbeb4a8412f8a93c0783f032af, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 18.54
+      value: 2.01
       objectReference: {fileID: 0}
     - target: {fileID: 4228299132235185309, guid: 8bc3e2cbeb4a8412f8a93c0783f032af, type: 3}
       propertyPath: m_LocalPosition.z
@@ -8879,7 +8883,7 @@ Transform:
   m_GameObject: {fileID: 1317987168}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.72, y: 3.99, z: 0.025077926}
+  m_LocalPosition: {x: 6.29, y: 1.45, z: 0.025077926}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -11546,6 +11550,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4138004350312494642, guid: 3a1e1246dff2d4e0f88642abb6882685, type: 3}
+      propertyPath: m_UiScaleMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4138004350312494642, guid: 3a1e1246dff2d4e0f88642abb6882685, type: 3}
+      propertyPath: m_ReferenceResolution.x
+      value: 1920
+      objectReference: {fileID: 0}
+    - target: {fileID: 4138004350312494642, guid: 3a1e1246dff2d4e0f88642abb6882685, type: 3}
+      propertyPath: m_ReferenceResolution.y
+      value: 1080
+      objectReference: {fileID: 0}
     - target: {fileID: 4821700984448308204, guid: 3a1e1246dff2d4e0f88642abb6882685, type: 3}
       propertyPath: m_Name
       value: FadeCanvas
@@ -11553,6 +11569,10 @@ PrefabInstance:
     - target: {fileID: 4821700984448308204, guid: 3a1e1246dff2d4e0f88642abb6882685, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8615971419429373814, guid: 3a1e1246dff2d4e0f88642abb6882685, type: 3}
+      propertyPath: m_RenderMode
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

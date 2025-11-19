@@ -1,97 +1,97 @@
-using UnityEngine;
+//using UnityEngine;
 
-public class DiabloDeathState : State<EnemyInputs>
-{
-    private readonly DiabloController boss;
-    private readonly float fallbackDuration;
-    private float timer;
+//public class DiabloDeathState : State<EnemyInputs>
+//{
+//    private readonly DiabloController boss;
+//    private readonly float fallbackDuration;
+//    private float timer;
 
-    private Animator animator;
-    private Rigidbody2D rb2d;
-    private Collider2D[] colliders;
+//    private Animator animator;
+//    private Rigidbody2D rb2d;
+//    private Collider2D[] colliders;
 
-    private RigidbodyConstraints2D savedConstraints;
-    private float savedGravity;
-    private bool hadRb;
-    private bool finished;
+//    private RigidbodyConstraints2D savedConstraints;
+//    private float savedGravity;
+//    private bool hadRb;
+//    private bool finished;
 
-    public DiabloDeathState(DiabloController boss, float fallbackDuration = 1.0f)
-    {
-        this.boss = boss;
-        this.fallbackDuration = Mathf.Max(0.1f, fallbackDuration);
-    }
+//    public DiabloDeathState(DiabloController boss, float fallbackDuration = 1.0f)
+//    {
+//        this.boss = boss;
+//        this.fallbackDuration = Mathf.Max(0.1f, fallbackDuration);
+//    }
 
-    public override void Awake()
-    {
-        base.Awake();
+//    public override void Awake()
+//    {
+//        base.Awake();
 
-        animator = boss.GetComponent<Animator>();
-        rb2d = boss.GetComponent<Rigidbody2D>();
-        colliders = boss.GetComponentsInChildren<Collider2D>(true);
+//        animator = boss.GetComponent<Animator>();
+//        rb2d = boss.GetComponent<Rigidbody2D>();
+//        colliders = boss.GetComponentsInChildren<Collider2D>(true);
 
-        // Congelar física
-        if (rb2d != null)
-        {
-            hadRb = true;
-            savedConstraints = rb2d.constraints;
-            savedGravity = rb2d.gravityScale;
-            rb2d.linearVelocity = Vector2.zero;
-            rb2d.angularVelocity = 0f;
-            rb2d.gravityScale = 0f;
-            rb2d.constraints = RigidbodyConstraints2D.FreezePosition | RigidbodyConstraints2D.FreezeRotation;
-        }
+//        // Congelar física
+//        if (rb2d != null)
+//        {
+//            hadRb = true;
+//            savedConstraints = rb2d.constraints;
+//            savedGravity = rb2d.gravityScale;
+//            rb2d.linearVelocity = Vector2.zero;
+//            rb2d.angularVelocity = 0f;
+//            rb2d.gravityScale = 0f;
+//            rb2d.constraints = RigidbodyConstraints2D.FreezePosition | RigidbodyConstraints2D.FreezeRotation;
+//        }
 
-        // Apagar colliders
-        if (colliders != null)
-        {
-            for (int i = 0; i < colliders.Length; i++)
-                colliders[i].enabled = false;
-        }
+//        // Apagar colliders
+//        if (colliders != null)
+//        {
+//            for (int i = 0; i < colliders.Length; i++)
+//                colliders[i].enabled = false;
+//        }
 
-        // Lanzar animación "Die"
-        if (animator != null)
-        {
-            animator.ResetTrigger("Die");
-            animator.SetTrigger("Die");
-        }
+//        // Lanzar animación "Die"
+//        if (animator != null)
+//        {
+//            animator.ResetTrigger("Die");
+//            animator.SetTrigger("Die");
+//        }
 
-        // Registrar este estado en el Diablo para el Animation Event
-        boss.RegisterDeathState(this);
+//        // Registrar este estado en el Diablo para el Animation Event
+//       // boss.RegisterDeathState(this);
 
-        timer = 0f;
-        finished = false;
-    }
+//        timer = 0f;
+//        finished = false;
+//    }
 
-    public override void Execute()
-    {
-        if (finished) return;
+//    public override void Execute()
+//    {
+//        if (finished) return;
 
-        timer += Time.deltaTime;
+//        timer += Time.deltaTime;
 
-        // Si por algún motivo nunca llega el AnimationEvent,
-        // usamos un fallback (un poco más largo que la duración aproximada).
-        if (animator == null || timer >= fallbackDuration * 3f)
-        {
-            SafeFinish();
-        }
-    }
+//        // Si por algún motivo nunca llega el AnimationEvent,
+//        // usamos un fallback (un poco más largo que la duración aproximada).
+//        if (animator == null || timer >= fallbackDuration * 3f)
+//        {
+//            SafeFinish();
+//        }
+//    }
 
-    // Animation Event desde el clip de muerte
-    public void OnDeathAnimFinished()
-    {
-        SafeFinish();
-    }
+//    // Animation Event desde el clip de muerte
+//    public void OnDeathAnimFinished()
+//    {
+//        SafeFinish();
+//    }
 
-    private void SafeFinish()
-    {
-        if (finished) return;
-        finished = true;
+//    private void SafeFinish()
+//    {
+//        if (finished) return;
+//        finished = true;
 
-        // Opcional: lo sacamos del EnemyManager para que deje de contar como enemigo vivo
-        if (EnemyManager.Instance) EnemyManager.Instance.UnregisterEnemy();
+//        // Opcional: lo sacamos del EnemyManager para que deje de contar como enemigo vivo
+//        if (EnemyManager.Instance) EnemyManager.Instance.UnregisterEnemy();
 
-        // NO destruimos el GameObject del Diablo:
-        // nada de Destroy(boss.gameObject);
-        Debug.Log("[DIABLO] Muerte completada (sin Destroy).");
-    }
-}
+//        // NO destruimos el GameObject del Diablo:
+//        // nada de Destroy(boss.gameObject);
+//        Debug.Log("[DIABLO] Muerte completada (sin Destroy).");
+//    }
+//}
