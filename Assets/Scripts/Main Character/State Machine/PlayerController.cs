@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections.Generic; // Necesario para la lógica de PowerUpEffect
+using System.Collections.Generic;
 
 public class PlayerController : MonoBehaviour
 {
@@ -8,14 +8,10 @@ public class PlayerController : MonoBehaviour
     public float moveSpeed = 90f;
 
     [Header("Combate")]
-    // ✅ --- VALOR CAMBIADO ---
     public int baseDamage = 3;
 
-    // ✅ --- AÑADIDO ---
     [Header("Stats de Ruleta")]
-    [Tooltip("Cuántas tiradas extra tiene el jugador (stackeable)")]
     public int extraSpins = 0;
-    // ✅ --- FIN ---
 
     [Header("Dash")]
     public float dashSpeed = 300f;
@@ -36,28 +32,15 @@ public class PlayerController : MonoBehaviour
     public IdleState IdleState { get; private set; }
     public MoveState MoveState { get; private set; }
     public DashState DashState { get; private set; }
-    public RecoilState RecoilState { get; private set; }
+    public AttackState AttackState { get; private set; } // ✅ NUEVO ESTADO
     public KnockbackState KnockbackState { get; private set; }
 
     private Vector2 moveInput;
     public Vector2 lastNonZeroMoveInput = Vector2.right;
     [HideInInspector] public float dashCooldownTimer;
     public bool isInvulnerable { get; set; }
-
     [HideInInspector] public bool IsDashing { get; set; }
-    public Vector2 RequestedDashDir { get; private set; } = Vector2.right;
-
-    // Knockback
-    [Header("Knockback (Player)")]
-    public float knockbackDecay = 18f;
-    public float knockbackMaxSpeed = 22f;
-    public float knockbackStackWindow = 0.08f;
-    public bool knockbackInterruptsDash = true;
-    public bool knockbackInterruptsRecoil = true;
-
-    private Vector2 knockVel;
-    private float knockWindowTimer;
-    private bool knockActive;
+    public Vector2 RequestedDashDir { get; set; } = Vector2.right;
 
     private void Awake()
     {
@@ -65,10 +48,11 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         stateMachine = new StateMachine();
 
+        // Inicialización de Estados
         IdleState = new IdleState(this, stateMachine);
         MoveState = new MoveState(this, stateMachine);
         DashState = new DashState(this, stateMachine);
-        RecoilState = new RecoilState(this, stateMachine);
+        AttackState = new AttackState(this, stateMachine); // ✅ Instanciar AttackState
         KnockbackState = new KnockbackState(this, stateMachine);
 
         dashCooldownTimer = 0f;
@@ -78,34 +62,40 @@ public class PlayerController : MonoBehaviour
     {
         stateMachine.Initialize(IdleState);
 
-        // Este Start() se ejecuta ANTES de LoadPlayerData,
-        // así que los 'initialPowerUps' aquí son solo los de "debug"
-        // o los de una partida nueva. LoadPlayerData los sobreescribirá.
-        foreach (var powerUp in initialPowerUps)
-            if (powerUp != null) powerUp.Apply(this);
+        // Aplicar PowerUps iniciales
+        if (initialPowerUps != null)
+        {
+            foreach (var powerUp in initialPowerUps)
+            {
+                if (powerUp != null)
+                {
+                    powerUp.Apply(this);
+                }
+            }
+        }
     }
 
     private void Update()
     {
         dashCooldownTimer -= Time.deltaTime;
 
-        // 🔒 Bloquear todo input mientras dure el RecoilState (ataque)
-        if (stateMachine.CurrentState == RecoilState)
+        // 1. Prioridad Knockback
+        if (stateMachine.CurrentState == KnockbackState)
         {
             stateMachine.CurrentState.LogicUpdate();
             return;
         }
 
-        // Flip sprite hacia el cursor
+        // Flip Sprite
         var sr = GetComponent<SpriteRenderer>();
-        if (sr != null)
+        if (sr != null && canMove && !IsDashing)
         {
             Vector2 playerScreenPos = Camera.main.WorldToScreenPoint(transform.position);
             Vector2 mousePos = Input.mousePosition;
             sr.flipX = mousePos.x < playerScreenPos.x;
         }
 
-        // Input movimiento
+        // Input Movimiento
         float moveX = Input.GetAxisRaw("Horizontal");
         float moveY = Input.GetAxisRaw("Vertical");
         moveInput = new Vector2(moveX, moveY).normalized;
@@ -113,108 +103,74 @@ public class PlayerController : MonoBehaviour
         if (!IsDashing && moveInput.sqrMagnitude > 0.0001f)
             lastNonZeroMoveInput = moveInput;
 
-        // DASH: sólo desde acá, respetando cooldown y sin permitirlo en RecoilState
+        // 2. Input Ataque (Entrada al estado)
+        if (Input.GetButtonDown("Fire1") && canMove && !IsDashing)
+        {
+            if (stateMachine.CurrentState != AttackState)
+            {
+                stateMachine.ChangeState(AttackState);
+            }
+        }
+
+        // 3. Input Dash
         if (Input.GetButtonDown("Jump") &&
             dashCooldownTimer <= 0f &&
             canMove &&
             !IsDashing &&
-            stateMachine.CurrentState != RecoilState &&
             (moveInput.sqrMagnitude > 0.0001f || lastNonZeroMoveInput.sqrMagnitude > 0.0001f))
         {
-            dashCooldownTimer = dashCooldown; // fija cooldown al apretar
+            dashCooldownTimer = dashCooldown;
             RequestedDashDir = (moveInput.sqrMagnitude > 0.0001f ? moveInput : lastNonZeroMoveInput).normalized;
             stateMachine.ChangeState(DashState);
-            return; // evita doble procesamiento este frame
+            return;
         }
 
-        // FSM
         stateMachine.CurrentState.HandleInput();
         stateMachine.CurrentState.LogicUpdate();
 
-
-        // Animator: NO marcar isMoving durante Dash/Knockback/Recoil/Attack
+        // Actualizar Animador
         if (animator != null)
         {
-            bool enAtaque = animator.GetBool("isAttacking");
-            bool bloqueado = stateMachine.CurrentState == RecoilState ||
-                                stateMachine.CurrentState == KnockbackState ||
-                                stateMachine.CurrentState == DashState ||
-                                enAtaque;
+            bool actionState = stateMachine.CurrentState == AttackState ||
+                               stateMachine.CurrentState == KnockbackState ||
+                               stateMachine.CurrentState == DashState;
 
-            animator.SetBool("isMoving", !bloqueado && canMove && moveInput.sqrMagnitude > 0.0001f);
+            animator.SetBool("isMoving", !actionState && canMove && moveInput.sqrMagnitude > 0.0001f);
         }
     }
 
     private void FixedUpdate()
     {
-        // Knockback acumulativo (bloquea physics de la FSM mientras dure)
-        if (knockActive)
-        {
-            rb.linearVelocity = knockVel;
-            knockVel = Vector2.MoveTowards(knockVel, Vector2.zero, knockbackDecay * Time.fixedDeltaTime);
-            if (knockWindowTimer > 0f) knockWindowTimer -= Time.fixedDeltaTime;
-
-            if (knockVel.sqrMagnitude < 0.0001f && knockWindowTimer <= 0f)
-            {
-                knockActive = false;
-                rb.linearVelocity = Vector2.zero;
-                canMove = true;
-            }
-            return;
-        }
-
-        // Si no puedo moverme, no aplico movimiento
-        if (!canMove)
-        {
-            rb.linearVelocity = Vector2.zero;
-            return;
-        }
-
-        // FSM physics
         stateMachine.CurrentState.PhysicsUpdate();
     }
 
-    public Vector2 GetMoveInput() => moveInput;
-
-    public void ApplyKnockback(Vector2 direction, float strength)
+    public void ApplyKnockback(Vector2 direction, float force, float duration)
     {
-        if (strength <= 0f) return;
+        if (isInvulnerable) return;
 
-        if (knockbackInterruptsDash && IsDashing)
-            stateMachine.ChangeState(IdleState);
-
-        if (knockbackInterruptsRecoil && stateMachine.CurrentState == RecoilState)
-            stateMachine.ChangeState(IdleState);
-
-        canMove = false;
-
-        Vector2 impulse = direction.sqrMagnitude > 0.0001f ? direction.normalized * strength : Vector2.zero;
-        knockVel += impulse;
-        knockVel = Vector2.ClampMagnitude(knockVel, knockbackMaxSpeed);
-        knockWindowTimer = knockbackStackWindow;
-
-        knockActive = true;
+        KnockbackState.SetKnockback(direction, force, duration);
+        stateMachine.ChangeState(KnockbackState);
     }
 
-    // ==== Guardado y carga de datos del jugador ====
+    // ✅ MÉTODO DE PUENTE PARA GUARDAR (Soluciona errores en SceneChanger y Portales)
     public void SavePlayerData()
     {
-        GameDataManager.Instance.SavePlayerData(this);
+        if (GameDataManager.Instance != null)
+        {
+            GameDataManager.Instance.SavePlayerData(this);
+            Debug.Log("[PlayerController] Datos guardados.");
+        }
     }
 
-    // ✅ --- MÉTODO 'LoadPlayerData' COMPLETAMENTE REEMPLAZADO ---
-    // (Esto es VITAL para que los power-ups stackeables funcionen
-    // y no se acumulen infinitamente en cada carga de escena)
-    public void LoadPlayerData()
+    public void LoadPlayerData(PlayerData data)
     {
-        var data = GameDataManager.Instance.playerData;
+        transform.position = new Vector3(data.position[0], data.position[1], data.position[2]);
 
-        // --- Stats de vida ---
         var health = GetComponent<PlayerHealth>();
         if (health != null)
         {
             health.maxHealth = data.maxHealth;
-            health.currentHealth = health.maxHealth; // full life
+            health.currentHealth = health.maxHealth;
             health.regenerationRate = data.regenerationRate;
             health.regenDelay = data.regenDelay;
             health.invulnerableTime = data.invulnerableTime;
@@ -226,22 +182,12 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        // ✅ --- RESETEAR STATS BASE ---
-        // ¡VITAL! Resetea stats a su valor por defecto ANTES de
-        // reaplicar los power-ups, para evitar que se stackeen.
-
-        // ✅ --- VALOR CAMBIADO ---
-        this.baseDamage = 3; // (O tu valor base por defecto)
+        this.baseDamage = 3;
         this.extraSpins = 0;
-        // (Añade aquí cualquier otra stat que tus power-ups modifiquen)
 
-        // --- Restaurar perks guardadas ---
         if (data.initialPowerUps != null && data.initialPowerUps.Count > 0)
         {
-            // Crear un array nuevo con el tamaño justo
             initialPowerUps = data.initialPowerUps.ToArray();
-
-            // Reaplicar perks al jugador
             foreach (var powerUp in initialPowerUps)
             {
                 if (powerUp != null)
@@ -249,5 +195,14 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
-
+    public void OnAttackHitEnemy()
+    {
+        // Verificamos si el estado actual es AttackState
+        if (stateMachine.CurrentState == AttackState)
+        {
+            // Llamamos a la función de retroceso
+            AttackState.ApplyHitRecoil();
+        }
+    }
+    public Vector2 GetMoveInput() => moveInput;
 }

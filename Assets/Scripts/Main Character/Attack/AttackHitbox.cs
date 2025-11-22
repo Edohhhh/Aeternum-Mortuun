@@ -1,45 +1,39 @@
 ﻿using UnityEngine;
 
-[RequireComponent(typeof(Collider2D))]
-[RequireComponent(typeof(Rigidbody2D))]
 public class AttackHitbox : MonoBehaviour
 {
-    public int damage = 1;
-    public float lifeTime = 0.1f;
-    public Vector2 knockbackDir;
-    public float knockbackForce = 100f;
+    public int damage;
+    public float lifeTime = 0.15f;
+    public float hitStopDuration = 0.08f;
+    public float knockbackForce = 15f;
 
-    private void OnEnable()
+    private CombatSystem combatRef;
+    private Vector2 knockbackDir;
+
+    public void Initialize(CombatSystem combat, Vector2 dir, int dmg)
     {
-        // 1) Si la hitbox está como hijo del Player (recomendado)
-        var owner = GetComponentInParent<PlayerController>();
-
-        // 2) Fallback: si no está parented al Player, buscá por tag "Player"
-        if (owner == null)
-        {
-            var playerGo = GameObject.FindWithTag("Player");
-            if (playerGo != null) owner = playerGo.GetComponent<PlayerController>();
-        }
-
-        // Snapshot del daño actual del Player en el instante del spawn
-        if (owner != null)
-            damage = Mathf.Max(1, owner.baseDamage);
-    }
-
-    private void Start()
-    {
-        // Se destruye usando el lifetime que tengas seteado (prefab o spawner)
+        combatRef = combat;
+        knockbackDir = dir;
+        damage = dmg;
         Destroy(gameObject, lifeTime);
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (!other.CompareTag("Enemy")) return;
-
-        var enemy = other.GetComponent<EnemyHealth>();
-        if (enemy != null)
+        if (other.CompareTag("Enemy"))
         {
-            enemy.TakeDamage(damage, knockbackDir, knockbackForce);
+            var enemy = other.GetComponent<EnemyHealth>();
+            if (enemy != null)
+            {
+                enemy.TakeDamage(damage, knockbackDir, knockbackForce);
+
+                if (combatRef != null)
+                {
+                    combatRef.TriggerHitStop(hitStopDuration);
+                    // ✅ AVISAR QUE GOLPEAMOS (Para el retroceso hacia atrás)
+                    combatRef.OnAttackHit();
+                }
+            }
         }
     }
 }

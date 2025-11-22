@@ -40,7 +40,8 @@ public class GameDataManager : MonoBehaviour
         var player = UnityEngine.Object.FindFirstObjectByType<PlayerController>();
         if (player != null)
         {
-            player.LoadPlayerData();
+            // ✅ CORRECCIÓN: Se pasa 'this.playerData' como argumento
+            player.LoadPlayerData(this.playerData);
 
             // Restaurar vida completa al cambiar de escena
             var health = player.GetComponent<PlayerHealth>();
