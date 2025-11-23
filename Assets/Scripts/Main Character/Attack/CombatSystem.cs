@@ -1,131 +1,200 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections;
+using UnityEngine;
 
 public class CombatSystem : MonoBehaviour
 {
-    [Header("Configuración Combate")]
-    public float attackCooldown = 0.4f;
-    // ✅ CAMBIO: Tiempo aumentado a 2 segundos como pediste
-    public float comboResetTime = 2f;
+    [Header("Combate")]
+    public float attackCooldown = 0.30f;
+    private float attackTimer;
 
-    [Header("Movimiento Ofensivo (Si fallas)")]
-    public float recoilDistance = 2f;
-    public float recoilDuration = 0.2f;
-
-    [Header("Retroceso al Golpear (Si aciertas)")]
-    public float hitRecoilForce = 15f;
-    public float hitRecoilDuration = 0.15f;
-
-    [Header("VFX & Hitbox")]
+    [Header("Efectos / Hitbox")]
     public GameObject[] slashEffectPrefabs;
     public GameObject hitboxPrefab;
-    public float hitboxOffset = 0.8f;
+    public float hitboxOffset = 0.5f;
 
-    // Estado interno
-    private int comboIndex = 0;
-    private float comboExpireTimer;
-    private bool isStopActive;
+    [Header("Recoil")]
+    [Tooltip("Distancia que avanza el jugador al atacar (unidades de mundo).")]
+    public float recoilDistance = 0.22f;
+    [Tooltip("Duración total del micro-dash antes de frenar en seco.")]
+    public float recoilDuration = 0.07f;
+
+    [Header("Movimiento durante ataque")]
+    [Tooltip("Fijado en falso para bloquear por completo el movimiento durante el recoil.")]
+    public bool allowMovementDuringAttack = false; // 🔒 BLOQUEO TOTAL
+
+    [Header("Animator Params")]
+    [SerializeField] private string attackTriggerParam = "attackTrigger";
+    [SerializeField] private string isAttackingParam = "isAttacking";
+
+    private Rigidbody2D rb;
     private PlayerController playerController;
 
-    public Vector2 LastAttackDir { get; private set; }
+    public Vector2 LastAttackDir { get; private set; } = Vector2.right;
+
+    private Coroutine recoilRoutine;
+    private bool bufferedAttack;
+
+    private int comboIndex = 0;
+    private float comboResetTime = 1f;
+    private float comboTimer;
 
     private void Awake()
     {
+        rb = GetComponent<Rigidbody2D>();
         playerController = GetComponent<PlayerController>();
     }
 
     private void Update()
     {
-        // Cuenta regresiva para olvidar el combo
-        if (comboExpireTimer > 0)
+        attackTimer -= Time.deltaTime;
+        comboTimer -= Time.deltaTime;
+
+        if (comboTimer <= 0f)
         {
-            comboExpireTimer -= Time.deltaTime;
-            if (comboExpireTimer <= 0)
+            comboIndex = 0;
+            bufferedAttack = false;
+        }
+
+        if (Input.GetButtonDown("Fire1"))
+        {
+            // 🚫 No atacar si estoy dashing (ni buffer)
+            if (playerController != null && playerController.IsDashing)
+                return;
+
+            if (IsRecoiling())
             {
-                // Si pasan 2 segundos sin atacar, volvemos al golpe 1
-                comboIndex = 0;
+                // ✅ Permitimos buffer SOLO durante recoil (opcional)
+                bufferedAttack = true;
+            }
+            else if (attackTimer <= 0f)
+            {
+                PerformAttack();
             }
         }
     }
 
-    public void ExecuteAttackLogic(Vector2 dir)
+    private void PerformAttack()
     {
-        LastAttackDir = dir;
-        // Reiniciamos el reloj de 2 segundos cada vez que atacas
-        comboExpireTimer = comboResetTime;
+        if (playerController != null && playerController.IsDashing)
+            return; // seguridad extra
 
-        // 1. Instanciar Hitbox
+        attackTimer = attackCooldown;
+        comboTimer = comboResetTime;
+        comboIndex++;
+        if (comboIndex > 3) comboIndex = 1;
+
+        LastAttackDir = GetAttackDirection();
+
+        // 🔒 Bloquear completamente el movimiento durante el recoil
+        if (!allowMovementDuringAttack && playerController != null)
+            playerController.canMove = false;
+
+        // === Animator lock de ataque ===
+        if (playerController != null && playerController.animator != null)
+        {
+            playerController.animator.SetBool(isAttackingParam, true);
+            playerController.animator.ResetTrigger(attackTriggerParam);
+            playerController.animator.SetTrigger(attackTriggerParam);
+        }
+
+        // SFX
+        //  if (AudioManager.Instance != null)
+        //  AudioManager.Instance.PlayWithRandomPitch("swing", 0.95f, 1.05f);
+
+        // VFX
+        Vector2 spawnPos = (Vector2)transform.position + LastAttackDir * hitboxOffset;
+        if (slashEffectPrefabs != null && slashEffectPrefabs.Length >= comboIndex)
+        {
+            var slashPrefab = slashEffectPrefabs[comboIndex - 1];
+            if (slashPrefab != null)
+            {
+                var slash = Instantiate(slashPrefab, spawnPos, Quaternion.identity, transform);
+                slash.transform.right = LastAttackDir;
+                Destroy(slash, 0.25f);
+            }
+        }
+
+        // Hitbox
         if (hitboxPrefab != null)
         {
-            Vector2 pos = (Vector2)transform.position + dir * hitboxOffset;
-            var hbGo = Instantiate(hitboxPrefab, pos, Quaternion.identity, transform);
-            var hb = hbGo.GetComponent<AttackHitbox>();
-
-            if (hb != null)
-                hb.Initialize(this, dir, playerController.baseDamage);
+            var hitbox = Instantiate(hitboxPrefab, spawnPos, Quaternion.identity, transform);
+            var hitboxScript = hitbox.GetComponent<AttackHitbox>();
+            if (hitboxScript != null)
+                hitboxScript.knockbackDir = LastAttackDir;
         }
 
-        // 2. Instanciar VFX CORRECTO según el combo
-        if (slashEffectPrefabs != null && slashEffectPrefabs.Length > 0)
-        {
-            // Usamos el comboIndex actual
-            int idx = comboIndex % slashEffectPrefabs.Length;
-
-            GameObject vfxPrefab = slashEffectPrefabs[idx];
-            if (vfxPrefab != null)
-            {
-                Vector2 pos = (Vector2)transform.position + dir * hitboxOffset;
-                float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-                Quaternion rot = Quaternion.AngleAxis(angle, Vector3.forward);
-
-                GameObject vfx = Instantiate(vfxPrefab, pos, rot, transform);
-                Destroy(vfx, 0.3f);
-            }
-        }
+        // Recoil
+        StartRecoil(LastAttackDir);
     }
 
-    public void OnAttackHit()
+    public bool IsRecoiling() => recoilRoutine != null;
+
+    public void ForceStopRecoil()
     {
+        if (recoilRoutine != null)
+        {
+            StopCoroutine(recoilRoutine);
+            recoilRoutine = null;
+        }
+
+        if (rb != null) rb.linearVelocity = Vector2.zero;
+
         if (playerController != null)
+            playerController.canMove = true; // liberar movimiento
+
+        if (playerController != null && playerController.animator != null)
+            playerController.animator.SetBool(isAttackingParam, false); // fin ataque
+    }
+
+    private void StartRecoil(Vector2 dir)
+    {
+        if (recoilRoutine != null) StopCoroutine(recoilRoutine);
+        recoilRoutine = StartCoroutine(Co_Recoil(dir.normalized));
+    }
+
+    private IEnumerator Co_Recoil(Vector2 dir)
+    {
+        int steps = Mathf.Max(1, Mathf.RoundToInt(recoilDuration / Time.fixedDeltaTime));
+        float stepDist = recoilDistance / steps;
+
+        rb.linearVelocity = Vector2.zero;
+
+        // 🔒 Sin movimiento durante todo el recoil
+        for (int i = 0; i < steps; i++)
         {
-            playerController.OnAttackHitEnemy();
+            rb.MovePosition(rb.position + dir * stepDist);
+            yield return new WaitForFixedUpdate();
+        }
+
+        rb.linearVelocity = Vector2.zero;
+
+        // ✅ liberar movimiento y fin de ataque
+        if (playerController != null)
+            playerController.canMove = true;
+
+        if (playerController != null && playerController.animator != null)
+            playerController.animator.SetBool(isAttackingParam, false);
+
+        recoilRoutine = null;
+
+        // Buffer al terminar (si el cooldown ya terminó)
+        if (bufferedAttack && attackTimer <= 0f)
+        {
+            bufferedAttack = false;
+            PerformAttack();
+        }
+        else
+        {
+            bufferedAttack = false;
         }
     }
 
-    // ✅ CAMBIO CLAVE: Preparamos el siguiente índice
-    // Si tenemos 3 ataques, hará 0 -> 1 -> 2 -> 0 -> 1 ...
-    public void AdvanceCombo()
-    {
-        comboIndex++;
-        // Opcional: Si quieres que el combo de 3 golpes se reinicie tras el tercero
-        // aunque sigas spameando click, descomenta la siguiente linea.
-        // if (slashEffectPrefabs.Length > 0) comboIndex %= slashEffectPrefabs.Length;
-    }
-
-    public void ResetCombo() => comboIndex = 0;
-
-    public Vector2 GetAttackDirection()
+    private Vector2 GetAttackDirection()
     {
         Vector2 playerPos = Camera.main.WorldToScreenPoint(transform.position);
         Vector2 mousePos = Input.mousePosition;
         Vector2 dir = (mousePos - playerPos).normalized;
-        if (dir.sqrMagnitude < 0.001f) dir = playerController.lastNonZeroMoveInput;
+        if (dir.sqrMagnitude < 0.0001f) dir = transform.right;
         return dir;
-    }
-
-    public void TriggerHitStop(float duration)
-    {
-        if (isStopActive) return;
-        StartCoroutine(DoHitStop(duration));
-    }
-
-    IEnumerator DoHitStop(float duration)
-    {
-        isStopActive = true;
-        float originalScale = Time.timeScale;
-        Time.timeScale = 0.0f;
-        yield return new WaitForSecondsRealtime(duration);
-        Time.timeScale = originalScale;
-        isStopActive = false;
     }
 }
