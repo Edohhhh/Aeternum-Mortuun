@@ -139,8 +139,11 @@ public class CombatSystem : MonoBehaviour
 
         if (rb != null) rb.linearVelocity = Vector2.zero;
 
+        // Recoil
         if (playerController != null)
-            playerController.canMove = true; // liberar movimiento
+            playerController.stateMachine.ChangeState(playerController.RecoilState);
+        StartRecoil(LastAttackDir);
+
 
         if (playerController != null && playerController.animator != null)
             playerController.animator.SetBool(isAttackingParam, false); // fin ataque
@@ -162,7 +165,9 @@ public class CombatSystem : MonoBehaviour
         // 🔒 Sin movimiento durante todo el recoil
         for (int i = 0; i < steps; i++)
         {
-            rb.MovePosition(rb.position + dir * stepDist);
+            rb.MovePosition(rb.position + (-dir) * stepDist);
+
+
             yield return new WaitForFixedUpdate();
         }
 
@@ -191,9 +196,10 @@ public class CombatSystem : MonoBehaviour
 
     private Vector2 GetAttackDirection()
     {
-        Vector2 playerPos = Camera.main.WorldToScreenPoint(transform.position);
-        Vector2 mousePos = Input.mousePosition;
-        Vector2 dir = (mousePos - playerPos).normalized;
+        // Usar world space es más fiable para direcciones en juego 2D.
+        Vector3 mouseWorld3 = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 mouseWorld = new Vector2(mouseWorld3.x, mouseWorld3.y);
+        Vector2 dir = (mouseWorld - (Vector2)transform.position).normalized;
         if (dir.sqrMagnitude < 0.0001f) dir = transform.right;
         return dir;
     }

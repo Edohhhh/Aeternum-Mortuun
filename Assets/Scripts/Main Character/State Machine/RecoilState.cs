@@ -48,7 +48,10 @@ public class RecoilState : IPlayerState
     {
         // Movimiento de micro-dash en la dirección del ataque
         float speed = distance / duration;
-        ctx.rb.MovePosition(ctx.rb.position + dir * speed * Time.fixedDeltaTime);
+        ctx.rb.MovePosition(ctx.rb.position + (-dir) * speed * Time.fixedDeltaTime);
+
+
+
     }
 
     public void Exit()
