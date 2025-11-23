@@ -8,312 +8,202 @@ using System.Collections;
 public class WeightedRuleta
 {
     public GameObject prefab;
-    [Range(0f, 100f)] public float weight = 1f; // porcentaje/ponderación de aparición
+    [Range(0f, 100f)] public float weight = 1f;
 }
 
 public class WheelSelector : MonoBehaviour
 {
-    [Header("Ruletas ponderadas (elige 3 sin reemplazo por porcentaje)")]
+    [Header("Configuración")]
     [SerializeField] private List<WeightedRuleta> ruletaWeightedPool;
-
-    [Header("Contenedor con HorizontalLayoutGroup")]
     [SerializeField] private Transform ruletaContainer;
-
-    [Header("Texto opcional para debug de selección")]
-    [SerializeField] private TextMeshProUGUI selectedLabel;
-
-    [Header("UI sets (uno por ruleta)")]
     [SerializeField] private List<RuletaUISet> ruletaUISets;
-
-    [Header("Efectos de celebración")]
     [SerializeField] private GameObject confettiPrefab;
 
-    [Header("Controlador de la UI de ruletas")]
-    [SerializeField] private EasyUI.PickerWheelUI.WheelUIController wheelUIController;
-
-
+    [Header("Referencias UI")]
+    [SerializeField] private WheelUIController wheelUIController;
+    [SerializeField] private RewardPopupUI rewardPopup;
 
     private List<PickerWheel> ruletasInstanciadas = new List<PickerWheel>();
     private PickerWheel ruletaSeleccionada;
+    private RuletaUISet uiSetSeleccionado;
+    private WheelPiece premioPendiente;
+
+    // Variables de Spins
+    private int spinsBase = 3;
+    private int spinsTotales;
+    private int spinsRestantes;
 
     public void IniciarSelector()
     {
+        CalcularSpins();
         InstanciarRuletasAleatorias();
+    }
+
+    // ✅ Lógica del Perk ExtraSpin
+    private void CalcularSpins()
+    {
+        int extra = 0;
+        var player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null)
+        {
+            var pc = player.GetComponent<PlayerController>();
+            if (pc != null) extra = pc.extraSpins;
+        }
+        spinsTotales = spinsBase + extra;
+        spinsRestantes = spinsTotales;
     }
 
     public void InstanciarRuletasAleatorias()
     {
-        foreach (Transform child in ruletaContainer)
-            Destroy(child.gameObject);
-
+        foreach (Transform child in ruletaContainer) Destroy(child.gameObject);
         ruletasInstanciadas.Clear();
-        ruletaSeleccionada = null;
 
-        List<WeightedRuleta> candidatos = new List<WeightedRuleta>();
-        foreach (var w in ruletaWeightedPool)
+        List<WeightedRuleta> poolCopia = new List<WeightedRuleta>(ruletaWeightedPool);
+
+        for (int i = 0; i < 3; i++)
         {
-            if (w != null && w.prefab != null && w.weight > 0f)
-                candidatos.Add(w);
-        }
+            if (poolCopia.Count == 0) break;
 
-        if (candidatos.Count < 3)
-        {
-            Debug.LogError("❌ Necesitas al menos 3 ruletas válidas...");
-            return;
-        }
-
-        PlayerController player = null;
-        GameObject playerObj = GameObject.FindWithTag("Player");
-        if (playerObj != null)
-            player = playerObj.GetComponent<PlayerController>();
-
-        if (player == null)
-            Debug.LogError("❌ WheelSelector no pudo encontrar al PlayerController.");
-
-        List<WeightedRuleta> seleccionadas = PickDistinctWeighted(candidatos, 3);
-
-        for (int i = 0; i < seleccionadas.Count; i++)
-        {
-            GameObject obj = Instantiate(seleccionadas[i].prefab, ruletaContainer);
-            obj.name = $"Ruleta {i + 1}";
-
-            PickerWheel wheel = obj.GetComponent<PickerWheel>();
-            if (wheel == null) continue;
-
-            ruletasInstanciadas.Add(wheel);
-
-            if (player != null)
+            WeightedRuleta seleccion = GetRandomWeightedRuleta(poolCopia);
+            if (seleccion != null)
             {
-                wheel.SincronizarSpinsConPlayer(player);
-            }
-
-            wheel.CargarPremiosDesdePoolsPonderados();
-
-            if (i < ruletaUISets.Count && ruletaUISets[i] != null)
-            {
-                ruletaUISets[i].Inicializar(wheel, this);
-            }
-        }
-    }
-
-    private List<WeightedRuleta> PickDistinctWeighted(List<WeightedRuleta> source, int k)
-    {
-        List<WeightedRuleta> pool = new List<WeightedRuleta>(source);
-        List<WeightedRuleta> result = new List<WeightedRuleta>(k);
-
-        for (int picks = 0; picks < k; picks++)
-        {
-            float total = 0f;
-            foreach (var w in pool) total += Mathf.Max(0f, w.weight);
-
-            if (total <= 0f)
-            {
-                result.Add(pool[0]);
-                pool.RemoveAt(0);
-                continue;
-            }
-
-            float r = Random.Range(0f, total);
-            float acc = 0f;
-            int chosenIndex = -1;
-
-            for (int i = 0; i < pool.Count; i++)
-            {
-                acc += Mathf.Max(0f, pool[i].weight);
-                if (r <= acc)
+                GameObject go = Instantiate(seleccion.prefab, ruletaContainer);
+                PickerWheel pw = go.GetComponent<PickerWheel>();
+                if (pw != null)
                 {
-                    chosenIndex = i;
-                    break;
+                    ruletasInstanciadas.Add(pw);
+                    if (i < ruletaUISets.Count)
+                        ruletaUISets[i].Inicializar(pw, this);
                 }
+                poolCopia.Remove(seleccion);
             }
-
-            if (chosenIndex < 0) chosenIndex = pool.Count - 1;
-
-            result.Add(pool[chosenIndex]);
-            pool.RemoveAt(chosenIndex);
         }
-
-        return result;
     }
 
-    public void SeleccionarRuletaDesdeBoton(RuletaUISet seleccionado)
+    private WeightedRuleta GetRandomWeightedRuleta(List<WeightedRuleta> pool)
     {
-        ruletaSeleccionada = seleccionado.linkedWheel;
+        float totalWeight = 0f;
+        foreach (var item in pool) totalWeight += item.weight;
+        float r = Random.Range(0f, totalWeight);
+        float c = 0f;
+        foreach (var item in pool) { c += item.weight; if (r <= c) return item; }
+        return pool.Count > 0 ? pool[0] : null;
+    }
 
-        if (wheelUIController != null)
-        {
-            // Oculta el texto de "Seleccione..."
-            wheelUIController.OcultarTextoInstruccion();
-        }
+    // 1. SELECCIONAR
+    public void SeleccionarRuletaDesdeBoton(RuletaUISet uiSet)
+    {
+        uiSetSeleccionado = uiSet;
+        ruletaSeleccionada = uiSet.linkedWheel;
 
         foreach (var set in ruletaUISets)
         {
-            set.selectButton.interactable = false;
-            set.Activar(set == seleccionado);
+            if (set == uiSetSeleccionado)
+            {
+                set.ModoGiro();
+                // ✅ Actualizar Texto: "GIRAR (3/3)"
+                set.ActualizarTextoSpin(spinsRestantes, spinsTotales);
+            }
+            else
+            {
+                set.Desactivar(true); // Oscurecer las otras
+            }
         }
 
-        Debug.Log($"🎯 Ruleta seleccionada: {ruletaSeleccionada.name}");
+        if (wheelUIController != null) wheelUIController.ActualizarInstruccion("¡Haz girar la ruleta!");
     }
 
-    public void SeleccionarRuleta(PickerWheel seleccionada)
-    {
-        ruletaSeleccionada = seleccionada;
-        if (selectedLabel != null)
-            selectedLabel.text = $"Seleccionada: {seleccionada.name}";
-        Debug.Log($"🎯 Ruleta seleccionada: {seleccionada.name}");
-    }
-
+    // 2. GIRAR
     public void SpinRuleta(PickerWheel wheel)
     {
-        if (wheel != null && !wheel.IsSpinning && wheel.UsosRestantes > 0)
+        if (wheel == null) return;
+        if (wheel.IsSpinning) return;
+
+        // No permitir girar si ya no quedan spins
+        if (spinsRestantes <= 0) return;
+
+        // Restamos visualmente
+        spinsRestantes--;
+
+        if (uiSetSeleccionado != null)
         {
-            foreach (var set in ruletaUISets)
-            {
-                if (set.linkedWheel == wheel && set.confirmButton != null)
-                    set.confirmButton.interactable = false;
-            }
-
-            wheel.Spin();
-
-            wheel.AddSpinEndListener((_) =>
-            {
-                foreach (var set in ruletaUISets)
-                {
-                    if (set.linkedWheel == wheel)
-                    {
-                        set.ActualizarTextoSpin();
-                        if (set.confirmButton != null)
-                            set.confirmButton.interactable = true;
-                    }
-                }
-            });
-
-            if (wheel.UsosRestantes == 1)
-            {
-                wheel.AddSpinEndListener((_) =>
-                {
-                    foreach (var set in ruletaUISets)
-                    {
-                        if (set.linkedWheel == wheel)
-                            set.ActualizarTextoSpin();
-                    }
-                    if (wheel.UsosRestantes <= 0)
-                    {
-                        foreach (var set in ruletaUISets)
-                        {
-                            if (set.linkedWheel == wheel)
-                            {
-                                if (set.spinButton != null)
-                                    set.spinButton.interactable = false;
-                                if (set.confirmButton != null)
-                                    set.confirmButton.interactable = true;
-                            }
-                        }
-                    }
-                });
-            }
+            uiSetSeleccionado.ModoGirando();
+            uiSetSeleccionado.ActualizarTextoSpin(spinsRestantes, spinsTotales);
         }
+
+        wheel.onSpinEndEvent = (piece) =>
+        {
+            premioPendiente = piece;
+
+            // ✅ Si aún quedan spins, permitir volver a girar o confirmar
+            if (spinsRestantes > 0)
+            {
+                if (uiSetSeleccionado != null)
+                    uiSetSeleccionado.ModoSpinYConfirmar();
+
+                if (wheelUIController != null)
+                    wheelUIController.ActualizarInstruccion("Puedes volver a girar o confirmar la recompensa.");
+            }
+            else
+            {
+                // ✅ Sin spins restantes: solo confirmar
+                if (uiSetSeleccionado != null)
+                    uiSetSeleccionado.ModoConfirmar();
+
+                if (wheelUIController != null)
+                    wheelUIController.ActualizarInstruccion("¡Confirma tu recompensa!");
+            }
+        };
+
+        wheel.Spin();
     }
 
-    public void ConfirmarRuleta(PickerWheel wheel)
+    // 3. CONFIRMAR (Cierre Instantáneo)
+    public void ConfirmarPremio()
     {
-        // Limpiar "AcidPoollChico(Clone)"
-        string targetName = "AcidPoollChico(Clone)";
-        GameObject[] allObjects = GameObject.FindObjectsOfType<GameObject>();
-        int count = 0;
-        foreach (GameObject obj in allObjects)
+        if (premioPendiente == null) return;
+
+        // Aplicar Efecto
+        if (premioPendiente.Effect != null)
         {
-            if (obj.name == targetName)
+            var player = GameObject.FindGameObjectWithTag("Player");
+            if (player != null)
             {
-                GameObject.Destroy(obj);
-                count++;
+                premioPendiente.Effect.Apply(player);
+                var pc = player.GetComponent<PlayerController>();
+                if (pc != null) pc.SavePlayerData();
             }
         }
-        if (count > 0)
-            Debug.Log($"🧹 Se eliminaron {count} objetos '{targetName}'.");
 
-
-        // Lógica de confirmación original
-        if (wheel == null)
+        // Popup (Quedará en pantalla mientras juegas)
+        if (rewardPopup != null)
         {
-            Debug.LogWarning("⚠️ No se asignó ruleta.");
-            return;
+            string name = (premioPendiente.Effect != null) ? premioPendiente.Effect.label : premioPendiente.Label;
+            string desc = (premioPendiente.Effect != null) ? premioPendiente.Effect.description : "";
+            rewardPopup.ShowReward(premioPendiente.Icon, name, desc);
         }
 
-        wheel.AplicarUltimoPremio();
-        wheel.MostrarPopupUltimoPremio();
-
+        // Confetti
         if (confettiPrefab != null)
         {
             confettiPrefab.SetActive(true);
-            ParticleSystem ps = confettiPrefab.GetComponent<ParticleSystem>();
-            float duracion = 2f;
-            if (ps != null)
-                duracion = ps.main.duration + ps.main.startLifetime.constantMax;
-            StartCoroutine(DesactivarConfetti(confettiPrefab, duracion));
+            StartCoroutine(DesactivarConfetti(confettiPrefab, 2f));
         }
 
-        GameObject player = GameObject.FindWithTag("Player");
-        if (player != null)
-        {
-            PlayerController playerController = player.GetComponent<PlayerController>();
-            if (playerController != null)
-            {
-                GameDataManager.Instance.SavePlayerData(playerController);
-                Debug.Log("📦 Datos del jugador guardados tras confirmar ruleta.");
-            }
-            else
-                Debug.LogError("❌ No se encontró PlayerController en el objeto del jugador.");
-        }
-        else
-            Debug.LogError("❌ No se encontró GameObject con tag 'Player'.");
+        // ✅ CIERRE INSTANTÁNEO:
+        // 1. Ocultamos la UI de ruleta YA.
+        if (wheelUIController != null) wheelUIController.OcultarTodo();
 
-        //RoomManager.Instance.LoadNextRoomWithDelay();
+        // 2. Reanudamos el juego YA.
+        Time.timeScale = 1f;
 
-        foreach (var set in ruletaUISets)
-        {
-            if (set != null)
-                set.Activar(false);
-        }
-
-        if (wheelUIController != null)
-        {
-            wheelUIController.ConfirmarPremio();
-        }
-        else
-        {
-            Debug.LogWarning("⚠️ No se asignó WheelUIController en WheelSelector.");
-        }
+        // 3. Si hay cambio de sala, lo activamos
+        if (RoomManager.Instance != null) RoomManager.Instance.LoadNextRoomWithDelay();
     }
 
     private IEnumerator DesactivarConfetti(GameObject confetti, float delay)
     {
-        yield return new WaitForSeconds(delay);
+        yield return new WaitForSeconds(delay); // TimeScale ya es 1, usamos Seconds normal
         confetti.SetActive(false);
-    }
-
-    public void SpinRuletaSeleccionada()
-    {
-        if (ruletaSeleccionada != null && !ruletaSeleccionada.IsSpinning)
-            ruletaSeleccionada.Spin();
-    }
-
-    // ✅ --- LÍNEAS CORREGIDAS ---
-    // Faltaba "public void" y había texto basura
-    public void ConfirmarRuletaSeleccionada()
-    {
-        if (ruletaSeleccionada != null)
-        {
-            WheelPiece premio = ruletaSeleccionada.ObtenerUltimoPremio();
-            if (premio != null)
-                Debug.Log($"✅ Premio confirmado: {premio.Label} x{premio.Amount}");
-        }
-    }
-    // ✅ --- FIN DE LA CORRECCIÓN ---
-
-    public void MostrarNombreRuletaSeleccionada()
-    {
-        if (ruletaSeleccionada != null)
-            Debug.Log($"🧩 Ruleta seleccionada es: {ruletaSeleccionada.name}");
     }
 }

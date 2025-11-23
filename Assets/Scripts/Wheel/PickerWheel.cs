@@ -75,7 +75,7 @@ namespace EasyUI.PickerWheelUI
 
         public Action<WheelPiece> OnSpinEnd;
         private UnityAction onSpinStartEvent;
-        private UnityAction<WheelPiece> onSpinEndEvent;
+        public UnityAction<WheelPiece> onSpinEndEvent;
 
         private Vector2 pieceMinSize = new Vector2(81f, 146f);
         private Vector2 pieceMaxSize = new Vector2(144f, 213f);

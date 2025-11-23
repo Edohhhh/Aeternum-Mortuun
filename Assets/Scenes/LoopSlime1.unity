@@ -393,13 +393,13 @@ MonoBehaviour:
   - prefab: {fileID: 531529343062115860, guid: b2900017f85b68f42a792aa741f69ba9, type: 3}
     weight: 55.5
   ruletaContainer: {fileID: 588630248}
-  selectedLabel: {fileID: 0}
   ruletaUISets:
   - {fileID: 576635356}
   - {fileID: 1174474507}
   - {fileID: 328972266}
   confettiPrefab: {fileID: 1364281512}
   wheelUIController: {fileID: 1749465130}
+  rewardPopup: {fileID: 0}
 --- !u!4 &86721582
 Transform:
   m_ObjectHideFlags: 0
@@ -17564,7 +17564,9 @@ MonoBehaviour:
   selectButton: {fileID: 0}
   spinButton: {fileID: 0}
   confirmButton: {fileID: 0}
+  rerollButton: {fileID: 0}
   spinButtonText: {fileID: 0}
+  rerollButtonText: {fileID: 0}
 --- !u!114 &328972267
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18624,7 +18626,9 @@ MonoBehaviour:
   selectButton: {fileID: 0}
   spinButton: {fileID: 0}
   confirmButton: {fileID: 0}
+  rerollButton: {fileID: 0}
   spinButtonText: {fileID: 0}
+  rerollButtonText: {fileID: 0}
 --- !u!114 &576635357
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24436,7 +24440,9 @@ MonoBehaviour:
   selectButton: {fileID: 0}
   spinButton: {fileID: 0}
   confirmButton: {fileID: 0}
+  rerollButton: {fileID: 0}
   spinButtonText: {fileID: 0}
+  rerollButtonText: {fileID: 0}
 --- !u!114 &1174474508
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26278,7 +26284,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   canMove: 1
   moveSpeed: 4
-  baseDamage: 1
+  baseDamage: 1000
   extraSpins: 0
   dashSpeed: 10
   dashIframes: 10
@@ -26291,11 +26297,6 @@ MonoBehaviour:
   initialPowerUps: []
   lastNonZeroMoveInput: {x: 1, y: 0}
   dashCooldownTimer: 0
-  knockbackDecay: 18
-  knockbackMaxSpeed: 22
-  knockbackStackWindow: 0.08
-  knockbackInterruptsDash: 1
-  knockbackInterruptsRecoil: 1
 --- !u!61 &1715398195
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -26474,17 +26475,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attackCooldown: 0.3
+  comboResetTime: 2
+  recoilDistance: 0.3
+  recoilDuration: 0.08
+  hitRecoilForce: 15
+  hitRecoilDuration: 0.15
   slashEffectPrefabs:
   - {fileID: 5981503115607741876, guid: 5400789b52072424799cb86f9becbd26, type: 3}
   - {fileID: 5981503115607741876, guid: cff7b82d5ba8caa478fd213024a1d5f9, type: 3}
   - {fileID: 5981503115607741876, guid: 4fc220dea784a134a93fe3100cb0d0f0, type: 3}
   hitboxPrefab: {fileID: 4335963568038847909, guid: cef6cbe95f78f9c478521dd7f4133bd4, type: 3}
   hitboxOffset: 0.99
-  recoilDistance: 0.3
-  recoilDuration: 0.08
-  allowMovementDuringAttack: 0
-  attackTriggerParam: attackTrigger
-  isAttackingParam: isAttacking
 --- !u!61 &1715398201
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -27156,9 +27157,7 @@ MonoBehaviour:
   - {fileID: 576635355}
   - {fileID: 309051787}
   - {fileID: 1729880624}
-  startActive: 0
   wheelSelector: {fileID: 86721581}
-  floatingText: {fileID: 0}
   textoInstruccion: {fileID: 396520001}
 --- !u!4 &1749465131
 Transform:
